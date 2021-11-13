@@ -38,6 +38,8 @@ AbstractType* Evaluator::evalList(ListType* l, Environment* env)
 
 ListType* Evaluator::listOfValues(ListType* l, Environment *env)
 {
+    if(Helper::isEmpty(l))
+        return l;
     ListType* root = new ListType();
     ListType* current = root;
     AbstractType* remain = Helper::foreach(l, [&](AbstractType* o) {

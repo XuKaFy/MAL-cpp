@@ -58,7 +58,8 @@ AbstractType* Analyzer::list()
         current = Helper::append(current, elem());
         delSpace();
     }
-    current->setList(List{Helper::car(current), new ListType()});
+    if(Helper::car(current) != nullptr)
+        current->setList(List{Helper::car(current), new ListType()});
     match(")");
     return root;
 }
