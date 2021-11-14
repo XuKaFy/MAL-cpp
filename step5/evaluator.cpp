@@ -2,16 +2,20 @@
 
 AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
 {
-    return eval(o, env, false);
+    return eval(o, env, true, true);
 }
 
-AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco)
+AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
 {
+    // (begin (begin (+ 1 2) (* 3 4)) (begin (+ 5 6) (* 7 8)))
+    printf("<EVAL> %s\n", Printer::print(o).c_str());
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o))
         return o;
-    if(fco)
+    if(!root && fco) {
+        puts("</EVAL> Jump out once");
         throw (StackFrame{o, env});
+    }
     try {
         switch(o->type()) {
         case Type::TYPE_ATOM:
@@ -26,6 +30,7 @@ LABEL_AGAIN:
         env = s.env;
         goto LABEL_AGAIN;
     }
+    puts("</EVAL>");
     return new AbstractType();
 }
 
@@ -160,7 +165,7 @@ AbstractType* Evaluator::funIf(ListType* o, Environment *env, bool fco)
         if(!Helper::isEmpty(o))
             throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
     }
-    if(Helper::isTrue(eval(a1, env, fco))) {
+    if(Helper::isTrue(eval(a1, env, false))) {
         return eval(a2, env, fco);
     } else if(a3 != nullptr) {
         return eval(a3, env, fco);
@@ -175,7 +180,7 @@ AbstractType* Evaluator::funIf2(ListType* o, Environment *env, bool fco)
     if(!Helper::isEmpty(o)) {
         throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
     }
-    if(Helper::isTrue(eval(a1, env, fco))) {
+    if(Helper::isTrue(eval(a1, env, false))) {
         return eval(a2, env, fco);
     }
     return nullptr;
@@ -202,9 +207,9 @@ AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
 {
     if(Helper::isEmpty(o) || !Helper::isList(o))
         throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
-    AbstractType* result;
-    Helper::foreach(o, [&](AbstractType* m) {
-        result = eval(m, env, fco); // ### last fco is true, otherwise false
-    });
-    return result;
+    while(!Helper::isLast(o)) {
+        eval(Helper::car(o), env, false);
+        Helper::next(o);
+    }
+    return eval(Helper::car(o), env, fco);
 }

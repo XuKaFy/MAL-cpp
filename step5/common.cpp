@@ -279,11 +279,11 @@ AbstractType* Helper::foreach(ListType* o, std::function<void(AbstractType* o)> 
 {
     if(isEmpty(o))
         return o;
-    f(car(o));
     while(!isLast(o)) {
-        next(o);
         f(car(o));
+        next(o);
     }
+    f(car(o));
     return cdr(o);
 }
 

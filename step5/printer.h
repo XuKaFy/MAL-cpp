@@ -7,20 +7,20 @@
 class Printer
 {
 public:
-    String print(AbstractType *obj);
-    String printWithEscape(StringType* str);
+    static String print(AbstractType *obj);
+    static String printWithEscape(StringType* str);
 
 private:
-    String escape();
-    int hexNumber(String::value_type c);
-    int octNumber(String::value_type c);
+    static String escape();
+    static int hexNumber(String::value_type c);
+    static int octNumber(String::value_type c);
 
-    String castNumber(Number n);
-    String castAtom(Atom n);
-    String castList(ListType *n);
-    String castBuildinFunction(BuildinFunctionType *n);
-    String castString(String n);
-    String castLambda(LambdaType* n);
+    static String castNumber(Number n);
+    static String castAtom(Atom n);
+    static String castList(ListType *n);
+    static String castBuildinFunction(BuildinFunctionType *n);
+    static String castString(String n);
+    static String castLambda(LambdaType* n);
 };
 
 #endif // PRINTER_H
