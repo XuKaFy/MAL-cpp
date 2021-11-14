@@ -1,7 +1,7 @@
 cc = g++
-prom = step1_read_print
-deps = reader.h printer.h evaluator.h environment.h common.h
-obj = step1_read_print.o reader.o printer.o evaluator.o environment.o common.o
+prom = main
+deps = reader.h printer.h evaluator.h environment.h common.h core.h
+obj = main.o reader.o printer.o evaluator.o environment.o common.o core.o
  
 $(prom): $(obj)
     $(cc) -o $(prom) $(obj)

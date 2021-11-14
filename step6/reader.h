@@ -51,7 +51,7 @@ private:
 class Reader
 {
 public:
-    AbstractType* read(String s);
+    static AbstractType* read(String s);
 };
 
 #endif // READER_H

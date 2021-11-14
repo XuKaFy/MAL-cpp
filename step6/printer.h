@@ -8,7 +8,7 @@ class Printer
 {
 public:
     static String print(AbstractType *obj);
-    static String printWithEscape(StringType* str);
+    static String printWithEscape(String str);
 
 private:
     static String escape();

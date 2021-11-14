@@ -5,6 +5,7 @@
 #include "reader.h"
 #include "evaluator.h"
 #include "printer.h"
+#include "core.h"
 #include "common.h"
 
 class Interface {
@@ -16,12 +17,11 @@ public:
         return str;
     }
     AbstractType* eval(String exp) {
-        AbstractType* root = reader.read(exp);
+        AbstractType* root = Reader::read(exp);
         return evaluator.eval(root, &environment);
-        //return root;
     }
     void print(AbstractType* obj) {
-        std::cout << printer.print(obj) << std::endl;
+        std::cout << Printer::print(obj) << std::endl;
     }
     bool rep() {
         String str;
@@ -31,7 +31,6 @@ public:
         } catch(Exception e) {
             return false;
         }
-        //std::cout << "--- READ END ---" << std::endl;
         print(eval(str));
         return true;
     }
@@ -95,241 +94,15 @@ public:
         }
     }
     void generateMainEnvironment() {
-        environment.setValue("+", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                Number num = 0;
-                Helper::foreach(o, [&](AbstractType* o) {
-                    num += Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
-                });
-                return new NumberType(num);
-            },
-            "+"
-        ));
-        environment.setValue("*", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                Number num = 1;
-                Helper::foreach(o, [&](AbstractType* o) {
-                    num *= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
-                });
-                return new NumberType(num);
-            },
-            "*"
-        ));
-        environment.setValue("-", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
-                            ->number();
-                Helper::next(o);
-                Helper::foreach(o, [&](AbstractType* o) {
-                    num -= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
-                });
-                return new NumberType(num);
-            },
-            "-"
-        ));
-        environment.setValue("/", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
-                            ->number();
-                Helper::next(o);
-                Helper::foreach(o, [&](AbstractType* o) {
-                    num /= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
-                });
-                return new NumberType(num);
-            },
-            "/"
-        ));
-        environment.setValue("car", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                AbstractType* ans = Helper::car(Helper::convert<ListType*>(Helper::car(o), Type::TYPE_LIST));
-                if(ans == nullptr)
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                return ans;
-            },
-            "car"
-        ));
-        environment.setValue("cdr", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                AbstractType* ans = Helper::cdr(Helper::convert<ListType*>(Helper::car(o), Type::TYPE_LIST));
-                if(ans == nullptr)
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                return ans;
-            },
-            "cdr"
-        ));
-        environment.setValue("atom", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::atom(Helper::car(o)))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "atom"
-        ));
-        environment.setValue("cons", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                return Helper::cons(a1, a2);
-            },
-            "cons"
-        ));
-        environment.setValue("eq", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::eq(a1, a2))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "eq"
-        ));
-        environment.setValue("list", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                return o;
-            },
-            "list"
-        ));
-        environment.setValue("empty?", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::isEmpty(Helper::car(o)))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "empty?"
-        ));
-        environment.setValue("list?", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                AbstractType* arg = Helper::car(o);
-                if(arg->type() != Type::TYPE_LIST)
-                    return Helper::constantFalse();
-                if(Helper::isList(Helper::convert<ListType*>(o)))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "list?"
-        ));
-        environment.setValue("true?", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::isTrue(Helper::car(o)))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "true?"
-        ));
-        environment.setValue("false?", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::isFalse(Helper::car(o)))
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "false?"
-        ));
-        environment.setValue(">", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
-                if(b1 > b2)
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            ">"
-        ));
-        environment.setValue("<", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
-                if(b1 < b2)
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "<"
-        ));
-        environment.setValue(">=", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
-                if(b1 >= b2)
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            ">="
-        ));
-        environment.setValue("<=", new BuildinFunctionType(
-            [](ListType* o) -> AbstractType* {
-                AbstractType* a1 = Helper::get(o);
-                AbstractType* a2 = Helper::get(o);
-                if(!Helper::isEmpty(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
-                if(b1 <= b2)
-                    return Helper::constantTrue();
-                return Helper::constantFalse();
-            },
-            "<="
-        ));
-        environment.setValue("print", new BuildinFunctionType(
-            [&](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::car(o)->type() == Type::TYPE_STRING)
-                    std::cout << printer.printWithEscape(
-                        Helper::convert<StringType*>(Helper::car(o)));    
-                else
-                    std::cout << printer.print(Helper::car(o));
-                return new AbstractType();
-            },
-            "print"
-        ));
-        environment.setValue("println", new BuildinFunctionType(
-            [&](ListType* o) -> AbstractType* {
-                if(Helper::isEmpty(o) || !Helper::isSingle(o))
-                    throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                if(Helper::car(o)->type() == Type::TYPE_STRING)
-                    std::cout << printer.printWithEscape(
-                        Helper::convert<StringType*>(Helper::car(o))) << std::endl;    
-                else
-                    std::cout << printer.print(Helper::car(o)) << std::endl;
-                return new AbstractType();
-            },
-            "println"
-        ));
+        Core::registerBasicFunction(&environment);
+        Core::registerFunction(&environment, "eval", QUOTEFUNCTION(o) {
+            SINGLE(it, o);
+            return evaluator.eval(it, &environment);
+        });
     }
 
 private:
-    Reader reader;
     Evaluator evaluator;
-    Printer printer;
     Environment environment;
 } interface;
 

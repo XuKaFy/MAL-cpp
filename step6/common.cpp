@@ -158,25 +158,24 @@ bool Helper::eq(AbstractType* a1, AbstractType* a2)
         return false;
     switch(a1->type()) {
     case Type::TYPE_ATOM:
-        return convert<AtomType*>(a1)->atom() == convert<AtomType*>(a2)->atom();
+        return GETATOM(a1) == GETATOM(a2);
     case Type::TYPE_BUILDIN_FUNCTION:
-        return convert<BuildinFunctionType*>(a1)->name() 
-            == convert<BuildinFunctionType*>(a2)->name();
+        return GETBUILDIN(a1)->name() == GETBUILDIN(a2)->name();
     case Type::TYPE_LIST:
-        if(!eq(car(convert<ListType*>(a1)), car(convert<ListType*>(a2))))
+        if(!eq(car(GETLIST(a1)), car(GETLIST(a2))))
             return false;
-        if(!eq(cdr(convert<ListType*>(a1)), cdr(convert<ListType*>(a2))))
+        if(!eq(cdr(GETLIST(a1)), cdr(GETLIST(a2))))
             return false;
         return true;
     case Type::TYPE_NULL:
         return true;
     case Type::TYPE_NUMBER:
-        return convert<NumberType*>(a1)->number() == convert<NumberType*>(a2)->number();
+        return GETNUMBER(a1) == GETNUMBER(a2);
     case Type::TYPE_STRING:
-        return convert<StringType*>(a1)->string() == convert<StringType*>(a2)->string();  
+        return GETSTRING(a1) == GETSTRING(a2);
     case Type::TYPE_LAMBDA:
-        return convert<LambdaType*>(a1)->body() == convert<LambdaType*>(a2)->body()
-                && convert<LambdaType*>(a1)->arg() == convert<LambdaType*>(a2)->arg();  
+        return GETLAMBDA(a2)->body() ==GETLAMBDA(a2)->body()
+                && GETLAMBDA(a1)->arg() == GETLAMBDA(a2)->arg();  
     }
     return new AbstractType();
 }
@@ -197,14 +196,14 @@ AbstractType* Helper::get(ListType*& o)
 
 void Helper::next(ListType *& o)
 {
-    o = convert<ListType*>(cdr(o), Type::TYPE_LIST);
+    o = GETLIST(cdr(o));
 }
 
 bool Helper::isEmpty(AbstractType *o)
 {
     if(o->type() != Type::TYPE_LIST)
         return false;
-    ListType* l = convert<ListType*>(o);
+    ListType* l = GETLIST(o);
     return car(l) == nullptr && cdr(l) == nullptr;
 }
 
@@ -220,7 +219,7 @@ bool Helper::isLast(ListType *o)
 bool Helper::isList(ListType* o)
 {
     if(!isLast(o))
-        return isList(convert<ListType*>(cdr(o), Type::TYPE_LIST));
+        return isList(GETLIST(cdr(o)));
     return isSingle(o);
 }
 
@@ -261,7 +260,7 @@ bool Helper::isFlat(ListType* o)
     if(car(o)->type() != Type::TYPE_ATOM)
         return false;
     if(!isLast(o))
-        return isFlat(convert<ListType*>(cdr(o), Type::TYPE_LIST));
+        return isFlat(GETLIST(cdr(o)));
     return isSingle(o);
 }
 

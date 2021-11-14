@@ -6,6 +6,43 @@
 #include <vector>
 #include <functional>
 
+#define GETNUMBER(o) (Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number())
+#define GETSTRING(o) (Helper::convert<StringType*>(o, Type::TYPE_STRING)->string())
+#define GETATOM(o) (Helper::convert<AtomType*>(o, Type::TYPE_ATOM)->atom())
+#define GETBUILDIN(o) (Helper::convert<BuildinFunctionType*>(o, Type::TYPE_BUILDIN_FUNCTION))
+#define GETLAMBDA(o) (Helper::convert<LambdaType*>(o, Type::TYPE_LAMBDA))
+#define GETLIST(o) (Helper::convert<ListType*>(o, Type::TYPE_LIST))
+
+#define CAR(o) (Helper::car(o))
+#define CDR(o) (Helper::cdr(o))
+#define CONS(a1, a2) (Helper::cons(a1, a2))
+#define EQ(a1, a2) (Helper::eq(a1, a2))
+#define ISEMPTY(o) (Helper::isEmpty(o))
+#define ISLIST(o) (Helper::isList(o))
+#define ISTRUE(o) (Helper::isTrue(o))
+#define ISFALSE(o) (Helper::isFalse(o))
+
+#define GET(o) (Helper::get(o))
+#define SINGLE(ans, o) \
+    if(Helper::isEmpty(o) || !Helper::isSingle(o)) \
+        throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR; \
+    AbstractType* ans = CAR(o);
+#define DOUBLE(a1, a2, o) \
+    AbstractType* a1 = GET(o); \
+    AbstractType* a2 = GET(o); \
+    if(!Helper::isEmpty(o)) \
+        throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
+#define NONEARG(o) \
+    if(!Helper::isEmpty(o)) \
+        throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
+#define FUNCTION(o) [](ListType* o) -> AbstractType*
+#define QUOTEFUNCTION(o) [&](ListType* o) -> AbstractType*
+#define FOREACH(o, m, block) (Helper::foreach(m, [&](AbstractType* o) block))
+
+#define TRUE (Helper::constantTrue())
+#define FALSE (Helper::constantFalse())
+#define IF(x) ((x) ? TRUE : FALSE)
+
 class AbstractType;
 class NumberType;
 class AtomType;

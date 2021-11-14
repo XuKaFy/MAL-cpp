@@ -44,10 +44,8 @@ int Printer::octNumber(String::value_type c)
     return ans;
 }
 
-String Printer::printWithEscape(StringType* str)
+String Printer::printWithEscape(String s)
 {
-    // (define f (lambda () (print "hello\n\"world")))
-    String s = str->string();
     String ans;
     for(size_t i=0; i<s.size(); ++i) {
         if(s[i] != '\\') {
