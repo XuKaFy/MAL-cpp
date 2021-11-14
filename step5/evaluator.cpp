@@ -7,6 +7,8 @@ AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
 
 AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
 {
+    // (define sum (lambda (x) (if (empty? x) 0 (+ (car x) (sum (cdr x))))))
+    // (sum (list 1 2 3))
     // (begin (begin (+ 1 2) (* 3 4)) (begin (+ 5 6) (* 7 8)))
     //printf("<EVAL> %s\n", Printer::print(o).c_str());
 LABEL_AGAIN:
@@ -19,7 +21,7 @@ LABEL_AGAIN:
     try {
         switch(o->type()) {
         case Type::TYPE_ATOM:
-            return eval(env->getValue(Helper::convert<AtomType*>(o)->atom()), env, fco);
+            return env->getValue(Helper::convert<AtomType*>(o)->atom());
         case Type::TYPE_LIST:
             return evalList(Helper::convert<ListType*>(o), env, fco);
         default:

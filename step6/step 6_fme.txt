@@ -1,0 +1,11 @@
+在第六步中加入一些字符串操作和自引用：
+
+	(read-string)：从stdin读入字符串
+	(slurp ...)：你可以理解为linux下的cat？
+	(read)：从stdin读入一个lisp串，相当于调用了Reader::read(...)
+	(eval ...)：执行一个lisp串，相当于调用了Evaluator::eval(...)
+
+其中直接用lisp实现的是：
+
+	(load-file ...)：从文件读入
+		(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))
