@@ -115,6 +115,8 @@ bool Analyzer::isSymbol(String::value_type c)
     if(c == '<') return true;
     if(c == '>') return true;
     if(c == '=') return true;
+    if(c == '?') return true;
+    if(c == '!') return true;
     return false;
 }
 
