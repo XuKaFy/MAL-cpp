@@ -34,10 +34,10 @@ AbstractType* Evaluator::evalList(ListType* l, Environment* env)
         } else if(name == "lambda") {
             Helper::next(l);
             return funLambda(l, env);
-        } else if(name == "def!") {
+        } else if(name == "define") {
             Helper::next(l);
             return funDef(l, env);
-        } else if(name == "let*") {
+        } else if(name == "let") {
             Helper::next(l);
             return funLet(l, env);
         }
@@ -46,16 +46,36 @@ AbstractType* Evaluator::evalList(ListType* l, Environment* env)
     Helper::next(l);
     switch(fun->type()) {
     case Type::TYPE_BUILDIN_FUNCTION:
-        return Helper::convert<BuildinFunctionType*>(fun, Type::TYPE_BUILDIN_FUNCTION)
+        return Helper::convert<BuildinFunctionType*>(fun)
             ->process(listOfValues(l, env));
         break;
-    case Type::TYPE_LIST:
-        // will write
-        break;
+    case Type::TYPE_LAMBDA:
+        return evalLambda(Helper::convert<LambdaType*>(fun), listOfValues(l, env), env);
     default:
         throw Exception::EXP_EVAL_CANNOT_EXECUTE;
     }
     return new AbstractType();
+}
+
+AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env)
+{
+    Environment* childEnv = new Environment(env);
+    if(!Helper::isList(args) && !Helper::isEmpty(args))
+        throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
+    ListType* lamPointer = lam->arg();
+    ListType* argsPointer = args;
+    while(!Helper::isEmpty(lamPointer) && !Helper::isEmpty(argsPointer)) {
+        Atom name = Helper::convert<AtomType*>(Helper::car(lamPointer))->atom();
+        AbstractType* val = Helper::car(argsPointer);
+        childEnv->setValue(name, val);
+        Helper::next(lamPointer);
+        Helper::next(argsPointer);
+    }
+    if(!Helper::isEmpty(lamPointer) || !Helper::isEmpty(argsPointer))
+        throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+    return eval(lam->body(), childEnv); 
+    // ((lambda (x y) (+ (* x x) (* y y))) 2 6)
+    // ((lambda () (+ (* 2 2) (* 3 3))))
 }
 
 ListType* Evaluator::listOfValues(ListType* l, Environment *env)

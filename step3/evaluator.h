@@ -11,6 +11,8 @@ public:
 
 private:
     AbstractType* evalList(ListType* o, Environment* env);
+    AbstractType* evalLambda(LambdaType* lam, ListType* args, Environment* env);
+
     ListType* listOfValues(ListType* o, Environment* env);
 
     AbstractType* funQuote(ListType* o);
