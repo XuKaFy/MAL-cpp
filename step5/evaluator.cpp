@@ -8,12 +8,12 @@ AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
 AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
 {
     // (begin (begin (+ 1 2) (* 3 4)) (begin (+ 5 6) (* 7 8)))
-    printf("<EVAL> %s\n", Printer::print(o).c_str());
+    //printf("<EVAL> %s\n", Printer::print(o).c_str());
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o))
         return o;
     if(!root && fco) {
-        puts("</EVAL> Jump out once");
+        //puts("</EVAL> Jump out once");
         throw (StackFrame{o, env});
     }
     try {
@@ -30,7 +30,7 @@ LABEL_AGAIN:
         env = s.env;
         goto LABEL_AGAIN;
     }
-    puts("</EVAL>");
+    //puts("</EVAL>");
     return new AbstractType();
 }
 
@@ -208,7 +208,7 @@ AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
     if(Helper::isEmpty(o) || !Helper::isList(o))
         throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
     while(!Helper::isLast(o)) {
-        eval(Helper::car(o), env, false);
+        eval(Helper::car(o), env, true, true);
         Helper::next(o);
     }
     return eval(Helper::car(o), env, fco);
