@@ -65,9 +65,9 @@ String Printer::castBuildinFunction(BuildinFunctionType* n)
 
 String Printer::castLambda(LambdaType* n)
 {
-    String ans = "(";
+    String ans = "#<lambda:(";
     ans += print_str(n->arg());
     ans += " " + print_str(n->body());
-    ans += ")";
+    ans += ")>";
     return ans;
 }

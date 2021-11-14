@@ -239,6 +239,8 @@ bool Helper::isSelfEvaluating(AbstractType* o)
         return true;
     if(o->type() == Type::TYPE_BUILDIN_FUNCTION)
         return true;
+    if(o->type() == Type::TYPE_LAMBDA)
+        return true;
     return false;
 }
 

@@ -167,6 +167,8 @@ AbstractType* Evaluator::funDef(ListType* o, Environment *env)
     a2 = eval(a2, env);
     env->setValue(Helper::convert<AtomType*>(a1, Type::TYPE_ATOM)->atom(), a2);
     return a2;
+    // (define sqr (lambda (x) (* x x)))
+    // (sqr 50)
 }
 
 AbstractType* Evaluator::funLet(ListType* o, Environment *env)
