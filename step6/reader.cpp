@@ -51,7 +51,7 @@ AbstractType* Analyzer::atom()
 
 AbstractType* Analyzer::list()
 {
-    match("(");
+    match('(');
     ListType* root = new ListType();
     ListType* current = root;
     while(remain() && lookahead() != ')') {
@@ -60,7 +60,7 @@ AbstractType* Analyzer::list()
     }
     if(Helper::car(current) != nullptr)
         current->setList(List{Helper::car(current), new ListType()});
-    match(")");
+    match(')');
     return root;
 }
 
