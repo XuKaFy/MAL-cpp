@@ -1,16 +1,17 @@
 在第六步中加入一些字符串操作和自引用：
 
+	*注意：这些函数可能和manual的实现差别很大。
 	(read)：读入一个lisp串，相当于调用了Reader::read(...)
-	(read-string)：读入一行字符串
 	(print)：输出一个lisp串，相当于调用了Printer::print(...)
-	(print-string ...)：输出字符串，会转义
+	(read-string)：读入一行字符串
+	(print-string ...)：输出字符串，会转义（对应manual里的prn）
+	(join-string ...)：返回直接拼接的字符串
+	(translate-from-string ...)：将字符串翻译为lisp串
+	(translate-to-string ...)：将lisp串翻译为字符串
+	(read-file ...)：读入整个文件字符串
+	(write-file ...)：将一个lisp串输出到文件
 
 	(eval ...)：执行一个lisp串，相当于调用了Evaluator::eval(...)
 	(apply fun ...)：将值代入fun中执行
-
-	(io file ...)：文件流，后跟参数（参考C++ fstream）
-	(eof?)：是否还能读入
-	(close ...)：关闭文件流
-	(close? ...)：文件流是否关闭
 
 注：因为之前看manual没有图片，所以忽略了Core的实现。现在实现。

@@ -2,6 +2,8 @@
 #define CORE_H
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "common.h"
 #include "helper.h"

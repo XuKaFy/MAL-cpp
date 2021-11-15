@@ -109,6 +109,32 @@ void Core::registerBasicFunction(Environment* env)
         FOREACH(m, o, { std::cout << Printer::printWithEscape(GETSTRING(m)); });
         return new AbstractType();
     });
+    registerFunction(env, "join-string", FUNCTION(o) {
+        String ans;
+        FOREACH(m, o, { ans += GETSTRING(m); });
+        return new StringType(ans);
+    });
+    registerFunction(env, "translate-from-string", FUNCTION(o) {
+        SINGLE(a1, o);
+        return Reader::read(GETSTRING(a1));
+    });
+    registerFunction(env, "translate-to-string", FUNCTION(o) {
+        SINGLE(a1, o);
+        return new StringType(Printer::print(a1));
+    });
+    registerFunction(env, "read-file", FUNCTION(o) {
+        SINGLE(a1, o);
+        std::ifstream stm(GETSTRING(a1));
+        std::stringstream buffer;
+        buffer << stm.rdbuf();
+        return new StringType(buffer.str());
+    });
+    registerFunction(env, "write-file", FUNCTION(o) {
+        DOUBLE(a1, a2, o);
+        std::ofstream stm(GETSTRING(a1));
+        stm << Printer::print(a2);
+        return new AbstractType();
+    });
 }
 
 void Core::registerFunction(Environment *env, String name, Function fun)

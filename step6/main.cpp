@@ -50,6 +50,9 @@ public:
     }
     void generateMainEnvironment() {
         Core::registerBasicFunction(&environment);
+        environment.setValue("true", eval("(quote t)"));
+        environment.setValue("false", eval("(quote ())"));
+        environment.setValue("not", eval("(lambda (x) (if x false true))"));
     }
 
 private:
