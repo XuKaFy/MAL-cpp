@@ -2,6 +2,7 @@
 #define EVALUATOR_H
 
 #include "common.h"
+#include "helper.h"
 #include "printer.h"
 #include "environment.h"
 
@@ -12,7 +13,7 @@ public:
 
 private:
     AbstractType* eval(AbstractType* o, Environment* env, bool fco, bool root = false);
-    AbstractType* evalList(ListType* o, Environment* env, bool fco);
+    AbstractType* apply(ListType* o, Environment* env, bool fco);
 
     ListType* listOfValues(ListType* o, Environment* env, bool fco);
 

@@ -1,17 +1,16 @@
 在第六步中加入一些字符串操作和自引用：
 
-	(read-string)：将字符串转化为lisp串
-	(write-string ...)：将lisp串转化为字符串
-	(join-string ...)：将所有string类型的参数拼接到一起
+	(read)：读入一个lisp串，相当于调用了Reader::read(...)
+	(read-string)：读入一行字符串
+	(print)：输出一个lisp串，相当于调用了Printer::print(...)
+	(print-string ...)：输出字符串，会转义
 
 	(eval ...)：执行一个lisp串，相当于调用了Evaluator::eval(...)
+	(apply fun ...)：将值代入fun中执行
 
-	(slurp ...)：你可以理解为linux下的cat？
-	(read)：从stdin读入一个lisp串，相当于调用了Reader::read(...)
-
-其中直接用lisp实现的是：
-
-	(load-file ...)：从文件读入
-		(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))
+	(io file ...)：文件流，后跟参数（参考C++ fstream）
+	(eof?)：是否还能读入
+	(close ...)：关闭文件流
+	(close? ...)：文件流是否关闭
 
 注：因为之前看manual没有图片，所以忽略了Core的实现。现在实现。

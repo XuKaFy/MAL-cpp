@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "common.h"
+#include "helper.h"
 #include "reader.h"
 #include "printer.h"
 #include "environment.h"

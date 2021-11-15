@@ -9,8 +9,10 @@ AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool 
 {
     //printf("<EVAL> %s\n", Printer::print(o).c_str());
 LABEL_AGAIN:
-    if(Helper::isSelfEvaluating(o))
+    if(Helper::isSelfEvaluating(o)) {
+        //puts("</EVAL>");
         return o;
+    }
     if(!root && fco) {
         //puts("</EVAL> Jump out once");
         throw (StackFrame{o, env});
@@ -20,9 +22,9 @@ LABEL_AGAIN:
         case Type::TYPE_ATOM:
             return env->getValue(GETATOM(o));
         case Type::TYPE_LIST:
-            return evalList(GETLIST(o), env, fco);
+            return apply(GETLIST(o), env, fco);
         default:
-            throw Exception::EXP_EVAL_CANNOT_EXECUTE;
+            throw Exception("Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root): Can't execute");
         }
     } catch (StackFrame s) {
         o = s.o;
@@ -33,10 +35,10 @@ LABEL_AGAIN:
     return new AbstractType();
 }
 
-AbstractType* Evaluator::evalList(ListType* l, Environment* env, bool fco)
+AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
 {
     if(ISEMPTY(l)) {
-        throw Exception::EXP_EVAL_CANNOT_EXECUTE;
+        throw Exception("Evaluator::apply(ListType* l, Environment* env, bool fco): Can't execute");
     }
     if(CAR(l)->type() == Type::TYPE_ATOM) {
         Atom name = GETATOM(CAR(l));
@@ -61,6 +63,14 @@ AbstractType* Evaluator::evalList(ListType* l, Environment* env, bool fco)
         } else if(name == "begin") {
             Helper::next(l);
             return funBegin(l, env, fco);
+        } else if(name == "apply") {
+            Helper::next(l);
+            return apply(l, env, fco);
+        } else if(name == "eval") {
+            Helper::next(l);
+            SINGLE(it, l);
+            it = eval(it, env, true, true); // (eval (list + 1 2 3)) -> (eval '(+ 1 2 3))
+            return eval(it, env, fco);
         }
     }
     AbstractType* fun = eval(CAR(l), env, false);
@@ -72,7 +82,7 @@ AbstractType* Evaluator::evalList(ListType* l, Environment* env, bool fco)
     case Type::TYPE_LAMBDA:
         return evalLambda(GETLAMBDA(fun), listOfValues(l, env, fco), env, fco);
     default:
-        throw Exception::EXP_EVAL_CANNOT_EXECUTE;
+        throw Exception("Evaluator::apply(ListType* l, Environment* env, bool fco): Can't execute");
     }
     return new AbstractType();
 }
@@ -93,7 +103,7 @@ ListType* Evaluator::listOfValues(ListType* l, Environment *env, bool fco)
 AbstractType* Evaluator::funQuote(ListType* o)
 {
     if(!Helper::isSingle(o))
-        throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+        throw Exception("Evaluator::funQuote(ListType* o): Length of args error");
     return CAR(o);
 }
 
@@ -109,14 +119,14 @@ AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
 {
     AbstractType* a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
-        throw Exception::EXP_EVAL_BUILDIN_ARG_ERROR;
+        throw Exception("Evaluator::funLambda(ListType* o, Environment *env, bool fco): Not a list");
     return new LambdaType(GETLIST(a1), o);
 }
 
 AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco)
 {
     if(!ISEMPTY(args) && !ISLIST(args))
-        throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
+        throw Exception("Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco): Args given wrong");
     Environment* childEnv = new Environment(env);
     ListType* lamPointer = lam->arg();
     ListType* argsPointer = args;
@@ -128,7 +138,7 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
         Helper::next(argsPointer);
     }
     if(!ISEMPTY(lamPointer) || !ISEMPTY(argsPointer))
-        throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+        throw Exception("Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco): Length of Args wrong");
     return funBegin(lam->body(), childEnv, fco); 
 }
 
@@ -138,7 +148,7 @@ AbstractType* Evaluator::funCond(ListType* o, Environment *env, bool fco)
         return FALSE;
     }
     if(!ISLIST(o))
-        throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
+        throw Exception("Evaluator::funCond(ListType* o, Environment *env, bool fco): Not a list");
     while(!ISEMPTY(o)) {
         AbstractType* res = funIf2(GETLIST(CAR(o)), env, fco);
         if(res != nullptr)
@@ -156,7 +166,7 @@ AbstractType* Evaluator::funIf(ListType* o, Environment *env, bool fco)
     if(!ISEMPTY(o)) {
         a3 = GET(o);
         if(!ISEMPTY(o))
-            throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+            throw Exception("Evaluator::funIf(ListType* o, Environment *env, bool fco): Length of args error");
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
@@ -171,7 +181,7 @@ AbstractType* Evaluator::funIf2(ListType* o, Environment *env, bool fco)
     AbstractType* a1 = GET(o);
     AbstractType* a2 = GET(o);
     if(!ISEMPTY(o)) {
-        throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+        throw Exception("Evaluator::funIf2(ListType* o, Environment *env, bool fco): Length of args error");
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
@@ -189,7 +199,7 @@ AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
         Atom b1 = GETATOM(GET(m));
         AbstractType* b2 = GET(m);
         if(!ISEMPTY(m)) {
-            throw Exception::EXP_EVAL_BUILDIN_LENGTH_ERROR;
+            throw Exception("Evaluator::funLet(ListType* o, Environment *env, bool fco): Length of args error");
         }
         childEnv->setValue(b1, b2);
     }
@@ -199,7 +209,7 @@ AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
 AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
 {
     if(ISEMPTY(o) || !ISLIST(o))
-        throw Exception::EXP_EVAL_BUILDIN_LIST_ERROR;
+        throw Exception("Evaluator::funBegin(ListType* o, Environment *env, bool fco): Args given wrong");
     while(!Helper::isLast(o)) {
         eval(CAR(o), env, true, true);
         Helper::next(o);

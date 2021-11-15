@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include "common.h"
+#include "helper.h"
 
 class Printer
 {

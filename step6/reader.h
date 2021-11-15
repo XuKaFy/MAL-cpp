@@ -2,6 +2,7 @@
 #define READER_H
 
 #include "common.h"
+#include "helper.h"
 
 /*
     atom    ->  [_A-Za-z]

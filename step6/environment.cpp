@@ -21,7 +21,7 @@ AbstractType* Environment::getValue(String s)
         if(parent() != nullptr) {
             return parent()->getValue(s);
         } else {
-            throw Exception::EXP_ENV_NOT_FOUND;
+            throw Exception("Environment::getValue(String s): Can't find value");
         }
     }
     return m_map[s];

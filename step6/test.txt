@@ -9,3 +9,7 @@
 ((lambda () (+ (* 2 2) (* 3 3))))
 
 (define f (lambda () (print "hello\n\"world")))
+
+(f)
+
+(eval (list + 1 2 3))
