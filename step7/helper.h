@@ -40,6 +40,9 @@
 #define IF(x) ((x) ? TRUE : FALSE)
 
 #define QUOTE(x) (new ListType(List{new AtomType("quote"), new ListType(List{x, new ListType()})}))
+#define UNQUOTE(x) (new ListType(List{new AtomType("unquote"), new ListType(List{x, new ListType()})}))
+#define SPLICE_UNQUOTE(x) (new ListType(List{new AtomType("splice-unquote"), new ListType(List{x, new ListType()})}))
+#define QUASIQUOTE(x) (new ListType(List{new AtomType("quasiquote"), new ListType(List{x, new ListType()})}))
 
 class Helper
 {

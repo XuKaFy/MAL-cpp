@@ -101,6 +101,16 @@ AbstractType* Analyzer::elem()
     } else if(lookahead() == '\'') {
         match(lookahead());
         return QUOTE(elem());
+    } if(lookahead() == '`') {
+        match(lookahead());
+        return QUASIQUOTE(elem());
+    } if(lookahead() == '~') {
+        match(lookahead());
+        if(lookahead() == '@') {
+            match(lookahead());
+            return SPLICE_UNQUOTE(elem());
+        }
+        return UNQUOTE(elem());
     } else {
         throw Exception("Analyzer::elem: Can't match an elem");
     }
