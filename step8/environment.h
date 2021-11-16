@@ -21,12 +21,8 @@ public:
     AbstractType* getValue(String s);
     void setValue(String s, AbstractType* val);
 
-    AbstractType* getFormValue(String s);
-    void setFormValue(String s, AbstractType* val);
-
 private:
     Map m_map;
-    Map m_form_map;
     Environment *m_parent;
 };
 

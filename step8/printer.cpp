@@ -166,21 +166,16 @@ String Printer::castLambda(LambdaType* n)
 {
     String ans = "#<lambda:(";
     ans += print(n->arg());
-    String in = print(n->body());
-    in.erase(in.begin());
-    in.pop_back();
-    ans += " (begin " + in;
-    ans += "))>";    return ans;
+    ans += " (begin " + print(n->body());
+    ans += "))>";
+    return ans;
 }
 
 String Printer::castMacro(MacroType* n)
 {
     String ans = "#<macro:(";
     ans += print(n->arg());
-    String in = print(n->body());
-    in.erase(in.begin());
-    in.pop_back();
-    ans += " (begin " + in;
+    ans += " (begin " + print(n->body());
     ans += "))>";
     return ans;
 }

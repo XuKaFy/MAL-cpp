@@ -28,12 +28,14 @@ private:
 
     // throw (AbstractType*, Environment*) or Exception
     AbstractType* evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco);
-    AbstractType* evalMacro(MacroType* lam, ListType* args, Environment* env, bool fco);
     AbstractType* funCond(ListType* o, Environment* env, bool fco);
     AbstractType* funLet(ListType* o, Environment* env, bool fco);
     AbstractType* funIf(ListType* o, Environment* env, bool fco);
     AbstractType* funIf2(ListType* o, Environment* env, bool fco);
     AbstractType* funBegin(ListType* o, Environment* env, bool fco);
+    
+    ListType* macroExpand(MacroType* o, ListType* args);
+    ListType* macroReplace(ListType* o, Atom name, AbstractType* val);
 };
 
 #endif // EVALUATOR_H

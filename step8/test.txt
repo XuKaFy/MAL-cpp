@@ -28,7 +28,7 @@
 
 (define-macro infix (a opr b) (opr a b))
 (infix 1 + 2)
-(infix (infix 3 * 4) + (infix 2 * 3))
+(infix 3 + (infix 5 * 7))
 
 
 ((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0)
