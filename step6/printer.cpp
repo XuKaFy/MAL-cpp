@@ -29,7 +29,7 @@ int Printer::hexNumber(String::value_type c)
     } else if(isalpha(c)) {
         ans = tolower(c) - 'a';
         if(ans >= 16)
-            throw Exception("Printer::hexNumber(String::value_type c): Wrong format");
+            throw Exception("Printer::hexNumber: Wrong format");
     }
     return ans;
 }
@@ -37,10 +37,10 @@ int Printer::hexNumber(String::value_type c)
 int Printer::octNumber(String::value_type c)
 {
     if(!isdigit(c))
-        throw Exception("Printer::octNumber(String::value_type c): Wrong format");
+        throw Exception("Printer::octNumber: Wrong format");
     int ans = c - '0';
     if(ans >= 8)
-            throw Exception("Printer::octNumber(String::value_type c): Wrong format");
+            throw Exception("Printer::octNumber: Wrong format");
     return ans;
 }
 
@@ -99,7 +99,7 @@ String Printer::printWithEscape(String s)
             break;
         default:
             if(!isalnum(s[i]))
-                throw Exception("Printer::printWithEscape(String s): Wrong format");
+                throw Exception("Printer::printWithEscape: Wrong format");
             int con = 0;
             if(s[i] == 'x') {
                 ++i;

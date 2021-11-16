@@ -22,16 +22,16 @@
 #define GET(o) (Helper::get(o))
 #define SINGLE(ans, o) \
     if(Helper::isEmpty(o) || !Helper::isSingle(o)) \
-        throw Exception("SINGLE(ans, o): Not single arg"); \
+        throw Exception("SINGLE: Not single arg"); \
     AbstractType* ans = CAR(o);
 #define DOUBLE(a1, a2, o) \
     AbstractType* a1 = GET(o); \
     AbstractType* a2 = GET(o); \
     if(!Helper::isEmpty(o)) \
-        throw Exception("DOUBLE(a1, a2, o): Not double args");
+        throw Exception("DOUBLE: Not double args");
 #define NONEARG(o) \
     if(!Helper::isEmpty(o)) \
-        throw Exception("NONEARG(o): Shouldn't give arg");
+        throw Exception("NONEARG: Shouldn't give arg");
 #define FUNCTION(o) [](ListType* o) -> AbstractType*
 #define FOREACH(o, m, block) (Helper::foreach(m, [&](AbstractType* o) block))
 
@@ -69,16 +69,16 @@ public:
     template<typename T>
     static T convert(AbstractType* o, Type t) {
         if(o == nullptr)
-            throw Exception("convert(AbstractType* o, Type t): Can't convert \"nullptr\"");
+            throw Exception("convert: Can't convert \"nullptr\"");
         if(o->type() != t)
-            throw Exception("convert(AbstractType* o, Type t): Wrong type");
+            throw Exception("convert: Wrong type");
         return static_cast<T>(o);
     }
 
     template<typename T>
     static T convert(AbstractType* o) {
         if(o == nullptr)
-            throw Exception("convert(AbstractType* o): Can't convert \"nullptr\"");
+            throw Exception("convert: Can't convert \"nullptr\"");
         return static_cast<T>(o);
     }
 };

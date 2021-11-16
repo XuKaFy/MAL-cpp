@@ -59,7 +59,7 @@ ListType* Helper::cons(AbstractType* a1, AbstractType* a2)
 AbstractType* Helper::get(ListType*& o)
 {
     if(isEmpty(o))
-        throw Exception("Helper::get(ListType*& o): Can't get 1 elem");
+        throw Exception("Helper::get: Can't get 1 elem");
     AbstractType* f = car(o);
     next(o);
     return f;

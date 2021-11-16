@@ -8,7 +8,7 @@
 #include "core.h"
 #include "common.h"
 
-#define EOF_EXCEPTION Exception("Interface::read(): EOF")
+#define EOF_EXCEPTION Exception("Interface::read: EOF")
 
 class Interface {
 public:

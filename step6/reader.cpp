@@ -30,7 +30,7 @@ AbstractType* Analyzer::number()
         read = true;
     }
     if(!read)
-        throw Exception("Analyzer::number(): No Number");
+        throw Exception("Analyzer::number: No Number");
     return new NumberType(k);
 }
 
@@ -46,7 +46,7 @@ AbstractType* Analyzer::atom()
         }
         return new AtomType(s);
     }
-    throw Exception("Analyzer::atom(): No Atom");
+    throw Exception("Analyzer::atom: No Atom");
 }
 
 AbstractType* Analyzer::list()
@@ -89,7 +89,7 @@ AbstractType* Analyzer::elem()
 {
     delSpace();
     if(!remain())
-        throw Exception("Analyzer::elem(): No elem");
+        throw Exception("Analyzer::elem: No elem");
     if(lookahead() == '(') {
         return list();
     } else if(isdigit(lookahead())) {
@@ -99,7 +99,7 @@ AbstractType* Analyzer::elem()
     } else if(lookahead() == '"') {
         return string();
     } else {
-        throw Exception("Analyzer::elem(): Can't match an elem");
+        throw Exception("Analyzer::elem: Can't match an elem");
     }
 }
 
@@ -133,7 +133,7 @@ bool Analyzer::isAtomBody(String::value_type c)
 String::value_type Analyzer::lookahead() const
 {
     if(m_pos == m_len) {
-        throw Exception("Analyzer::lookahead(): At the end");
+        throw Exception("Analyzer::lookahead: At the end");
     }
     return m_s[m_pos];
 }
@@ -143,7 +143,7 @@ void Analyzer::match(String::value_type k)
     if(k == lookahead()) {
         ++m_pos;
     } else {
-        throw Exception("Analyzer::match(String::value_type k): Wrong match");
+        throw Exception("Analyzer::match: Wrong match");
     }
 }
 

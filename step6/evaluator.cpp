@@ -24,7 +24,7 @@ LABEL_AGAIN:
         case Type::TYPE_LIST:
             return apply(GETLIST(o), env, fco);
         default:
-            throw Exception("Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root): Can't execute");
+            throw Exception("Evaluator::eval: Can't execute");
         }
     } catch (StackFrame s) {
         o = s.o;
@@ -38,7 +38,7 @@ LABEL_AGAIN:
 AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
 {
     if(ISEMPTY(l)) {
-        throw Exception("Evaluator::apply(ListType* l, Environment* env, bool fco): Can't execute");
+        throw Exception("Evaluator::apply: Can't execute");
     }
     if(CAR(l)->type() == Type::TYPE_ATOM) {
         Atom name = GETATOM(CAR(l));
@@ -82,7 +82,7 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
     case Type::TYPE_LAMBDA:
         return evalLambda(GETLAMBDA(fun), listOfValues(l, env, fco), env, fco);
     default:
-        throw Exception("Evaluator::apply(ListType* l, Environment* env, bool fco): Can't execute");
+        throw Exception("Evaluator::apply: Can't execute");
     }
     return new AbstractType();
 }
@@ -103,7 +103,7 @@ ListType* Evaluator::listOfValues(ListType* l, Environment *env, bool fco)
 AbstractType* Evaluator::funQuote(ListType* o)
 {
     if(!Helper::isSingle(o))
-        throw Exception("Evaluator::funQuote(ListType* o): Length of args error");
+        throw Exception("Evaluator::funQuote: Length of args error");
     return CAR(o);
 }
 
@@ -119,14 +119,14 @@ AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
 {
     AbstractType* a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
-        throw Exception("Evaluator::funLambda(ListType* o, Environment *env, bool fco): Not a list");
+        throw Exception("Evaluator::funLambda: Not a list");
     return new LambdaType(GETLIST(a1), o);
 }
 
 AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco)
 {
     if(!ISEMPTY(args) && !ISLIST(args))
-        throw Exception("Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco): Args given wrong");
+        throw Exception("Evaluator::evalLambda: Args given wrong");
     Environment* childEnv = new Environment(env);
     ListType* lamPointer = lam->arg();
     ListType* argsPointer = args;
@@ -138,7 +138,7 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
         Helper::next(argsPointer);
     }
     if(!ISEMPTY(lamPointer) || !ISEMPTY(argsPointer))
-        throw Exception("Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco): Length of Args wrong");
+        throw Exception("Evaluator::evalLambda: Length of Args wrong");
     return funBegin(lam->body(), childEnv, fco); 
 }
 
@@ -148,7 +148,7 @@ AbstractType* Evaluator::funCond(ListType* o, Environment *env, bool fco)
         return FALSE;
     }
     if(!ISLIST(o))
-        throw Exception("Evaluator::funCond(ListType* o, Environment *env, bool fco): Not a list");
+        throw Exception("Evaluator::funCond: Not a list");
     while(!ISEMPTY(o)) {
         AbstractType* res = funIf2(GETLIST(CAR(o)), env, fco);
         if(res != nullptr)
@@ -166,7 +166,7 @@ AbstractType* Evaluator::funIf(ListType* o, Environment *env, bool fco)
     if(!ISEMPTY(o)) {
         a3 = GET(o);
         if(!ISEMPTY(o))
-            throw Exception("Evaluator::funIf(ListType* o, Environment *env, bool fco): Length of args error");
+            throw Exception("Evaluator::funIf: Length of args error");
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
@@ -181,7 +181,7 @@ AbstractType* Evaluator::funIf2(ListType* o, Environment *env, bool fco)
     AbstractType* a1 = GET(o);
     AbstractType* a2 = GET(o);
     if(!ISEMPTY(o)) {
-        throw Exception("Evaluator::funIf2(ListType* o, Environment *env, bool fco): Length of args error");
+        throw Exception("Evaluator::funIf2: Length of args error");
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
@@ -199,7 +199,7 @@ AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
         Atom b1 = GETATOM(GET(m));
         AbstractType* b2 = GET(m);
         if(!ISEMPTY(m)) {
-            throw Exception("Evaluator::funLet(ListType* o, Environment *env, bool fco): Length of args error");
+            throw Exception("Evaluator::funLet: Length of args error");
         }
         childEnv->setValue(b1, b2);
     }
@@ -209,7 +209,7 @@ AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
 AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
 {
     if(ISEMPTY(o) || !ISLIST(o))
-        throw Exception("Evaluator::funBegin(ListType* o, Environment *env, bool fco): Args given wrong");
+        throw Exception("Evaluator::funBegin: Args given wrong");
     while(!Helper::isLast(o)) {
         eval(CAR(o), env, true, true);
         Helper::next(o);

@@ -26,14 +26,14 @@ void Core::registerBasicFunction(Environment* env)
         SINGLE(it, o);
         AbstractType* res = CAR(GETLIST(it));
         if(res == nullptr)
-            throw Exception("FUNCTION car(o): Can't \"car\" an empty list");
+            throw Exception("FUNCTION car: Can't \"car\" an empty list");
         return res;
     });
     registerFunction(env, "cdr", FUNCTION(o) {
         SINGLE(it, o);
         AbstractType* res = CDR(GETLIST(it));
         if(res == nullptr)
-            throw Exception("FUNCTION car(o): Can't \"car\" an empty list");
+            throw Exception("FUNCTION car: Can't \"car\" an empty list");
         return res;
     });
     registerFunction(env, "atom", FUNCTION(o) {

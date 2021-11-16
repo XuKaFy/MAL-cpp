@@ -13,3 +13,5 @@
 (f)
 
 (eval (list + 1 2 3))
+
+((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0)
