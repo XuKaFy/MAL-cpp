@@ -1,0 +1,20 @@
+(define-macro infix (a opr b) (list opr a b))
+(infix 1 + 2)
+(infix 3 + (infix 5 * 7))
+
+(define-macro my-cond (x)
+    (if (empty? x) 
+        ''()
+        `(if ~(car (car x))
+            ~(car (cdr (car x)))
+            (my-cond ~(cdr x))
+        )
+    )
+)
+
+(println (my-cond (
+    (false 1)
+    (true 2)
+)))
+
+"text_8 end"

@@ -1,0 +1,8 @@
+(define data `(list 1 2 3 4 5 6 7 8 9))
+(write-file "test_6_addition.mal" data)
+(define re-data (translate-from-string (read-file "test_6_addition.mal")))
+(println data)
+(println re-data)
+(println (eq data re-data))
+
+"test_6 end"

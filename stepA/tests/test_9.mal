@@ -1,0 +1,11 @@
+(try
+    (throw "hello_world")
+    (catch X 
+        (begin 
+            (print-string "Catched: ")
+            (println X)
+        )
+    )
+)
+
+"text_9 end"

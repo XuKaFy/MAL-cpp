@@ -1,0 +1,7 @@
+(define sum (lambda (x all) (if (empty? x) all (sum (cdr x) (+ all (car x))))))
+(println (sum (list 1 2 3) 0))
+
+(println ((lambda (x y) (+ (* x x) (* y y))) 2 6))
+(println ((lambda () (+ (* 2 2) (* 3 3)))))
+
+"test_4 end"
