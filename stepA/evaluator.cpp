@@ -7,31 +7,31 @@ AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
 
 AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
 {
-    //printf("<EVAL> %s\n", Printer::print(o).c_str());
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o)) {
-        //puts("</EVAL>");
         return o;
     }
     if(!root && fco) {
-        //puts("</EVAL> Jump out once");
         throw (StackFrame{o, env});
     }
     try {
+        AbstractType* res = nullptr;
         switch(o->type()) {
         case Type::TYPE_ATOM:
-            return env->getValue(GETATOM(o));
+            res = env->getValue(GETATOM(o));
+            break;
         case Type::TYPE_LIST:
-            return apply(GETLIST(o), env, fco);
+            res = apply(GETLIST(o), env, fco);
+            break;
         default:
             throw Exception("Evaluator::eval: Can't execute");
         }
+        return res;
     } catch (StackFrame s) {
         o = s.o;
         env = s.env;
         goto LABEL_AGAIN;
     }
-    //puts("</EVAL>");
     return new AbstractType();
 }
 
@@ -91,10 +91,10 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
     Helper::next(l);
     switch(fun->type()) {
     case Type::TYPE_BUILDIN_FUNCTION:
-        return GETBUILDIN(fun)->process(listOfValues(l, env, fco));
+        return GETBUILDIN(fun)->process(listOfValues(l, env));
         break;
     case Type::TYPE_LAMBDA:
-        return evalLambda(GETLAMBDA(fun), listOfValues(l, env, fco), env, fco);
+        return evalLambda(GETLAMBDA(fun), listOfValues(l, env), env, fco);
     case Type::TYPE_MACRO:
         return eval(evalLambda(GETMACRO(fun), l, env, false), env, fco);
     default:
@@ -103,14 +103,14 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
     return new AbstractType();
 }
 
-ListType* Evaluator::listOfValues(ListType* l, Environment *env, bool fco)
+ListType* Evaluator::listOfValues(ListType* l, Environment *env)
 {
     if(ISEMPTY(l))
         return l;
     ListType* root = new ListType();
     ListType* current = root;
     AbstractType* remain = FOREACH(o, l, {
-        current = Helper::append(current, eval(o, env, false));
+        current = Helper::append(current, eval(o, env, true, true));
     });
     current->setList(List{CAR(current), remain});
     return root;

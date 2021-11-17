@@ -16,7 +16,7 @@ private:
     AbstractType* eval(AbstractType* o, Environment* env, bool fco, bool root = false);
     AbstractType* apply(ListType* o, Environment* env, bool fco);
 
-    ListType* listOfValues(ListType* o, Environment* env, bool fco);
+    ListType* listOfValues(ListType* o, Environment* env);
 
     // throw Exception
     AbstractType* funQuote(ListType* o);
