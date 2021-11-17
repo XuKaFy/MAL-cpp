@@ -6,7 +6,19 @@ AbstractType* Analyzer::analyze(String s)
     m_pos = 0;
     m_len = s.size();
 
-    return elem();
+    AbstractType* ans = elem();
+    if(remain()) {
+        ListType* root = new ListType();
+        ListType* current = root;
+        current = Helper::append(current, ans);
+        while(remain()) {
+            ans = elem();
+            current = Helper::append(current, ans);
+        }
+        current->setList(List{CAR(current), new ListType()});
+        return BEGIN(root);
+    }
+    return ans;
 }
 
 bool Analyzer::remain() const

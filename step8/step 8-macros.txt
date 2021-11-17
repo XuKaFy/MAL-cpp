@@ -4,6 +4,8 @@
 	(macro? ...)：是否是宏
 	(<macro_type> ...)：展开宏并且执行
 
+	注意，宏的用法形如(define-macro name (args...) body...)。当调用(name args...)时，这个lambda函数接受args的原始形式进行计算，返回最后的一个lisp串，并且自动代入eval执行。
+
 	以下将会延缓实现
 	(apply-self ...)：用于在匿名函数中调用自身
 

@@ -33,9 +33,6 @@ private:
     AbstractType* funIf(ListType* o, Environment* env, bool fco);
     AbstractType* funIf2(ListType* o, Environment* env, bool fco);
     AbstractType* funBegin(ListType* o, Environment* env, bool fco);
-    
-    ListType* macroExpand(MacroType* o, ListType* args);
-    ListType* macroReplace(ListType* o, Atom name, AbstractType* val);
 };
 
 #endif // EVALUATOR_H

@@ -87,9 +87,9 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
         return GETBUILDIN(fun)->process(listOfValues(l, env, fco));
         break;
     case Type::TYPE_LAMBDA:
-        return evalLambda(GETLAMBDA(fun), listOfValues(l, env, fco), env, fco);
+        return evalLambda(GETLAMBDA(fun), listOfValues(l, env, false), env, fco);
     case Type::TYPE_MACRO:
-        return funBegin(macroExpand(GETMACRO(fun), l), env, fco);
+        return eval(evalLambda(GETMACRO(fun), l, env, false), env, fco);
     default:
         throw Exception("Evaluator::apply: Can't execute");
     }
@@ -284,72 +284,4 @@ AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
         Helper::next(o);
     }
     return eval(CAR(o), env, fco);
-}
-
-ListType* Evaluator::macroExpand(MacroType* o, ListType* args)
-{
-    if(!ISEMPTY(args) && !ISLIST(args))
-        throw Exception("Evaluator::macroExpand: Args given wrong");
-    ListType* lamPointer = o->arg();
-    ListType* argsPointer = args;
-    ListType* body = GETLIST(o->body()->copy());
-    while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
-        Atom name = GETATOM(CAR(lamPointer));
-        AbstractType* val = CAR(argsPointer);
-        macroReplace(body, name, val);
-        Helper::next(lamPointer);
-        Helper::next(argsPointer);
-    }
-    if(!ISEMPTY(lamPointer) || !ISEMPTY(argsPointer))
-        throw Exception("Evaluator::evalLambda: Length of Args wrong");
-    return body; 
-}
-
-ListType* Evaluator::macroReplace(ListType* l, Atom name, AbstractType* val)
-{
-    if(ISEMPTY(l))
-        return l;
-    while(!Helper::isLast(l)) {
-        switch(CAR(l)->type()) {
-        case Type::TYPE_ATOM:
-            if(GETATOM(CAR(l)) == name) {
-                List k = l->list();
-                k.first = val->copy();
-                l->setList(k);
-            }
-            break;
-        case Type::TYPE_LIST:
-            macroReplace(GETLIST(CAR(l)), name, val);
-            break;
-        default: break;
-        }
-        Helper::next(l);
-    }
-    switch(CAR(l)->type()) {
-    case Type::TYPE_ATOM:
-        if(GETATOM(CAR(l)) == name) {
-            List k = l->list();
-            k.first = val->copy();
-            l->setList(k);
-        }
-        break;
-    case Type::TYPE_LIST:
-        macroReplace(GETLIST(CAR(l)), name, val);
-        break;
-    default: break;
-    }
-    switch(CDR(l)->type()) {
-    case Type::TYPE_ATOM:
-        if(GETATOM(CDR(l)) == name) {
-            List k = l->list();
-            k.first = val->copy();
-            l->setList(k);
-        }
-        break;
-    case Type::TYPE_LIST:
-        macroReplace(GETLIST(CDR(l)), name, val);
-        break;
-    default: break;
-    }
-    return l;
 }

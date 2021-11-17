@@ -45,6 +45,8 @@
 #define SPLICE_UNQUOTE(x) (new ListType(List{new AtomType("splice-unquote"), new ListType(List{x, new ListType()})}))
 #define QUASIQUOTE(x) (new ListType(List{new AtomType("quasiquote"), new ListType(List{x, new ListType()})}))
 
+#define BEGIN(x) (new ListType(List{new AtomType("begin"), x}))
+
 class Helper
 {
 public:
