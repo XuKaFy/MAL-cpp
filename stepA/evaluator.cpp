@@ -170,6 +170,10 @@ AbstractType* Evaluator::funTry(ListType* o, Environment *env)
         Environment* childEnv = new Environment(env);
         childEnv->setValue(catchName, k);
         return eval(catchBody, childEnv, true, true);
+    } catch(Exception e) {
+        Environment* childEnv = new Environment(env);
+        childEnv->setValue(catchName, new StringType(e));
+        return eval(catchBody, childEnv, true, true);
     }
     return new AbstractType();
 }
