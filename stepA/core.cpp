@@ -36,10 +36,6 @@ void Core::registerBasicFunction(Environment* env)
             throw Exception("FUNCTION car: Can't \"car\" an empty list");
         return res;
     });
-    registerFunction(env, "atom", FUNCTION(o) {
-        SINGLE(it, o);
-        return IF(it->type() == Type::TYPE_ATOM);
-    });
     registerFunction(env, "cons", FUNCTION(o) {
         DOUBLE(a1, a2, o);
         return CONS(a1->copy(), a2->copy());
