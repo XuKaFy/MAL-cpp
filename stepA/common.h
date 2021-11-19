@@ -13,6 +13,8 @@ class ListType;
 class LambdaType;
 class BuildinFunctionType;
 
+class Environment;
+
 enum class Type {
     TYPE_NUMBER,
     TYPE_STRING,
@@ -131,7 +133,7 @@ private:
 class LambdaType : public AbstractType
 {
 public:
-    LambdaType(ListType* arg, ListType *body);
+    LambdaType(ListType* arg, ListType *body, Environment *env);
     virtual Type type() const;
     virtual AbstractType* copy() const final;
 
@@ -141,17 +143,21 @@ public:
     ListType* body() const;
     void setBody(ListType* body);
 
+    Environment* environment() const;
+    void setEnvironment(Environment* env);
+
     virtual ~LambdaType();
 
 private:
     ListType* m_arg;
     ListType* m_body;
+    Environment* m_env;
 };
 
 class MacroType : public LambdaType
 {
 public:
-    MacroType(ListType *args, ListType *body);
+    MacroType(ListType *args, ListType *body, Environment* env);
     virtual Type type() const final;
 
     virtual ~MacroType();

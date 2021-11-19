@@ -57,6 +57,9 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
         } else if(name == "define") {
             Helper::next(l);
             return funDef(l, env);
+        } else if(name == "set") {
+            Helper::next(l);
+            return funSet(l, env);
         } else if(name == "define-macro") {
             Helper::next(l);
             return funDefMacro(l, env);
@@ -131,13 +134,21 @@ AbstractType* Evaluator::funDef(ListType* o, Environment *env)
     return a2;
 }
 
+AbstractType* Evaluator::funSet(ListType* o, Environment *env)
+{
+    AbstractType* a1 = GET(o);
+    AbstractType* a2 = funBegin(o, env, false);
+    env->setExistValue(GETATOM(a1), a2);
+    return a2;
+}
+
 AbstractType* Evaluator::funDefMacro(ListType* o, Environment *env)
 {
     AbstractType* name = GET(o);
     AbstractType* args = GET(o);
     if(!Helper::isFlat(GETLIST(args)))
         throw Exception("Evaluator::funDefMacro: Not a list");
-    MacroType* ans = new MacroType(GETLIST(args), o);
+    MacroType* ans = new MacroType(GETLIST(args), o, env);
     env->setValue(GETATOM(name), ans);
     return ans;
 }
@@ -168,7 +179,7 @@ AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
     AbstractType* a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
         throw Exception("Evaluator::funLambda: Not a list");
-    return new LambdaType(GETLIST(a1), o);
+    return new LambdaType(GETLIST(a1), o, env);
 }
 
 AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
@@ -224,7 +235,7 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
 {
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
-    Environment* childEnv = new Environment(env);
+    Environment* childEnv = new Environment(lam->environment());
     ListType* lamPointer = lam->arg();
     ListType* argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {

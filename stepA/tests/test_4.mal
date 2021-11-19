@@ -4,4 +4,9 @@
 (println ((lambda (x y) (+ (* x x) (* y y))) 2 6))
 (println ((lambda () (+ (* 2 2) (* 3 3)))))
 
+(println (begin (begin (+ 1 2) (* 3 4)) (begin (+ 5 6) (* 7 8))))
+
+(define sqr (lambda (x) (* x x)))
+(println (sqr 50))
+
 "test_4 end"

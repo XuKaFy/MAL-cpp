@@ -136,8 +136,8 @@ StringType::~StringType()
     ;
 }
 
-LambdaType::LambdaType(ListType *arg, ListType* body)
-    : m_arg(arg), m_body(body) {
+LambdaType::LambdaType(ListType *arg, ListType* body, Environment* env)
+    : m_arg(arg), m_body(body), m_env(env) {
 }
 
 Type LambdaType::type() const
@@ -148,7 +148,8 @@ Type LambdaType::type() const
 AbstractType* LambdaType::copy() const
 {
     return new LambdaType(static_cast<ListType*>(m_arg->copy()), 
-                          static_cast<ListType*>(m_body->copy()));
+                          static_cast<ListType*>(m_body->copy()),
+                          m_env);
 }
 
 ListType* LambdaType::arg() const
@@ -169,6 +170,16 @@ ListType* LambdaType::body() const
 void LambdaType::setBody(ListType* body)
 {
     m_body = body;
+}
+
+Environment* LambdaType::environment() const
+{
+    return m_env;
+}
+
+void LambdaType::setEnvironment(Environment *env)
+{
+    m_env = env;
 }
 
 LambdaType::~LambdaType()
@@ -205,8 +216,8 @@ BuildinFunctionType::~BuildinFunctionType()
     ;
 }
 
-MacroType::MacroType(ListType *args, ListType *body)
-    : LambdaType(args, body) {
+MacroType::MacroType(ListType *args, ListType *body, Environment* env)
+    : LambdaType(args, body, env) {
 }
 
 Type MacroType::type() const

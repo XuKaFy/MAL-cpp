@@ -21,6 +21,7 @@ private:
     // throw Exception
     AbstractType* funQuote(ListType* o);
     AbstractType* funDef(ListType* o, Environment* env);
+    AbstractType* funSet(ListType* o, Environment* env);
     AbstractType* funDefMacro(ListType* o, Environment* env);
     AbstractType* funTry(ListType* o, Environment* env);
     AbstractType* funLambda(ListType* o, Environment* env, bool fco);

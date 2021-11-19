@@ -2,6 +2,7 @@
 #define ENVIRONMENT_H
 
 #include "common.h"
+#include "printer.h"
 
 class Environment;
 
@@ -20,6 +21,7 @@ public:
 
     AbstractType* getValue(String s);
     void setValue(String s, AbstractType* val);
+    void setExistValue(String s, AbstractType* val);
 
 private:
     Map m_map;
