@@ -25,6 +25,7 @@ private:
     AbstractType* funDefMacro(ListType* o, Environment* env);
     AbstractType* funTry(ListType* o, Environment* env);
     AbstractType* funLambda(ListType* o, Environment* env, bool fco);
+    AbstractType* funApplySelf(ListType* o, Environment* env, bool fco);
 
     AbstractType* funQuasiquote(AbstractType* o, Environment* env);
 

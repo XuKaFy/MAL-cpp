@@ -88,6 +88,9 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
         } else if(name == "try") {
             Helper::next(l);
             return funTry(l, env);
+        } else if(name == "apply-self") {
+            Helper::next(l);
+            return funApplySelf(listOfValues(l, env), env, fco);
         }
     }
     AbstractType* fun = eval(CAR(l), env, false);
@@ -186,6 +189,13 @@ AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
     return new LambdaType(GETLIST(a1), o, env);
 }
 
+AbstractType* Evaluator::funApplySelf(ListType* o, Environment* env, bool fco)
+{
+    if(env->lambda() == nullptr)
+        throw Exception("Evaluator::funApplySelf: No self to apply");
+    return evalLambda(env->lambda(), o, env, fco);
+}
+
 AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
 {
     if(o->type() != Type::TYPE_LIST) {
@@ -239,7 +249,7 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
 {
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
-    Environment* childEnv = new Environment(lam->environment());
+    Environment* childEnv = new Environment(lam->environment(), lam);
     ListType* lamPointer = lam->arg();
     ListType* argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {

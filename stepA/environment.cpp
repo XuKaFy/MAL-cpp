@@ -1,8 +1,10 @@
 #include "environment.h"
 
-Environment::Environment(Environment* parent)
-    : m_parent(parent) {
+Environment::Environment(Environment* parent, LambdaType* lambda)
+    : m_parent(parent), m_lambda(lambda) {
     //printf("Environment Inherit %u -> %u\n", parent, this);
+    if(m_parent != nullptr && m_lambda == nullptr)
+        m_lambda = m_parent->lambda();
 }
 
 Environment* Environment::parent() const
@@ -15,7 +17,7 @@ void Environment::setParent(Environment* parent)
     m_parent = parent;
 }
 
-AbstractType* Environment::getValue(String s)
+AbstractType* Environment::getValue(String s) const
 {
     //printf("Environment %u: getValue %s\n", this, s.c_str());
     if(!m_map.count(s)) {
@@ -25,7 +27,7 @@ AbstractType* Environment::getValue(String s)
             throw Exception("Environment::getValue: Can't find value - " + s);
         }
     }
-    return m_map[s];
+    return m_map.at(s);
 }
 
 void Environment::setValue(String s, AbstractType* val)
@@ -46,4 +48,14 @@ void Environment::setExistValue(String s, AbstractType* val)
     } else {
         m_map[s] = val;
     }
+}
+
+LambdaType* Environment::lambda() const
+{
+    return m_lambda;
+}
+
+void Environment::setLambda(LambdaType* lambda)
+{
+    m_lambda = lambda;
 }
