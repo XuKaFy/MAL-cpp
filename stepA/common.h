@@ -5,13 +5,16 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <memory>
 
 class AbstractType;
-class NumberType;
 class AtomType;
+class BuildinFunctionType;
 class ListType;
 class LambdaType;
-class BuildinFunctionType;
+class MacroType;
+class NumberType;
+class StringType;
 
 class Environment;
 
@@ -26,18 +29,11 @@ enum class Type {
     TYPE_NULL,
 };
 
-struct Pair {
-    Pair(AbstractType* first = nullptr, AbstractType* second = nullptr)
-        : first(first), second(second) {}
-    AbstractType *first;
-    AbstractType *second;
-};
-
+typedef     AbstractType*                               Pointer;
 typedef     std::string                                 String;
 typedef     double                                      Number;
 typedef     String                                      Atom;
-typedef     Pair                                        List;
-typedef     std::map<String, AbstractType*>             Map;
+typedef     std::map<String, Pointer>                   Map;
 typedef     std::function<AbstractType*(ListType*)>     Function;
 typedef     String                                      Exception;
 
@@ -86,16 +82,20 @@ private:
 class ListType : public AbstractType
 {
 public:
-    ListType(List n = List());
+    ListType(AbstractType* first, AbstractType* second);
     virtual Type type() const final;
     virtual AbstractType* copy() const final;
-    List list() const;
-    void setList(List n);
+
+    AbstractType* first() const;
+    void setFirst(AbstractType* first);
+    AbstractType* second() const;
+    void setSecond(AbstractType* second);
 
     virtual ~ListType();
 
 private:
-    List m_list;
+    AbstractType* m_first;
+    AbstractType* m_second;
 };
 
 class StringType : public AbstractType

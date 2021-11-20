@@ -5,22 +5,22 @@ void Core::registerBasicFunction(Environment* env)
     registerFunction(env, "+", FUNCTION(o) {
         Number num = 0;
         FOREACH(m, o, { num += GETNUMBER(m); });
-        return new NumberType(num);
+        return Memory::dispatch(num);
     });
     registerFunction(env, "*", FUNCTION(o) {
         Number num = 1;
         FOREACH(m, o, { num *= GETNUMBER(m); });
-        return new NumberType(num);
+        return Memory::dispatch(num);
     });
     registerFunction(env, "-", FUNCTION(o) {
         Number num = GETNUMBER(GET(o));
         FOREACH(m, o, { num -= GETNUMBER(m); });
-        return new NumberType(num);
+        return Memory::dispatch(num);
     });
     registerFunction(env, "/", FUNCTION(o) {
         Number num = GETNUMBER(GET(o));
         FOREACH(m, o, { num /= GETNUMBER(m); });
-        return new NumberType(num);
+        return Memory::dispatch(num);
     });
     registerFunction(env, "car", FUNCTION(o) {
         SINGLE(it, o);
@@ -110,12 +110,12 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, "print", FUNCTION(o) {
         FOREACH(m, o, { std::cout << Printer::print(m); });
-        return new AbstractType();
+        return Helper::constantVoid();
     });
     registerFunction(env, "newline", FUNCTION(o) {
         NONEARG(o)
         std::cout << std::endl;
-        return new AbstractType();
+        return Helper::constantVoid();
     });
     registerFunction(env, "read", FUNCTION(o) {
         NONEARG(o)
@@ -127,16 +127,16 @@ void Core::registerBasicFunction(Environment* env)
         NONEARG(o)
         String s;
         getline(std::cin, s);
-        return new StringType(s);
+        return Memory::dispatch(s);
     });
     registerFunction(env, "print-string", FUNCTION(o) {
         FOREACH(m, o, { std::cout << Printer::printWithEscape(GETSTRING(m)); });
-        return new AbstractType();
+        return Helper::constantVoid();
     });
     registerFunction(env, "join-string", FUNCTION(o) {
         String ans;
         FOREACH(m, o, { ans += GETSTRING(m); });
-        return new StringType(ans);
+        return Memory::dispatch(ans, true);
     });
     registerFunction(env, "translate-from-string", FUNCTION(o) {
         SINGLE(a1, o);
@@ -144,24 +144,24 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, "translate-to-string", FUNCTION(o) {
         SINGLE(a1, o);
-        return new StringType(Printer::print(a1));
+        return Memory::dispatch(Printer::print(a1), true);
     });
     registerFunction(env, "read-file", FUNCTION(o) {
         SINGLE(a1, o);
         std::ifstream stm(GETSTRING(a1));
         std::stringstream buffer;
         buffer << stm.rdbuf();
-        return new StringType(buffer.str());
+        return Memory::dispatch(buffer.str(), true);
     });
     registerFunction(env, "write-file", FUNCTION(o) {
         DOUBLE(a1, a2, o);
         std::ofstream stm(GETSTRING(a1));
         stm << Printer::print(a2);
-        return new AbstractType();
+        return Helper::constantVoid();
     });
 }
 
 void Core::registerFunction(Environment *env, String name, Function fun)
 {
-    env->setValue(name, new BuildinFunctionType(fun, name));
+    env->setValue(name, Memory::dispatch(fun, name));
 }

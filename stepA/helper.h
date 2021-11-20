@@ -2,6 +2,7 @@
 #define HELPER_H
 
 #include "common.h"
+#include "memory.h"
 
 #define GETNUMBER(o) (Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number())
 #define GETSTRING(o) (Helper::convert<StringType*>(o, Type::TYPE_STRING)->string())
@@ -40,12 +41,12 @@
 #define FALSE (Helper::constantFalse())
 #define IF(x) ((x) ? TRUE : FALSE)
 
-#define QUOTE(x) (new ListType(List{new AtomType("quote"), new ListType(List{x, new ListType()})}))
-#define UNQUOTE(x) (new ListType(List{new AtomType("unquote"), new ListType(List{x, new ListType()})}))
-#define SPLICE_UNQUOTE(x) (new ListType(List{new AtomType("splice-unquote"), new ListType(List{x, new ListType()})}))
-#define QUASIQUOTE(x) (new ListType(List{new AtomType("quasiquote"), new ListType(List{x, new ListType()})}))
+#define QUOTE(x) (Memory::dispatch(Memory::dispatch("quote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
+#define UNQUOTE(x) (Memory::dispatch(Memory::dispatch("unquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
+#define SPLICE_UNQUOTE(x) (Memory::dispatch(Memory::dispatch("splice-unquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
+#define QUASIQUOTE(x) (Memory::dispatch(Memory::dispatch("quasiquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
 
-#define BEGIN(x) (new ListType(List{new AtomType("begin"), x}))
+#define BEGIN(x) (Memory::dispatch(Memory::dispatch("begin"), x))
 
 class Helper
 {
@@ -68,6 +69,7 @@ public:
     static bool isFalse(AbstractType* o);
     static bool isFlat(ListType* o);
 
+    static AbstractType* constantVoid();
     static AbstractType* constantTrue();
     static AbstractType* constantFalse();
     

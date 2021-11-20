@@ -73,8 +73,8 @@ AtomType::~AtomType()
     ;
 }
 
-ListType::ListType(List n)
-    : m_list(n) {
+ListType::ListType(AbstractType* first, AbstractType* second)
+    : m_first(first), m_second(second) {
 }
 
 Type ListType::type() const
@@ -84,22 +84,32 @@ Type ListType::type() const
 
 AbstractType* ListType::copy() const
 {
-    List ans = {nullptr, nullptr};
-    if(m_list.first != nullptr)
-        ans.first = m_list.first->copy();
-    if(m_list.second != nullptr)
-        ans.second = m_list.second->copy();
-    return new ListType(ans);
+    AbstractType* first = nullptr, *second = nullptr;
+    if(m_first != nullptr)
+        first = m_first->copy();
+    if(m_second != nullptr)
+        second = m_second->copy();
+    return new ListType(first, second);
 }
 
-List ListType::list() const
+AbstractType* ListType::first() const
 {
-    return m_list;
+    return m_first;
 }
 
-void ListType::setList(List n)
+void ListType::setFirst(AbstractType* first)
 {
-    m_list = n;
+    m_first = first;
+}
+
+AbstractType* ListType::second() const
+{
+    return m_second;
+}
+
+void ListType::setSecond(AbstractType* second)
+{
+    m_second = second;
 }
 
 ListType::~ListType()

@@ -7,6 +7,7 @@ AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
 
 AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
 {
+    //printf("EVAL<%s>\n", Printer::print(o).c_str());
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o)) {
         return o;
@@ -32,7 +33,7 @@ LABEL_AGAIN:
         env = s.env;
         goto LABEL_AGAIN;
     }
-    return new AbstractType();
+    return Helper::constantVoid();
 }
 
 AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
@@ -106,19 +107,19 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
     default:
         throw Exception("Evaluator::apply: Can't execute");
     }
-    return new AbstractType();
+    return Helper::constantVoid();
 }
 
 ListType* Evaluator::listOfValues(ListType* l, Environment *env)
 {
     if(ISEMPTY(l))
         return l;
-    ListType* root = new ListType();
+    ListType* root = Memory::dispatch(nullptr, nullptr);
     ListType* current = root;
     AbstractType* remain = FOREACH(o, l, {
         current = Helper::append(current, eval(o, env, true, true));
     });
-    current->setList(List{CAR(current), remain});
+    current->setSecond(remain);
     return root;
 }
 
@@ -151,7 +152,7 @@ AbstractType* Evaluator::funDefMacro(ListType* o, Environment *env)
     AbstractType* args = GET(o);
     if(!Helper::isFlat(GETLIST(args)))
         throw Exception("Evaluator::funDefMacro: Not a list");
-    MacroType* ans = new MacroType(GETLIST(args), o, env);
+    MacroType* ans = Memory::dispatch(GETLIST(args), o, env, true);
     env->setValue(GETATOM(name), ans);
     return ans;
 }
@@ -170,15 +171,15 @@ AbstractType* Evaluator::funTry(ListType* o, Environment *env)
     try {
         return eval(tryBody, env, true, true);
     } catch(AbstractType* k) {
-        Environment* childEnv = new Environment(env);
+        Environment* childEnv = Memory::dispatch(env);
         childEnv->setValue(catchName, k);
         return eval(catchBody, childEnv, true, true);
     } catch(Exception e) {
-        Environment* childEnv = new Environment(env);
-        childEnv->setValue(catchName, new StringType(e));
+        Environment* childEnv = Memory::dispatch(env);
+        childEnv->setValue(catchName, Memory::dispatch(e, true));
         return eval(catchBody, childEnv, true, true);
     }
-    return new AbstractType();
+    return Helper::constantVoid();
 }
 
 AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
@@ -186,7 +187,7 @@ AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
     AbstractType* a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
         throw Exception("Evaluator::funLambda: Not a list");
-    return new LambdaType(GETLIST(a1), o, env);
+    return Memory::dispatch(GETLIST(a1), o, env);
 }
 
 AbstractType* Evaluator::funApplySelf(ListType* o, Environment* env, bool fco)
@@ -220,7 +221,7 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
             throw GETLIST(ans->copy());
         }
     }
-    ListType* root = new ListType();
+    ListType* root = Memory::dispatch(nullptr, nullptr);
     ListType* current = root;
     AbstractType* remain = FOREACH(o, l, {
         try {
@@ -230,18 +231,16 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
                 delete root;
                 root = current = splice;
             } else {
-                current->setList(List{CAR(current), splice});
+                current->setSecond(splice);
             }
             while(!Helper::isLast(current)) {
                 Helper::next(current);
             }
-            List list = current->list();
-            delete list.second;
-            list.second = nullptr;
-            current->setList(list);
+            delete current->second();
+            current->setSecond(nullptr);
         }
     });
-    current->setList(List{CAR(current), funQuasiquote(remain, env)});
+    current->setSecond(funQuasiquote(remain, env));
     return root;
 }
 
@@ -249,7 +248,8 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
 {
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
-    Environment* childEnv = new Environment(lam->environment(), lam);
+    Environment* childEnv = Memory::dispatch(lam->environment());
+    childEnv->setLambda(lam);
     ListType* lamPointer = lam->arg();
     ListType* argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
@@ -314,7 +314,7 @@ AbstractType* Evaluator::funIf2(ListType* o, Environment *env, bool fco)
 AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
 {
     AbstractType* a1 = GET(o);
-    Environment *childEnv = new Environment(env);
+    Environment *childEnv = Memory::dispatch(env);
     ListType* args = GETLIST(a1);
     while(!ISEMPTY(args)) {
         ListType* m = GETLIST(GET(args));

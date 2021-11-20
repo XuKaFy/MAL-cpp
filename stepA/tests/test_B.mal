@@ -2,7 +2,7 @@
 (println 
     (
         (lambda (x all) 
-            (print "Now, x = ")
+            (print-string "Now, x = ")
             (println x)
             (if (empty? x) 
                 all 

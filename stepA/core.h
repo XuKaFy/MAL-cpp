@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "common.h"
+#include "memory.h"
 #include "helper.h"
 #include "reader.h"
 #include "printer.h"

@@ -8,14 +8,14 @@ AbstractType* Analyzer::analyze(String s)
 
     AbstractType* ans = elem();
     if(remain()) {
-        ListType* root = new ListType();
+        ListType* root = Memory::dispatch(nullptr, nullptr);
         ListType* current = root;
         current = Helper::append(current, ans);
         while(remain()) {
             ans = elem();
             current = Helper::append(current, ans);
         }
-        current->setList(List{CAR(current), new ListType()});
+        current->setSecond(Memory::dispatch(nullptr, nullptr));
         return BEGIN(root);
     }
     return ans;
@@ -43,7 +43,7 @@ AbstractType* Analyzer::number()
     }
     if(!read)
         throw Exception("Analyzer::number: No Number");
-    return new NumberType(k);
+    return Memory::dispatch(k);
 }
 
 AbstractType* Analyzer::atom()
@@ -56,7 +56,7 @@ AbstractType* Analyzer::atom()
             s += lookahead();
             match(lookahead());
         }
-        return new AtomType(s);
+        return Memory::dispatch(s);
     }
     throw Exception("Analyzer::atom: No Atom");
 }
@@ -64,14 +64,14 @@ AbstractType* Analyzer::atom()
 AbstractType* Analyzer::list()
 {
     match('(');
-    ListType* root = new ListType();
+    ListType* root = Memory::dispatch(nullptr, nullptr);
     ListType* current = root;
     while(remain() && lookahead() != ')') {
         current = Helper::append(current, elem());
         delSpace();
     }
     if(Helper::car(current) != nullptr)
-        current->setList(List{Helper::car(current), new ListType()});
+        current->setSecond(Memory::dispatch(nullptr, nullptr));
     match(')');
     return root;
 }
@@ -94,7 +94,7 @@ AbstractType* Analyzer::string()
         }
     }
     match('"');
-    return new StringType(s);
+    return Memory::dispatch(s, true);
 }
 
 AbstractType* Analyzer::elem()

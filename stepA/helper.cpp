@@ -2,12 +2,12 @@
 
 AbstractType* Helper::car(ListType* o)
 {
-    return o->list().first;
+    return o->first();
 }
 
 AbstractType* Helper::cdr(ListType* o)
 {
-    return o->list().second;
+    return o->second();
 }
 
 bool Helper::atom(AbstractType* o)
@@ -51,12 +51,12 @@ bool Helper::eq(AbstractType* a1, AbstractType* a2)
         return GETMACRO(a2)->body() == GETMACRO(a2)->body()
                 && GETMACRO(a1)->arg() == GETMACRO(a2)->arg();  
     }
-    return new AbstractType();
+    return Helper::constantVoid();
 }
 
 ListType* Helper::cons(AbstractType* a1, AbstractType* a2)
 {
-    return new ListType(List{a1, a2});
+    return Memory::dispatch(a1, a2);
 }
 
 AbstractType* Helper::get(ListType*& o)
@@ -140,14 +140,22 @@ bool Helper::isFlat(ListType* o)
     return isSingle(o);
 }
 
+AbstractType* Helper::constantVoid()
+{
+    static std::shared_ptr<AbstractType> val(Memory::dispatch());
+    return val.get();
+}
+
 AbstractType* Helper::constantTrue()
 {
-    return new AtomType("t");
+    static std::shared_ptr<AbstractType> val(Memory::dispatch("t"));
+    return val.get();
 }
 
 AbstractType* Helper::constantFalse()
 {
-    return new ListType();
+    static std::shared_ptr<AbstractType> val(Memory::dispatch(nullptr, nullptr));
+    return val.get();
 }
 
 AbstractType* Helper::foreach(ListType* o, std::function<void(AbstractType* o)> f)
@@ -165,10 +173,10 @@ AbstractType* Helper::foreach(ListType* o, std::function<void(AbstractType* o)> 
 ListType* Helper::append(ListType* o, AbstractType* n)
 {
     if(isEmpty(o)) {
-        o->setList(List{n, nullptr});
+        o->setFirst(n);
         return o;
     }
-    ListType* back = new ListType(List{n, nullptr});
-    o->setList(List{car(o), back});
+    ListType* back = Memory::dispatch(n, nullptr);
+    o->setSecond(back);
     return back;
 }
