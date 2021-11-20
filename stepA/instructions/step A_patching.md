@@ -59,6 +59,10 @@
     * translate-to-string
     * write-file
 
+    计时器：
+
+    * time
+
 3. 全局变量：`Interface`
 
     * false

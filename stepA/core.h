@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <ctime>
+
 #include "common.h"
 #include "memory.h"
 #include "helper.h"

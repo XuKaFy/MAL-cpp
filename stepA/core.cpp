@@ -159,6 +159,10 @@ void Core::registerBasicFunction(Environment* env)
         stm << Printer::print(a2);
         return Helper::constantVoid();
     });
+    registerFunction(env, "time", FUNCTION(o) {
+        NONEARG(o)
+        return Memory::dispatch(Number(time(0)));
+    });
 }
 
 void Core::registerFunction(Environment *env, String name, Function fun)
