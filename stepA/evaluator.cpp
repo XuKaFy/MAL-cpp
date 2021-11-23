@@ -216,7 +216,9 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
             Helper::next(l);
             SINGLE(it, l);
             ListType* ans = GETLIST(eval(it, env, false, true));
-            if(ISEMPTY(ans) || !Helper::isList(ans))
+            if(ISEMPTY(ans))
+                return FALSE;
+            if(!Helper::isList(ans))
                 throw Exception("Evaluator::funQuasiquote: args of quasiquote error");
             throw GETLIST(ans->copy());
         }
@@ -246,6 +248,10 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
 
 AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco)
 {
+    //printf("EVAL LAMBDA\n");
+    //printf("    BODY<%s>\n", Printer::print(lam->body()).c_str());
+    //printf("    ARGS<%s>\n", Printer::print(lam->arg()).c_str());
+    //printf("    GIVEN<%s>\n", Printer::print(args).c_str());
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
     Environment* childEnv = Memory::dispatch(lam->environment());
@@ -254,13 +260,32 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
     ListType* argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
         Atom name = GETATOM(CAR(lamPointer));
+        if(name == "&") {
+            Helper::next(lamPointer);
+            SINGLE(it, lamPointer);
+            name = GETATOM(it);
+            childEnv->setValue(name, argsPointer);
+            return funBegin(lam->body(), childEnv, fco);
+        }
         AbstractType* val = CAR(argsPointer);
         childEnv->setValue(name, val);
         Helper::next(lamPointer);
         Helper::next(argsPointer);
     }
+    if(!ISEMPTY(lamPointer) && ISEMPTY(argsPointer)) {
+        Atom name = GETATOM(CAR(lamPointer));
+        if(name == "&") {
+            Helper::next(lamPointer);
+            SINGLE(it, lamPointer);
+            name = GETATOM(it);
+            childEnv->setValue(name, FALSE);
+            return funBegin(lam->body(), childEnv, fco);
+        } else {
+            throw Exception("Evaluator::evalLambda: (1) Length of Args wrong");
+        }
+    }
     if(!ISEMPTY(lamPointer) || !ISEMPTY(argsPointer))
-        throw Exception("Evaluator::evalLambda: Length of Args wrong");
+        throw Exception("Evaluator::evalLambda: (2) Length of Args wrong");
     return funBegin(lam->body(), childEnv, fco); 
 }
 

@@ -41,10 +41,10 @@
 #define FALSE (Helper::constantFalse())
 #define IF(x) ((x) ? TRUE : FALSE)
 
-#define QUOTE(x) (Memory::dispatch(Memory::dispatch("quote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
-#define UNQUOTE(x) (Memory::dispatch(Memory::dispatch("unquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
-#define SPLICE_UNQUOTE(x) (Memory::dispatch(Memory::dispatch("splice-unquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
-#define QUASIQUOTE(x) (Memory::dispatch(Memory::dispatch("quasiquote"), Memory::dispatch(x, Memory::dispatch(nullptr, nullptr))))
+#define QUOTE(x) (Memory::dispatch(Memory::dispatch("quote"), Memory::dispatch(x, Helper::constantFalse())))
+#define UNQUOTE(x) (Memory::dispatch(Memory::dispatch("unquote"), Memory::dispatch(x, Helper::constantFalse())))
+#define SPLICE_UNQUOTE(x) (Memory::dispatch(Memory::dispatch("splice-unquote"), Memory::dispatch(x, Helper::constantFalse())))
+#define QUASIQUOTE(x) (Memory::dispatch(Memory::dispatch("quasiquote"), Memory::dispatch(x, Helper::constantFalse())))
 
 #define BEGIN(x) (Memory::dispatch(Memory::dispatch("begin"), x))
 

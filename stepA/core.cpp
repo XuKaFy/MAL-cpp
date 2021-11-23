@@ -149,6 +149,8 @@ void Core::registerBasicFunction(Environment* env)
     registerFunction(env, "read-file", FUNCTION(o) {
         SINGLE(a1, o);
         std::ifstream stm(GETSTRING(a1));
+        if(!stm.is_open())
+            throw Exception("Core::read-file: File not existed");
         std::stringstream buffer;
         buffer << stm.rdbuf();
         return Memory::dispatch(buffer.str(), true);
@@ -156,6 +158,8 @@ void Core::registerBasicFunction(Environment* env)
     registerFunction(env, "write-file", FUNCTION(o) {
         DOUBLE(a1, a2, o);
         std::ofstream stm(GETSTRING(a1));
+        if(!stm.is_open())
+            throw Exception("Core::write-file: File not existed");
         stm << Printer::print(a2);
         return Helper::constantVoid();
     });

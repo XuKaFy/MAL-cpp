@@ -15,7 +15,7 @@ AbstractType* Analyzer::analyze(String s)
             ans = elem();
             current = Helper::append(current, ans);
         }
-        current->setSecond(Memory::dispatch(nullptr, nullptr));
+        current->setSecond(Helper::constantFalse());
         return BEGIN(root);
     }
     return ans;
@@ -71,7 +71,7 @@ AbstractType* Analyzer::list()
         delSpace();
     }
     if(Helper::car(current) != nullptr)
-        current->setSecond(Memory::dispatch(nullptr, nullptr));
+        current->setSecond(Helper::constantFalse());
     match(')');
     return root;
 }
@@ -142,6 +142,7 @@ bool Analyzer::isSymbol(String::value_type c)
     if(c == '=') return true;
     if(c == '?') return true;
     if(c == '!') return true;
+    if(c == '&') return true;
     return false;
 }
 
