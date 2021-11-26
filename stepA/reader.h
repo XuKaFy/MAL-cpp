@@ -7,18 +7,18 @@
 class Analyzer
 {
 public:
-    AbstractType* analyze(String s);
+    ValueType analyze(String s);
 
 private:
     void match(String k);
     void match(String::value_type k);
     String::value_type lookahead() const;
 
-    AbstractType* atom();
-    AbstractType* list();
-    AbstractType* number();
-    AbstractType* string();
-    AbstractType* elem();
+    ValueType atom();
+    ValueType list();
+    ValueType number();
+    ValueType string();
+    ValueType elem();
 
     bool remain() const;
     void delSpace();
@@ -35,7 +35,7 @@ private:
 class Reader
 {
 public:
-    static AbstractType* read(String s);
+    static ValueType read(String s);
 };
 
 #endif // READER_H

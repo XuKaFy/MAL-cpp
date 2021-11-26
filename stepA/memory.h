@@ -11,23 +11,27 @@ class AtomType;
 class ListType;
 class LambdaType;
 class MacroType;
-class BuildinFunctionType;
+class BuildinType;
 
 class Environment;
 
 class Memory
 {
 public:
-    static AbstractType*        dispatch();
-    static AtomType*            dispatch(Atom num);
-    static BuildinFunctionType* dispatch(Function fun, String name);
-    static ListType*            dispatch(AbstractType* first, AbstractType* second);
-    static LambdaType*          dispatch(ListType* args, ListType* body,  Environment* env);
-    static MacroType*           dispatch(ListType* args, ListType* body,  Environment* env, bool);
-    static NumberType*          dispatch(Number num);
-    static StringType*          dispatch(String str, bool);
+    static Pointer<AbstractType>        dispatch();
+    static Pointer<AtomType>            dispatch(Atom num);
+    static Pointer<BuildinType>         dispatch(Function fun, String name);
+    static Pointer<ListType>            dispatch(ValueType first, ValueType second);
+    static Pointer<LambdaType>          dispatch(Pointer<ListType> args, 
+                                                 Pointer<ListType> body,  
+                                                 Pointer<Environment> env);
+    static Pointer<MacroType>           dispatch(Pointer<ListType> args, 
+                                                 Pointer<ListType> body,  
+                                                 Pointer<Environment> env, bool);
+    static Pointer<NumberType>          dispatch(Number num);
+    static Pointer<StringType>          dispatch(String str, bool);
 
-    static Environment*         dispatch(Environment* env);
+    static Pointer<Environment>         dispatch(Pointer<Environment> env);
 };
 
 #endif // MEMORY_H

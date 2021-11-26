@@ -1,16 +1,16 @@
 #include "helper.h"
 
-AbstractType* Helper::car(ListType* o)
+ValueType Helper::car(Pointer<ListType> o)
 {
     return o->first();
 }
 
-AbstractType* Helper::cdr(ListType* o)
+ValueType Helper::cdr(Pointer<ListType> o)
 {
     return o->second();
 }
 
-bool Helper::atom(AbstractType* o)
+bool Helper::atom(ValueType o)
 {
     if(o->type() == Type::TYPE_ATOM)
         return true;
@@ -19,18 +19,18 @@ bool Helper::atom(AbstractType* o)
     return false;
 }
 
-bool Helper::eq(AbstractType* a1, AbstractType* a2)
+bool Helper::eq(ValueType a1, ValueType a2)
 {
-    if(a1 == nullptr && a2 == nullptr)
+    if(!a1 && !a2)
         return true;
-    if(a1 == nullptr || a2 == nullptr)
+    if(!a1 || !a2)
         return false;
     if(a1->type() != a2->type())
         return false;
     switch(a1->type()) {
     case Type::TYPE_ATOM:
         return GETATOM(a1) == GETATOM(a2);
-    case Type::TYPE_BUILDIN_FUNCTION:
+    case Type::TYPE_BUILDIN:
         return GETBUILDIN(a1)->name() == GETBUILDIN(a2)->name();
     case Type::TYPE_LIST:
         if(!eq(car(GETLIST(a1)), car(GETLIST(a2))))
@@ -51,66 +51,70 @@ bool Helper::eq(AbstractType* a1, AbstractType* a2)
         return GETMACRO(a2)->body() == GETMACRO(a2)->body()
                 && GETMACRO(a1)->arg() == GETMACRO(a2)->arg();  
     }
-    return Helper::constantVoid();
+    return false;
 }
 
-ListType* Helper::cons(AbstractType* a1, AbstractType* a2)
+Pointer<ListType> Helper::cons(ValueType a1, ValueType a2)
 {
     return Memory::dispatch(a1, a2);
 }
 
-AbstractType* Helper::get(ListType*& o)
+ValueType Helper::get(Pointer<ListType>& o)
 {
-    if(isEmpty(o))
+    if(isEmpty(o.convert<AbstractType>()))
         throw Exception("Helper::get: Can't get 1 elem");
-    AbstractType* f = car(o);
+    ValueType f = car(o);
     next(o);
     return f;
 }
 
-void Helper::next(ListType *& o)
+void Helper::next(Pointer<ListType> &o)
 {
     o = GETLIST(cdr(o));
 }
 
-bool Helper::isEmpty(AbstractType *o)
+bool Helper::isEmpty(ValueType o)
 {
     if(o->type() != Type::TYPE_LIST)
         return false;
-    ListType* l = GETLIST(o);
-    return car(l) == nullptr && cdr(l) == nullptr;
+    return isEmpty(GETLIST(o));
 }
 
-bool Helper::isLast(ListType *o)
+bool Helper::isEmpty(Pointer<ListType> o)
 {
-    if(cdr(o) == nullptr)
+    return !car(o) && !cdr(o);
+}
+
+bool Helper::isLast(Pointer<ListType> o)
+{
+    if(!cdr(o))
         return true;
     if(cdr(o)->type() != Type::TYPE_LIST)
         return true;
     return isEmpty(cdr(o));
 }
 
-bool Helper::isList(ListType* o)
+bool Helper::isList(Pointer<ListType> o)
 {
     if(!isLast(o))
         return isList(GETLIST(cdr(o)));
     return isSingle(o);
 }
 
-bool Helper::isSingle(ListType* o)
+bool Helper::isSingle(Pointer<ListType> o)
 {
     if(isEmpty(o))
         return false;
     return isEmpty(cdr(o));
 }
 
-bool Helper::isSelfEvaluating(AbstractType* o)
+bool Helper::isSelfEvaluating(ValueType o)
 {
     if(o->type() == Type::TYPE_NUMBER)
         return true;
     if(o->type() == Type::TYPE_STRING)
         return true;
-    if(o->type() == Type::TYPE_BUILDIN_FUNCTION)
+    if(o->type() == Type::TYPE_BUILDIN)
         return true;
     if(o->type() == Type::TYPE_LAMBDA)
         return true;
@@ -119,17 +123,17 @@ bool Helper::isSelfEvaluating(AbstractType* o)
     return false;
 }
 
-bool Helper::isTrue(AbstractType* o)
+bool Helper::isTrue(ValueType o)
 {
     return !isFalse(o);
 }
 
-bool Helper::isFalse(AbstractType* o)
+bool Helper::isFalse(ValueType o)
 {
     return isEmpty(o);
 }
 
-bool Helper::isFlat(ListType* o)
+bool Helper::isFlat(Pointer<ListType> o)
 {
     if(isEmpty(o))
         return true;
@@ -140,28 +144,28 @@ bool Helper::isFlat(ListType* o)
     return isSingle(o);
 }
 
-AbstractType* Helper::constantVoid()
+ValueType Helper::constantVoid()
 {
-    static std::shared_ptr<AbstractType> val(Memory::dispatch());
-    return val.get();
+    static Pointer<AbstractType> val(Memory::dispatch());
+    return val;
 }
 
-AbstractType* Helper::constantTrue()
+ValueType Helper::constantTrue()
 {
-    static std::shared_ptr<AbstractType> val(Memory::dispatch("t"));
-    return val.get();
+    static Pointer<AtomType> val(Memory::dispatch("t"));
+    return val.convert<AbstractType>();
 }
 
-AbstractType* Helper::constantFalse()
+ValueType Helper::constantFalse()
 {
-    static std::shared_ptr<AbstractType> val(Memory::dispatch(nullptr, nullptr));
-    return val.get();
+    static Pointer<ListType> val(Memory::dispatch(ValueType(), ValueType()));
+    return val.convert<AbstractType>();
 }
 
-AbstractType* Helper::foreach(ListType* o, std::function<void(AbstractType* o)> f)
+ValueType Helper::foreach(Pointer<ListType> o, std::function<void(ValueType o)> f)
 {
     if(isEmpty(o))
-        return o;
+        return o.convert<AbstractType>();
     while(!isLast(o)) {
         f(car(o));
         next(o);
@@ -170,13 +174,13 @@ AbstractType* Helper::foreach(ListType* o, std::function<void(AbstractType* o)> 
     return cdr(o);
 }
 
-ListType* Helper::append(ListType* o, AbstractType* n)
+Pointer<ListType> Helper::append(Pointer<ListType> o, ValueType n)
 {
     if(isEmpty(o)) {
         o->setFirst(n);
         return o;
     }
-    ListType* back = Memory::dispatch(n, nullptr);
-    o->setSecond(back);
+    Pointer<ListType> back = Memory::dispatch(n, ValueType());
+    o->setSecond(VALUE(back));
     return back;
 }

@@ -7,29 +7,30 @@
 class Environment;
 
 struct StackFrame {
-    AbstractType* o;
-    Environment* env;
+    ValueType o;
+    Pointer<Environment> env;
 };
 
 class Environment
 {
 public:
-    Environment(Environment *parent = nullptr, LambdaType* lambda = nullptr);
+    Environment(Pointer<Environment> parent = nullptr, Pointer<LambdaType> lambda = nullptr);
+    ~Environment();
 
-    Environment* parent() const;
-    void setParent(Environment *parent);
+    Pointer<Environment> parent() const;
+    void setParent(Pointer<Environment> parent);
 
-    AbstractType* getValue(String s) const;
-    void setValue(String s, AbstractType* val);
-    void setExistValue(String s, AbstractType* val);
+    ValueType getValue(String s) const;
+    void setValue(String s, ValueType val);
+    void setExistValue(String s, ValueType val);
 
-    LambdaType* lambda() const;
-    void setLambda(LambdaType* lambda);
+    Pointer<LambdaType>  lambda() const;
+    void setLambda(Pointer<LambdaType>  lambda);
 
 private:
     Map m_map;
-    Environment *m_parent;
-    LambdaType* m_lambda;
+    Pointer<Environment> m_parent;
+    Pointer<LambdaType>  m_lambda;
 };
 
 #endif // ENVIRONMENT_H

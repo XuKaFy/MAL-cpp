@@ -7,41 +7,15 @@
 #include <functional>
 #include <memory>
 
-class AbstractType;
-class AtomType;
-class BuildinFunctionType;
-class ListType;
-class LambdaType;
-class MacroType;
-class NumberType;
-class StringType;
-
-class Environment;
-
-enum class Type {
-    TYPE_NUMBER,
-    TYPE_STRING,
-    TYPE_ATOM,
-    TYPE_LIST,
-    TYPE_BUILDIN_FUNCTION,
-    TYPE_LAMBDA,
-    TYPE_MACRO,
-    TYPE_NULL,
-};
-
-typedef     AbstractType*                               Pointer;
-typedef     std::string                                 String;
-typedef     double                                      Number;
-typedef     String                                      Atom;
-typedef     std::map<String, Pointer>                   Map;
-typedef     std::function<AbstractType*(ListType*)>     Function;
-typedef     String                                      Exception;
+#include "definition.h"
+#include "debug.h"
+#include "pointer.h"
 
 class AbstractType
 {
 public:
     virtual Type type() const;
-    virtual AbstractType* copy() const;
+    virtual ValueType copy() const;
 
     virtual ~AbstractType();
 
@@ -54,7 +28,7 @@ class NumberType : public AbstractType
 public:
     NumberType(Number n = Number());
     virtual Type type() const final;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
     Number number() const;
     void setNumber(Number n);
 
@@ -69,7 +43,7 @@ class AtomType : public AbstractType
 public:
     AtomType(Atom n = Atom());
     virtual Type type() const final;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
     Atom atom() const;
     void setAtom(Atom n);
 
@@ -82,20 +56,20 @@ private:
 class ListType : public AbstractType
 {
 public:
-    ListType(AbstractType* first, AbstractType* second);
+    ListType(ValueType first, ValueType second);
     virtual Type type() const final;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
 
-    AbstractType* first() const;
-    void setFirst(AbstractType* first);
-    AbstractType* second() const;
-    void setSecond(AbstractType* second);
+    ValueType first() const;
+    void setFirst(ValueType first);
+    ValueType second() const;
+    void setSecond(ValueType second);
 
     virtual ~ListType();
 
 private:
-    AbstractType* m_first;
-    AbstractType* m_second;
+    ValueType m_first;
+    ValueType m_second;
 };
 
 class StringType : public AbstractType
@@ -103,7 +77,7 @@ class StringType : public AbstractType
 public:
     StringType(String n = String());
     virtual Type type() const final;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
     Atom string() const;
     void setString(Atom n);
 
@@ -113,17 +87,17 @@ private:
     String m_str;
 };
 
-class BuildinFunctionType : public AbstractType
+class BuildinType : public AbstractType
 {
 public:
-    BuildinFunctionType(Function f, String name);
+    BuildinType(Function f, String name);
     virtual Type type() const final;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
 
-    AbstractType* process(ListType* obj);
+    ValueType process(Pointer<ListType> obj);
     String name() const;
 
-    virtual ~BuildinFunctionType();
+    virtual ~BuildinType();
 
 private:
     Function m_f;
@@ -133,31 +107,31 @@ private:
 class LambdaType : public AbstractType
 {
 public:
-    LambdaType(ListType* arg, ListType *body, Environment *env);
+    LambdaType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env);
     virtual Type type() const;
-    virtual AbstractType* copy() const final;
+    virtual ValueType copy() const final;
 
-    ListType* arg() const;
-    void setArg(ListType* arg);
+    Pointer<ListType> arg() const;
+    void setArg(Pointer<ListType> arg);
 
-    ListType* body() const;
-    void setBody(ListType* body);
+    Pointer<ListType> body() const;
+    void setBody(Pointer<ListType> body);
 
-    Environment* environment() const;
-    void setEnvironment(Environment* env);
+    Pointer<Environment> environment() const;
+    void setEnvironment(Pointer<Environment> env);
 
     virtual ~LambdaType();
 
 private:
-    ListType* m_arg;
-    ListType* m_body;
-    Environment* m_env;
+    Pointer<ListType> m_arg;
+    Pointer<ListType> m_body;
+    Pointer<Environment> m_env;
 };
 
 class MacroType : public LambdaType
 {
 public:
-    MacroType(ListType *args, ListType *body, Environment* env);
+    MacroType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env);
     virtual Type type() const final;
 
     virtual ~MacroType();

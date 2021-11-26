@@ -10,32 +10,32 @@
 class Evaluator
 {
 public:
-    AbstractType* eval(AbstractType* o, Environment* env);
+    ValueType eval(ValueType o, Pointer<Environment> env);
 
 private:
-    AbstractType* eval(AbstractType* o, Environment* env, bool fco, bool root = false);
-    AbstractType* apply(ListType* o, Environment* env, bool fco);
+    ValueType eval(ValueType o, Pointer<Environment> env, bool fco, bool root = false);
+    ValueType apply(Pointer<ListType> o, Pointer<Environment> env, bool fco);
 
-    ListType* listOfValues(ListType* o, Environment* env);
+    Pointer<ListType> listOfValues(Pointer<ListType> o, Pointer<Environment> env);
 
     // throw Exception
-    AbstractType* funQuote(ListType* o);
-    AbstractType* funDef(ListType* o, Environment* env);
-    AbstractType* funSet(ListType* o, Environment* env);
-    AbstractType* funDefMacro(ListType* o, Environment* env);
-    AbstractType* funTry(ListType* o, Environment* env);
-    AbstractType* funLambda(ListType* o, Environment* env, bool fco);
-    AbstractType* funApplySelf(ListType* o, Environment* env, bool fco);
+    ValueType funQuote(Pointer<ListType> o);
+    ValueType funDef(Pointer<ListType> o, Pointer<Environment> env);
+    ValueType funSet(Pointer<ListType> o, Pointer<Environment> env);
+    ValueType funDefMacro(Pointer<ListType> o, Pointer<Environment> env);
+    ValueType funTry(Pointer<ListType> o, Pointer<Environment> env);
+    ValueType funLambda(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValueType funApplySelf(Pointer<ListType> o, Pointer<Environment> env, bool fco);
 
-    AbstractType* funQuasiquote(AbstractType* o, Environment* env);
+    ValueType funQuasiquote(ValueType o, Pointer<Environment> env);
 
-    // throw (AbstractType*, Environment*) or Exception
-    AbstractType* evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco);
-    AbstractType* funCond(ListType* o, Environment* env, bool fco);
-    AbstractType* funLet(ListType* o, Environment* env, bool fco);
-    AbstractType* funIf(ListType* o, Environment* env, bool fco);
-    AbstractType* funIf2(ListType* o, Environment* env, bool fco);
-    AbstractType* funBegin(ListType* o, Environment* env, bool fco);
+    // throw (ValueType, Pointer<Environment>) or Exception
+    ValueType evalLambda(Pointer<LambdaType>, Pointer<ListType> args, Pointer<Environment> env, bool fco);
+    ValueType funCond(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValueType funLet(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValueType funIf(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValueType funIf2(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValueType funBegin(Pointer<ListType> o, Pointer<Environment> env, bool fco);
 };
 
 #endif // EVALUATOR_H

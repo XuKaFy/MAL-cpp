@@ -1,13 +1,15 @@
 #include "evaluator.h"
 
-AbstractType* Evaluator::eval(AbstractType* o, Environment* env)
+ValueType Evaluator::eval(ValueType o, Pointer<Environment> env)
 {
     return eval(o, env, true, true);
 }
 
-AbstractType* Evaluator::eval(AbstractType* o, Environment* env, bool fco, bool root)
+ValueType Evaluator::eval(ValueType o, Pointer<Environment> env, bool fco, bool root)
 {
-    //printf("EVAL<%s>\n", Printer::print(o).c_str());
+#ifdef EVAL_DEBUG
+    printf("EVAL<%s>\n", Printer::print(o).c_str());
+#endif
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o)) {
         return o;
@@ -16,7 +18,7 @@ LABEL_AGAIN:
         throw (StackFrame{o, env});
     }
     try {
-        AbstractType* res = nullptr;
+        ValueType res = nullptr;
         switch(o->type()) {
         case Type::TYPE_ATOM:
             res = env->getValue(GETATOM(o));
@@ -36,7 +38,7 @@ LABEL_AGAIN:
     return Helper::constantVoid();
 }
 
-AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
+ValueType Evaluator::apply(Pointer<ListType> l, Pointer<Environment> env, bool fco)
 {
     if(ISEMPTY(l)) {
         throw Exception("Evaluator::apply: Can't execute");
@@ -94,117 +96,117 @@ AbstractType* Evaluator::apply(ListType* l, Environment* env, bool fco)
             return funApplySelf(listOfValues(l, env), env, fco);
         }
     }
-    AbstractType* fun = eval(CAR(l), env, false);
+    ValueType fun = eval(CAR(l), env, false);
     Helper::next(l);
     switch(fun->type()) {
-    case Type::TYPE_BUILDIN_FUNCTION:
+    case Type::TYPE_BUILDIN:
         return GETBUILDIN(fun)->process(listOfValues(l, env));
         break;
     case Type::TYPE_LAMBDA:
         return evalLambda(GETLAMBDA(fun), listOfValues(l, env), env, fco);
     case Type::TYPE_MACRO:
-        return eval(evalLambda(GETMACRO(fun), l, env, false), env, fco);
+        return eval(evalLambda(GETMACRO(fun).convert<LambdaType>(), l, env, false), env, fco);
     default:
         throw Exception("Evaluator::apply: Can't execute");
     }
     return Helper::constantVoid();
 }
 
-ListType* Evaluator::listOfValues(ListType* l, Environment *env)
+Pointer<ListType> Evaluator::listOfValues(Pointer<ListType> l, Pointer<Environment> env)
 {
     if(ISEMPTY(l))
         return l;
-    ListType* root = Memory::dispatch(nullptr, nullptr);
-    ListType* current = root;
-    AbstractType* remain = FOREACH(o, l, {
+    Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+    Pointer<ListType> current = root;
+    ValueType remain = FOREACH(o, l, {
         current = Helper::append(current, eval(o, env, true, true));
     });
     current->setSecond(remain);
     return root;
 }
 
-AbstractType* Evaluator::funQuote(ListType* o)
+ValueType Evaluator::funQuote(Pointer<ListType> o)
 {
     if(!Helper::isSingle(o))
         throw Exception("Evaluator::funQuote: Length of args error");
     return CAR(o);
 }
 
-AbstractType* Evaluator::funDef(ListType* o, Environment *env)
+ValueType Evaluator::funDef(Pointer<ListType> o, Pointer<Environment> env)
 {
-    AbstractType* a1 = GET(o);
-    AbstractType* a2 = funBegin(o, env, false);
+    ValueType a1 = GET(o);
+    ValueType a2 = funBegin(o, env, false);
     env->setValue(GETATOM(a1), a2);
     return a2;
 }
 
-AbstractType* Evaluator::funSet(ListType* o, Environment *env)
+ValueType Evaluator::funSet(Pointer<ListType> o, Pointer<Environment> env)
 {
-    AbstractType* a1 = GET(o);
-    AbstractType* a2 = funBegin(o, env, false);
+    ValueType a1 = GET(o);
+    ValueType a2 = funBegin(o, env, false);
     env->setExistValue(GETATOM(a1), a2);
     return a2;
 }
 
-AbstractType* Evaluator::funDefMacro(ListType* o, Environment *env)
+ValueType Evaluator::funDefMacro(Pointer<ListType> o, Pointer<Environment> env)
 {
-    AbstractType* name = GET(o);
-    AbstractType* args = GET(o);
+    ValueType name = GET(o);
+    ValueType args = GET(o);
     if(!Helper::isFlat(GETLIST(args)))
         throw Exception("Evaluator::funDefMacro: Not a list");
-    MacroType* ans = Memory::dispatch(GETLIST(args), o, env, true);
+    ValueType ans = VALUE(Memory::dispatch(GETLIST(args), o, env, true));
     env->setValue(GETATOM(name), ans);
     return ans;
 }
 
-AbstractType* Evaluator::funTry(ListType* o, Environment *env)
+ValueType Evaluator::funTry(Pointer<ListType> o, Pointer<Environment> env)
 {
-    AbstractType* tryBody = GET(o);
-    ListType* catchList = GETLIST(GET(o));
+    ValueType tryBody = GET(o);
+    Pointer<ListType> catchList = GETLIST(GET(o));
     if(!ISEMPTY(o))
         throw Exception("Evaluator::funTry: Wrong format");
     Atom catchSymbol = GETATOM(GET(catchList));
     Atom catchName = GETATOM(GET(catchList));
-    AbstractType* catchBody = GET(catchList);
+    ValueType catchBody = GET(catchList);
     if(!ISEMPTY(catchList) || catchSymbol != "catch")
         throw Exception("Evaluator::funTry: Wrong format");
     try {
         return eval(tryBody, env, true, true);
-    } catch(AbstractType* k) {
-        Environment* childEnv = Memory::dispatch(env);
+    } catch(ValueType k) {
+        Pointer<Environment> childEnv = Memory::dispatch(env);
         childEnv->setValue(catchName, k);
         return eval(catchBody, childEnv, true, true);
     } catch(Exception e) {
-        Environment* childEnv = Memory::dispatch(env);
-        childEnv->setValue(catchName, Memory::dispatch(e, true));
+        Pointer<Environment> childEnv = Memory::dispatch(env);
+        childEnv->setValue(catchName, VALUE(Memory::dispatch(e, true)));
         return eval(catchBody, childEnv, true, true);
     }
     return Helper::constantVoid();
 }
 
-AbstractType* Evaluator::funLambda(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funLambda(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
-    AbstractType* a1 = GET(o);
+    ValueType a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
         throw Exception("Evaluator::funLambda: Not a list");
-    return Memory::dispatch(GETLIST(a1), o, env);
+    return VALUE(Memory::dispatch(GETLIST(a1), o, env));
 }
 
-AbstractType* Evaluator::funApplySelf(ListType* o, Environment* env, bool fco)
+ValueType Evaluator::funApplySelf(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
-    if(env->lambda() == nullptr)
+    if(!env->lambda())
         throw Exception("Evaluator::funApplySelf: No self to apply");
     return evalLambda(env->lambda(), o, env, fco);
 }
 
-AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
+ValueType Evaluator::funQuasiquote(ValueType o, Pointer<Environment> env)
 {
     if(o->type() != Type::TYPE_LIST) {
         return o;
     }
-    ListType* l = GETLIST(o);
+    Pointer<ListType> l = GETLIST(o);
     if(ISEMPTY(l)) {
-        return l;
+        return FALSE;
     }
     if(CAR(l)->type() == Type::TYPE_ATOM) {
         Atom name = GETATOM(CAR(l));
@@ -215,7 +217,7 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
         } else if(name == "splice-unquote") {
             Helper::next(l);
             SINGLE(it, l);
-            ListType* ans = GETLIST(eval(it, env, false, true));
+            Pointer<ListType> ans = GETLIST(eval(it, env, false, true));
             if(ISEMPTY(ans))
                 return FALSE;
             if(!Helper::isList(ans))
@@ -223,51 +225,51 @@ AbstractType* Evaluator::funQuasiquote(AbstractType *o, Environment *env)
             throw GETLIST(ans->copy());
         }
     }
-    ListType* root = Memory::dispatch(nullptr, nullptr);
-    ListType* current = root;
-    AbstractType* remain = FOREACH(o, l, {
+    Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+    Pointer<ListType> current = root;
+    ValueType remain = FOREACH(o, l, {
         try {
             current = Helper::append(current, funQuasiquote(o, env));
-        } catch (ListType* splice) {
+        } catch (Pointer<ListType> splice) {
             if(ISEMPTY(root)) {
-                delete root;
                 root = current = splice;
             } else {
-                current->setSecond(splice);
+                current->setSecond(VALUE(splice));
             }
             while(!Helper::isLast(current)) {
                 Helper::next(current);
             }
-            delete current->second();
-            current->setSecond(nullptr);
+            current->setSecond(ValueType());
         }
     });
     current->setSecond(funQuasiquote(remain, env));
-    return root;
+    return VALUE(root);
 }
 
-AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment* env, bool fco)
+ValueType Evaluator::evalLambda(Pointer<LambdaType> lam, Pointer<ListType> args, Pointer<Environment> env, bool fco)
 {
-    //printf("EVAL LAMBDA\n");
-    //printf("    BODY<%s>\n", Printer::print(lam->body()).c_str());
-    //printf("    ARGS<%s>\n", Printer::print(lam->arg()).c_str());
-    //printf("    GIVEN<%s>\n", Printer::print(args).c_str());
+#ifdef EVALLAMBDA_DEBUG
+    printf("EVAL LAMBDA\n");
+    printf("    BODY<%s>\n", Printer::print(lam->body()).c_str());
+    printf("    ARGS<%s>\n", Printer::print(lam->arg()).c_str());
+    printf("    GIVEN<%s>\n", Printer::print(args).c_str());
+#endif
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
-    Environment* childEnv = Memory::dispatch(lam->environment());
+    Pointer<Environment> childEnv = Memory::dispatch(lam->environment());
     childEnv->setLambda(lam);
-    ListType* lamPointer = lam->arg();
-    ListType* argsPointer = args;
+    Pointer<ListType> lamPointer = lam->arg();
+    Pointer<ListType> argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
         Atom name = GETATOM(CAR(lamPointer));
         if(name == "&") {
             Helper::next(lamPointer);
             SINGLE(it, lamPointer);
             name = GETATOM(it);
-            childEnv->setValue(name, argsPointer);
+            childEnv->setValue(name, VALUE(argsPointer));
             return funBegin(lam->body(), childEnv, fco);
         }
-        AbstractType* val = CAR(argsPointer);
+        ValueType val = CAR(argsPointer);
         childEnv->setValue(name, val);
         Helper::next(lamPointer);
         Helper::next(argsPointer);
@@ -289,7 +291,7 @@ AbstractType* Evaluator::evalLambda(LambdaType* lam, ListType* args, Environment
     return funBegin(lam->body(), childEnv, fco); 
 }
 
-AbstractType* Evaluator::funCond(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funCond(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
     if(ISEMPTY(o)) {
         return FALSE;
@@ -297,19 +299,19 @@ AbstractType* Evaluator::funCond(ListType* o, Environment *env, bool fco)
     if(!ISLIST(o))
         throw Exception("Evaluator::funCond: Not a list");
     while(!ISEMPTY(o)) {
-        AbstractType* res = funIf2(GETLIST(CAR(o)), env, fco);
-        if(res != nullptr)
+        ValueType res = funIf2(GETLIST(CAR(o)), env, fco);
+        if(res)
             return res;
         Helper::next(o);
     }
     return FALSE;
 }
 
-AbstractType* Evaluator::funIf(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funIf(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
-    AbstractType* a1 = GET(o);
-    AbstractType* a2 = GET(o);
-    AbstractType* a3 = nullptr;
+    ValueType a1 = GET(o);
+    ValueType a2 = GET(o);
+    ValueType a3;
     if(!ISEMPTY(o)) {
         a3 = GET(o);
         if(!ISEMPTY(o))
@@ -317,34 +319,34 @@ AbstractType* Evaluator::funIf(ListType* o, Environment *env, bool fco)
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
-    } else if(a3 != nullptr) {
+    } else if(a3) {
         return eval(a3, env, fco);
     }
     return FALSE;
 }
 
-AbstractType* Evaluator::funIf2(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funIf2(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
-    AbstractType* a1 = GET(o);
-    AbstractType* a2 = GET(o);
+    ValueType a1 = GET(o);
+    ValueType a2 = GET(o);
     if(!ISEMPTY(o)) {
         throw Exception("Evaluator::funIf2: Length of args error");
     }
     if(ISTRUE(eval(a1, env, false))) {
         return eval(a2, env, fco);
     }
-    return nullptr;
+    return ValueType();
 }
 
-AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funLet(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
-    AbstractType* a1 = GET(o);
-    Environment *childEnv = Memory::dispatch(env);
-    ListType* args = GETLIST(a1);
+    ValueType a1 = GET(o);
+    Pointer<Environment> childEnv = Memory::dispatch(env);
+    Pointer<ListType> args = GETLIST(a1);
     while(!ISEMPTY(args)) {
-        ListType* m = GETLIST(GET(args));
+        Pointer<ListType> m = GETLIST(GET(args));
         Atom b1 = GETATOM(GET(m));
-        AbstractType* b2 = GET(m);
+        ValueType b2 = GET(m);
         if(!ISEMPTY(m)) {
             throw Exception("Evaluator::funLet: Length of args error");
         }
@@ -353,7 +355,7 @@ AbstractType* Evaluator::funLet(ListType* o, Environment *env, bool fco)
     return funBegin(o, childEnv, fco); // (let ((x 1) (y 2)) (+ x y))
 }
 
-AbstractType* Evaluator::funBegin(ListType* o, Environment *env, bool fco)
+ValueType Evaluator::funBegin(Pointer<ListType> o, Pointer<Environment> env, bool fco)
 {
     if(ISEMPTY(o) || !ISLIST(o))
         throw Exception("Evaluator::funBegin: Args given wrong");

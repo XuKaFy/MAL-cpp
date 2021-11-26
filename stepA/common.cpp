@@ -10,7 +10,7 @@ AbstractType::~AbstractType()
     ;
 }
 
-AbstractType*  AbstractType::copy() const
+ValueType  AbstractType::copy() const
 {
     return new AbstractType();
 }
@@ -20,7 +20,7 @@ Type NumberType::type() const
     return Type::TYPE_NUMBER;
 }
 
-AbstractType* NumberType::copy() const
+ValueType NumberType::copy() const
 {
     return new NumberType(m_num);
 }
@@ -53,7 +53,7 @@ Type AtomType::type() const
     return Type::TYPE_ATOM;
 }
 
-AbstractType* AtomType::copy() const
+ValueType AtomType::copy() const
 {
     return new AtomType(m_atom);
 }
@@ -73,7 +73,7 @@ AtomType::~AtomType()
     ;
 }
 
-ListType::ListType(AbstractType* first, AbstractType* second)
+ListType::ListType(ValueType first, ValueType second)
     : m_first(first), m_second(second) {
 }
 
@@ -82,32 +82,32 @@ Type ListType::type() const
     return Type::TYPE_LIST;
 }
 
-AbstractType* ListType::copy() const
+ValueType ListType::copy() const
 {
-    AbstractType* first = nullptr, *second = nullptr;
-    if(m_first != nullptr)
+    ValueType first, second;
+    if(m_first)
         first = m_first->copy();
-    if(m_second != nullptr)
+    if(m_second)
         second = m_second->copy();
     return new ListType(first, second);
 }
 
-AbstractType* ListType::first() const
+ValueType ListType::first() const
 {
     return m_first;
 }
 
-void ListType::setFirst(AbstractType* first)
+void ListType::setFirst(ValueType first)
 {
     m_first = first;
 }
 
-AbstractType* ListType::second() const
+ValueType ListType::second() const
 {
     return m_second;
 }
 
-void ListType::setSecond(AbstractType* second)
+void ListType::setSecond(ValueType second)
 {
     m_second = second;
 }
@@ -126,7 +126,7 @@ Type StringType::type() const
     return Type::TYPE_STRING;
 }
 
-AbstractType* StringType::copy() const
+ValueType StringType::copy() const
 {
     return new StringType(m_str);
 }
@@ -146,7 +146,7 @@ StringType::~StringType()
     ;
 }
 
-LambdaType::LambdaType(ListType *arg, ListType* body, Environment* env)
+LambdaType::LambdaType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env)
     : m_arg(arg), m_body(body), m_env(env) {
 }
 
@@ -155,39 +155,39 @@ Type LambdaType::type() const
     return Type::TYPE_LAMBDA;
 }
 
-AbstractType* LambdaType::copy() const
+ValueType LambdaType::copy() const
 {
-    return new LambdaType(static_cast<ListType*>(m_arg->copy()), 
-                          static_cast<ListType*>(m_body->copy()),
+    return new LambdaType(m_arg->copy().convert<ListType>(), 
+                          m_body->copy().convert<ListType>(),
                           m_env);
 }
 
-ListType* LambdaType::arg() const
+Pointer<ListType> LambdaType::arg() const
 {
     return m_arg;
 }
 
-void LambdaType::setArg(ListType* arg)
+void LambdaType::setArg(Pointer<ListType> arg)
 {
     m_arg = arg;
 }
 
-ListType* LambdaType::body() const
+Pointer<ListType> LambdaType::body() const
 {
     return m_body;
 }
 
-void LambdaType::setBody(ListType* body)
+void LambdaType::setBody(Pointer<ListType> body)
 {
     m_body = body;
 }
 
-Environment* LambdaType::environment() const
+Pointer<Environment> LambdaType::environment() const
 {
     return m_env;
 }
 
-void LambdaType::setEnvironment(Environment *env)
+void LambdaType::setEnvironment(Pointer<Environment> env)
 {
     m_env = env;
 }
@@ -197,37 +197,37 @@ LambdaType::~LambdaType()
     ;
 }
 
-BuildinFunctionType::BuildinFunctionType(Function f, String name)
+BuildinType::BuildinType(Function f, String name)
     : m_f(f), m_name(name) {
 }
 
-Type BuildinFunctionType::type() const
+Type BuildinType::type() const
 {
-    return Type::TYPE_BUILDIN_FUNCTION;
+    return Type::TYPE_BUILDIN;
 }
 
-AbstractType* BuildinFunctionType::copy() const
+ValueType BuildinType::copy() const
 {
-    return new BuildinFunctionType(m_f, m_name);
+    return new BuildinType(m_f, m_name);
 }
 
-String BuildinFunctionType::name() const
+String BuildinType::name() const
 {
     return m_name;
 }
 
-AbstractType* BuildinFunctionType::process(ListType* obj)
+ValueType BuildinType::process(Pointer<ListType> obj)
 {
     return m_f(obj);
 }
 
-BuildinFunctionType::~BuildinFunctionType()
+BuildinType::~BuildinType()
 {
     ;
 }
 
-MacroType::MacroType(ListType *args, ListType *body, Environment* env)
-    : LambdaType(args, body, env) {
+MacroType::MacroType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env)
+    : LambdaType(arg, body, env) {
 }
 
 Type MacroType::type() const

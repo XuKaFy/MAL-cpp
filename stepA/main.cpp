@@ -12,17 +12,21 @@
 
 class Interface {
 public:
+    Interface() {
+        environment = new Environment();
+    }
     String read() {
         String str;
         if(!getline(std::cin, str))
             throw EOF_EXCEPTION;
         return str;
     }
-    AbstractType* eval(String exp) {
-        AbstractType* root = Reader::read(exp);
-        return evaluator.eval(root, &environment);
+    ValueType eval(String exp) {
+        ValueType root = Reader::read(exp);
+        Printer::print(root);
+        return evaluator.eval(root, environment);
     }
-    void print(AbstractType* obj) {
+    void print(ValueType obj) {
         std::cout << Printer::print(obj) << std::endl;
     }
     bool rep() {
@@ -35,7 +39,7 @@ public:
         }
         try {
             print(eval(str));
-        } catch(AbstractType* k) {
+        } catch(ValueType k) {
             std::cout << "rep: Caught error: " + Printer::print(k) << std::endl;
             return false;
         }
@@ -55,12 +59,12 @@ public:
     }
     void generateMainEnvironment() {
         try {
-            Core::registerBasicFunction(&environment);
-            environment.setValue("true", eval("(quote t)"));
-            environment.setValue("false", eval("(quote ())"));
-            environment.setValue("not", eval("(lambda (x) (if x false true))"));
-            environment.setValue("println", eval("(lambda (x) (print x) (newline))"));
-            environment.setValue("load-file", eval("(lambda (x) (eval (translate-from-string (read-file x))))"));
+            Core::registerBasicFunction(environment);
+            environment->setValue("true", eval("(quote t)"));
+            environment->setValue("false", eval("(quote ())"));
+            environment->setValue("not", eval("(lambda (x) (if x false true))"));
+            environment->setValue("println", eval("(lambda (x) (print x) (newline))"));
+            environment->setValue("load-file", eval("(lambda (x) (eval (translate-from-string (read-file x))))"));
         } catch (Exception e) {
             std::cout << e << std::endl;
         }
@@ -68,7 +72,7 @@ public:
 
 private:
     Evaluator evaluator;
-    Environment environment;
+    Pointer<Environment> environment;
 } interface;
 
 int main()

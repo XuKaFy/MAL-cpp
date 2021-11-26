@@ -17,8 +17,8 @@
 class Core
 {
 public:
-    static void registerBasicFunction(Environment* env);
-    static void registerFunction(Environment* env, String name, Function fun);
+    static void registerBasicFunction(Pointer<Environment> env);
+    static void registerFunction(Pointer<Environment> env, String name, Function fun);
 };
 
 #endif // CORE_H

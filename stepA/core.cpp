@@ -1,51 +1,51 @@
 #include "core.h"
 
-void Core::registerBasicFunction(Environment* env)
+void Core::registerBasicFunction(Pointer<Environment> env)
 {
     registerFunction(env, "+", FUNCTION(o) {
         Number num = 0;
         FOREACH(m, o, { num += GETNUMBER(m); });
-        return Memory::dispatch(num);
+        return VALUE(Memory::dispatch(num));
     });
     registerFunction(env, "*", FUNCTION(o) {
         Number num = 1;
         FOREACH(m, o, { num *= GETNUMBER(m); });
-        return Memory::dispatch(num);
+        return VALUE(Memory::dispatch(num));
     });
     registerFunction(env, "-", FUNCTION(o) {
         Number num = GETNUMBER(GET(o));
         FOREACH(m, o, { num -= GETNUMBER(m); });
-        return Memory::dispatch(num);
+        return VALUE(Memory::dispatch(num));
     });
     registerFunction(env, "/", FUNCTION(o) {
         Number num = GETNUMBER(GET(o));
         FOREACH(m, o, { num /= GETNUMBER(m); });
-        return Memory::dispatch(num);
+        return VALUE(Memory::dispatch(num));
     });
     registerFunction(env, "car", FUNCTION(o) {
         SINGLE(it, o);
-        AbstractType* res = CAR(GETLIST(it));
-        if(res == nullptr)
+        ValueType res = CAR(GETLIST(it));
+        if(!res)
             throw Exception("FUNCTION car: Can't \"car\" an empty list");
         return res;
     });
     registerFunction(env, "cdr", FUNCTION(o) {
         SINGLE(it, o);
-        AbstractType* res = CDR(GETLIST(it));
-        if(res == nullptr)
+        ValueType res = CDR(GETLIST(it));
+        if(!res)
             throw Exception("FUNCTION car: Can't \"car\" an empty list");
         return res;
     });
     registerFunction(env, "cons", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return CONS(a1->copy(), a2->copy());
+        return VALUE(CONS(a1->copy(), a2->copy()));
     });
     registerFunction(env, "eq", FUNCTION(o) {
         DOUBLE(a1, a2, o);
         return IF(EQ(a1, a2));
     });
     registerFunction(env, "list", FUNCTION(o) {
-        return o;
+        return VALUE(o);
     });
     registerFunction(env, "empty?", FUNCTION(o) {
         SINGLE(it, o);
@@ -54,7 +54,7 @@ void Core::registerBasicFunction(Environment* env)
     registerFunction(env, "list?", FUNCTION(o) {
         SINGLE(it, o);
         return IF(it->type() == Type::TYPE_LIST 
-                && ISLIST((Helper::convert<ListType*>(o))));
+                && ISLIST(CONVERT(o, ListType)));
     });
     registerFunction(env, "pair?", FUNCTION(o) {
         SINGLE(it, o);
@@ -82,7 +82,7 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, "buildin?", FUNCTION(o) {
         SINGLE(it, o);
-        return IF(it->type() == Type::TYPE_BUILDIN_FUNCTION);
+        return IF(it->type() == Type::TYPE_BUILDIN);
     });
     registerFunction(env, "true?", FUNCTION(o) {
         SINGLE(a1, o);
@@ -127,7 +127,7 @@ void Core::registerBasicFunction(Environment* env)
         NONEARG(o)
         String s;
         getline(std::cin, s);
-        return Memory::dispatch(s);
+        return VALUE(Memory::dispatch(s));
     });
     registerFunction(env, "print-string", FUNCTION(o) {
         FOREACH(m, o, { std::cout << Printer::printWithEscape(GETSTRING(m)); });
@@ -136,7 +136,7 @@ void Core::registerBasicFunction(Environment* env)
     registerFunction(env, "join-string", FUNCTION(o) {
         String ans;
         FOREACH(m, o, { ans += GETSTRING(m); });
-        return Memory::dispatch(ans, true);
+        return VALUE(Memory::dispatch(ans, true));
     });
     registerFunction(env, "translate-from-string", FUNCTION(o) {
         SINGLE(a1, o);
@@ -144,7 +144,7 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, "translate-to-string", FUNCTION(o) {
         SINGLE(a1, o);
-        return Memory::dispatch(Printer::print(a1), true);
+        return VALUE(Memory::dispatch(Printer::print(a1), true));
     });
     registerFunction(env, "read-file", FUNCTION(o) {
         SINGLE(a1, o);
@@ -153,7 +153,7 @@ void Core::registerBasicFunction(Environment* env)
             throw Exception("Core::read-file: File not existed");
         std::stringstream buffer;
         buffer << stm.rdbuf();
-        return Memory::dispatch(buffer.str(), true);
+        return VALUE(Memory::dispatch(buffer.str(), true));
     });
     registerFunction(env, "write-file", FUNCTION(o) {
         DOUBLE(a1, a2, o);
@@ -165,11 +165,11 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, "time", FUNCTION(o) {
         NONEARG(o)
-        return Memory::dispatch(Number(time(0)));
+        return VALUE(Memory::dispatch(Number(time(0))));
     });
 }
 
-void Core::registerFunction(Environment *env, String name, Function fun)
+void Core::registerFunction(Pointer<Environment> env, String name, Function fun)
 {
-    env->setValue(name, Memory::dispatch(fun, name));
+    env->setValue(name, VALUE(Memory::dispatch(fun, name)));
 }

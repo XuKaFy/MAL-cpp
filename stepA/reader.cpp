@@ -1,22 +1,22 @@
 #include "reader.h"
 
-AbstractType* Analyzer::analyze(String s)
+ValueType Analyzer::analyze(String s)
 {
     m_s = s;
     m_pos = 0;
     m_len = s.size();
 
-    AbstractType* ans = elem();
+    ValueType ans = elem();
     if(remain()) {
-        ListType* root = Memory::dispatch(nullptr, nullptr);
-        ListType* current = root;
+        Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+        Pointer<ListType> current = root;
         current = Helper::append(current, ans);
         while(remain()) {
             ans = elem();
             current = Helper::append(current, ans);
         }
         current->setSecond(Helper::constantFalse());
-        return BEGIN(root);
+        return VALUE(BEGIN(root));
     }
     return ans;
 }
@@ -32,7 +32,7 @@ void Analyzer::delSpace()
         match(lookahead());
 }
 
-AbstractType* Analyzer::number()
+ValueType Analyzer::number()
 {
     Number k = 0;
     bool read = false;
@@ -43,10 +43,10 @@ AbstractType* Analyzer::number()
     }
     if(!read)
         throw Exception("Analyzer::number: No Number");
-    return Memory::dispatch(k);
+    return VALUE(Memory::dispatch(k));
 }
 
-AbstractType* Analyzer::atom()
+ValueType Analyzer::atom()
 {
     String s;
     if(remain() && isAtomHead(lookahead())) {
@@ -56,27 +56,27 @@ AbstractType* Analyzer::atom()
             s += lookahead();
             match(lookahead());
         }
-        return Memory::dispatch(s);
+        return Memory::dispatch(s).convert<AbstractType>();
     }
     throw Exception("Analyzer::atom: No Atom");
 }
 
-AbstractType* Analyzer::list()
+ValueType Analyzer::list()
 {
     match('(');
-    ListType* root = Memory::dispatch(nullptr, nullptr);
-    ListType* current = root;
+    Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+    Pointer<ListType> current = root;
     while(remain() && lookahead() != ')') {
         current = Helper::append(current, elem());
         delSpace();
     }
-    if(Helper::car(current) != nullptr)
-        current->setSecond(Helper::constantFalse());
+    if(Helper::car(current))
+        current->setSecond(FALSE);
     match(')');
-    return root;
+    return VALUE(root);
 }
 
-AbstractType* Analyzer::string()
+ValueType Analyzer::string()
 {
     String s;
     match('"');
@@ -94,10 +94,10 @@ AbstractType* Analyzer::string()
         }
     }
     match('"');
-    return Memory::dispatch(s, true);
+    return VALUE(Memory::dispatch(s, true));
 }
 
-AbstractType* Analyzer::elem()
+ValueType Analyzer::elem()
 {
     delSpace();
     if(!remain())
@@ -112,17 +112,17 @@ AbstractType* Analyzer::elem()
         return string();
     } else if(lookahead() == '\'') {
         match(lookahead());
-        return QUOTE(elem());
+        return VALUE(QUOTE(elem()));
     } if(lookahead() == '`') {
         match(lookahead());
-        return QUASIQUOTE(elem());
+        return VALUE(QUASIQUOTE(elem()));
     } if(lookahead() == '~') {
         match(lookahead());
         if(lookahead() == '@') {
             match(lookahead());
-            return SPLICE_UNQUOTE(elem());
+            return VALUE(SPLICE_UNQUOTE(elem()));
         }
-        return UNQUOTE(elem());
+        return VALUE(UNQUOTE(elem()));
     } else {
         throw Exception("Analyzer::elem: Can't match an elem");
     }
@@ -179,7 +179,7 @@ void Analyzer::match(String k)
         match(i);
 }
 
-AbstractType* Reader::read(String s)
+ValueType Reader::read(String s)
 {
     Analyzer az;
     return az.analyze(s);

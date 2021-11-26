@@ -1,6 +1,6 @@
 #include "printer.h"
 
-String Printer::print(AbstractType *obj)
+String Printer::print(ValueType obj)
 {
     switch(obj->type()) {
     case Type::TYPE_NULL:
@@ -11,7 +11,7 @@ String Printer::print(AbstractType *obj)
         return castNumber(GETNUMBER(obj));
     case Type::TYPE_LIST:
         return castList(GETLIST(obj));
-    case Type::TYPE_BUILDIN_FUNCTION:
+    case Type::TYPE_BUILDIN:
         return castBuildinFunction(GETBUILDIN(obj));
     case Type::TYPE_STRING:
         return castString(GETSTRING(obj));
@@ -132,12 +132,12 @@ String Printer::castAtom(Atom n)
     return n;
 }
 
-String Printer::castList(ListType *n)
+String Printer::castList(Pointer<ListType> n)
 {
     String ans = "(";
     if(!Helper::isEmpty(n)) {
         bool first = true;
-        AbstractType* remain = Helper::foreach(n, [&](AbstractType* o) {
+        ValueType remain = Helper::foreach(n, [&](ValueType o) {
             if(first) {
                 first = false;
             } else {
@@ -157,16 +157,16 @@ String Printer::castString(String n)
     return '"' + n + '"';
 }
 
-String Printer::castBuildinFunction(BuildinFunctionType* n)
+String Printer::castBuildinFunction(Pointer<BuildinType> n)
 {
     return "#<procedure:" + n->name() + ">";
 }
 
-String Printer::castLambda(LambdaType* n)
+String Printer::castLambda(Pointer<LambdaType> n)
 {
     String ans = "#<lambda:(";
-    ans += print(n->arg());
-    String in = print(n->body());
+    ans += castList(n->arg());
+    String in = castList(n->body());
     in.erase(in.begin());
     in.pop_back();
     ans += " (begin " + in;
@@ -174,11 +174,11 @@ String Printer::castLambda(LambdaType* n)
     return ans;
 }
 
-String Printer::castMacro(MacroType* n)
+String Printer::castMacro(Pointer<MacroType>n)
 {
     String ans = "#<macro:(";
-    ans += print(n->arg());
-    String in = print(n->body());
+    ans += castList(n->arg());
+    String in = castList(n->body());
     in.erase(in.begin());
     in.pop_back();
     ans += " (begin " + in;
