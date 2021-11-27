@@ -43,6 +43,12 @@ ValuePointer Analyzer::number()
     }
     if(!read)
         throw Exception("Analyzer::number: No Number");
+    if(remain() && lookahead() == '.') {
+        match(lookahead());
+        Number m = GETNUMBER(number());
+        while(m > 1) m /= 10;
+        return VALUE(Memory::dispatchNumber(k + m));
+    }
     return VALUE(Memory::dispatchNumber(k));
 }
 
@@ -143,6 +149,7 @@ bool Analyzer::isSymbol(String::value_type c)
     if(c == '?') return true;
     if(c == '!') return true;
     if(c == '&') return true;
+    if(c == '.') return true;
     return false;
 }
 

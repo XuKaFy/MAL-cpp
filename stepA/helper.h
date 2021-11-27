@@ -49,6 +49,19 @@
     ValuePointer a2 = GET(o); \
     if(!ISEMPTY(o)) \
         throw Exception("DOUBLE: Not double args");
+#define DOUBLE_FROM_VALUE(a1, a2, o) \
+    ListPointer o##Temp = GETLIST(o); \
+    ValuePointer a1 = GET(o##Temp); \
+    ValuePointer a2 = GET(o##Temp); \
+    if(!ISEMPTY(o##Temp)) \
+        throw Exception("DOUBLE_FROM_VALUE: Not double args");
+#define TRIBLE_FROM_VALUE(a1, a2, a3, o) \
+    ListPointer o##Temp = GETLIST(o); \
+    ValuePointer a1 = GET(o##Temp); \
+    ValuePointer a2 = GET(o##Temp); \
+    ValuePointer a3 = GET(o##Temp); \
+    if(!ISEMPTY(o##Temp)) \
+        throw Exception("TRIBLE_FROM_VALUE: Not trible args");
 #define NONEARG(o) \
     if(!ISEMPTY(o)) \
         throw Exception("NONEARG: Shouldn't give arg");

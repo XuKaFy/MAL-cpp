@@ -40,9 +40,8 @@ LABEL_AGAIN:
 
 ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
 {
-    if(ISEMPTY(l)) {
+    if(ISEMPTY(l))
         throw Exception("Evaluator::apply: Can't execute");
-    }
     if(CAR(l)->type() == Type::TYPE_ATOM) {
         Atom name = GETATOM(CAR(l));
         if(name == "quote") {
@@ -158,24 +157,19 @@ ValuePointer Evaluator::funDefMacro(ListPointer o, EnvironmentPointer env)
 
 ValuePointer Evaluator::funTry(ListPointer o, EnvironmentPointer env)
 {
-    ValuePointer tryBody = GET(o);
-    ListPointer catchList = GETLIST(GET(o));
-    if(!ISEMPTY(o))
-        throw Exception("Evaluator::funTry: Wrong format");
-    Atom catchSymbol = GETATOM(GET(catchList));
-    Atom catchName = GETATOM(GET(catchList));
-    ValuePointer catchBody = GET(catchList);
-    if(!ISEMPTY(catchList) || catchSymbol != "catch")
+    DOUBLE(tryBody, catchListValue, o)
+    TRIBLE_FROM_VALUE(catchSymbol, catchName, catchBody, catchListValue)
+    if(GETATOM(catchSymbol) != "catch")
         throw Exception("Evaluator::funTry: Wrong format");
     try {
         return eval(tryBody, env, true, true);
     } catch(ValuePointer k) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-        childEnv->setValue(catchName, k);
+        childEnv->setValue(GETATOM(catchName), k);
         return eval(catchBody, childEnv, true, true);
     } catch(Exception e) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-        childEnv->setValue(catchName, VALUE(Memory::dispatchString(e)));
+        childEnv->setValue(GETATOM(catchName), VALUE(Memory::dispatchString(e)));
         return eval(catchBody, childEnv, true, true);
     }
     return VOID;
@@ -195,9 +189,8 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
         return o;
     }
     ListPointer l = GETLIST(o);
-    if(ISEMPTY(l)) {
+    if(ISEMPTY(l))
         return FALSE;
-    }
     if(CAR(l)->type() == Type::TYPE_ATOM) {
         Atom name = GETATOM(CAR(l));
         if(name == "unquote") {
@@ -249,7 +242,7 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(lam->environment());
     ListPointer lamPointer = lam->arg();
     ListPointer argsPointer = args;
-    while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
+    while(!ISEMPTY(lamPointer)) {
         Atom name = GETATOM(CAR(lamPointer));
         if(name == "&") {
             NEXT(lamPointer);
@@ -258,33 +251,22 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
             childEnv->setValue(name, VALUE(argsPointer));
             return funBegin(lam->body(), childEnv, tco);
         }
+        if(ISEMPTY(argsPointer))
+            throw Exception("Evaluator::evalLambda: (1) Length of Args wrong");
         ValuePointer val = CAR(argsPointer);
         childEnv->setValue(name, val);
         NEXT(lamPointer);
         NEXT(argsPointer);
     }
-    if(!ISEMPTY(lamPointer) && ISEMPTY(argsPointer)) {
-        Atom name = GETATOM(CAR(lamPointer));
-        if(name == "&") {
-            NEXT(lamPointer);
-            SINGLE(it, lamPointer);
-            name = GETATOM(it);
-            childEnv->setValue(name, FALSE);
-            return funBegin(lam->body(), childEnv, tco);
-        } else {
-            throw Exception("Evaluator::evalLambda: (1) Length of Args wrong");
-        }
-    }
-    if(!ISEMPTY(lamPointer) || !ISEMPTY(argsPointer))
+    if(!ISEMPTY(argsPointer))
         throw Exception("Evaluator::evalLambda: (2) Length of Args wrong");
     return funBegin(lam->body(), childEnv, tco); 
 }
 
 ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)
 {
-    if(ISEMPTY(o)) {
+    if(ISEMPTY(o))
         return FALSE;
-    }
     if(!ISLIST(o))
         throw Exception("Evaluator::funCond: Not a list");
     while(!ISEMPTY(o)) {
@@ -318,29 +300,23 @@ ValuePointer Evaluator::funIf2(ListPointer o, EnvironmentPointer env, bool tco)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = GET(o);
-    if(!ISEMPTY(o)) {
+    if(!ISEMPTY(o))
         throw Exception("Evaluator::funIf2: Length of args error");
-    }
-    if(ISTRUE(eval(a1, env, false))) {
+    if(ISTRUE(eval(a1, env, false)))
         return eval(a2, env, tco);
-    }
     return nullptr;
 }
 
 ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
 {
-    ValuePointer a1 = GET(o);
+    ListPointer args = GETLIST(GET(o));
+    if(!ISLIST(args))
+        throw Exception("Evaluator::funLet: Not a list");
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-    ListPointer args = GETLIST(a1);
-    while(!ISEMPTY(args)) {
-        ListPointer m = GETLIST(GET(args));
-        Atom b1 = GETATOM(GET(m));
-        ValuePointer b2 = GET(m);
-        if(!ISEMPTY(m)) {
-            throw Exception("Evaluator::funLet: Length of args error");
-        }
-        childEnv->setValue(b1, b2);
-    }
+    FOREACH(m, args, {
+        DOUBLE_FROM_VALUE(b1, b2, m)
+        childEnv->setValue(GETATOM(b1), b2);
+    });
     return funBegin(o, childEnv, tco); // (let ((x 1) (y 2)) (+ x y))
 }
 

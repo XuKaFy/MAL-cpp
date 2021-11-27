@@ -17,4 +17,9 @@
     (true 2)
 )))
 
+(println (cond
+    (false 1)
+    (true 2)
+))
+
 "text_8 end"

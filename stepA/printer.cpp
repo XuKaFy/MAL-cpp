@@ -122,9 +122,7 @@ String Printer::printWithEscape(String s)
 
 String Printer::castNumber(Number n)
 {
-    std::ostringstream s;
-    s << n;
-    return s.str();
+    return std::to_string(n);
 }
 
 String Printer::castAtom(Atom n)
