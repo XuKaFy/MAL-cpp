@@ -1,41 +1,46 @@
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
 
-#include "common.h"
+#include "type.h"
 #include "helper.h"
-#include "reader.h"
-#include "printer.h"
+#include "memory.h"
 #include "environment.h"
+
+#include "debug.h"
+
+#ifdef EVAL_DEBUG
+#include "printer.h"
+#endif
 
 class Evaluator
 {
 public:
-    ValueType eval(ValueType o, Pointer<Environment> env);
+    ValuePointer eval  (ValuePointer o,           EnvironmentPointer env);
 
 private:
-    ValueType eval(ValueType o, Pointer<Environment> env, bool fco, bool root = false);
-    ValueType apply(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValuePointer eval  (ValuePointer o,           EnvironmentPointer env, bool tco, bool root = false);
+    ValuePointer apply (Pointer<ListType> o,      EnvironmentPointer env, bool tco);
 
-    Pointer<ListType> listOfValues(Pointer<ListType> o, Pointer<Environment> env);
+    Pointer<ListType> listOfValues(Pointer<ListType> o, EnvironmentPointer env);
 
     // throw Exception
-    ValueType funQuote(Pointer<ListType> o);
-    ValueType funDef(Pointer<ListType> o, Pointer<Environment> env);
-    ValueType funSet(Pointer<ListType> o, Pointer<Environment> env);
-    ValueType funDefMacro(Pointer<ListType> o, Pointer<Environment> env);
-    ValueType funTry(Pointer<ListType> o, Pointer<Environment> env);
-    ValueType funLambda(Pointer<ListType> o, Pointer<Environment> env, bool fco);
-    ValueType funApplySelf(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    ValuePointer funQuote      (Pointer<ListType> o);
+    ValuePointer funDef        (Pointer<ListType> o, EnvironmentPointer env);
+    ValuePointer funSet        (Pointer<ListType> o, EnvironmentPointer env);
+    ValuePointer funDefMacro   (Pointer<ListType> o, EnvironmentPointer env);
+    ValuePointer funTry        (Pointer<ListType> o, EnvironmentPointer env);
+    ValuePointer funLambda     (Pointer<ListType> o, EnvironmentPointer env, bool tco);
 
-    ValueType funQuasiquote(ValueType o, Pointer<Environment> env);
+    ValuePointer funQuasiquote (ValuePointer o, EnvironmentPointer env);
 
-    // throw (ValueType, Pointer<Environment>) or Exception
-    ValueType evalLambda(Pointer<LambdaType>, Pointer<ListType> args, Pointer<Environment> env, bool fco);
-    ValueType funCond(Pointer<ListType> o, Pointer<Environment> env, bool fco);
-    ValueType funLet(Pointer<ListType> o, Pointer<Environment> env, bool fco);
-    ValueType funIf(Pointer<ListType> o, Pointer<Environment> env, bool fco);
-    ValueType funIf2(Pointer<ListType> o, Pointer<Environment> env, bool fco);
-    ValueType funBegin(Pointer<ListType> o, Pointer<Environment> env, bool fco);
+    // throw (ValuePointer, EnvironmentPointer) or Exception
+    ValuePointer evalLambda    (Pointer<LambdaType>, Pointer<ListType> args, 
+                                EnvironmentPointer env, bool tco);
+    ValuePointer funCond       (Pointer<ListType> o, EnvironmentPointer env, bool tco);
+    ValuePointer funLet        (Pointer<ListType> o, EnvironmentPointer env, bool tco);
+    ValuePointer funIf         (Pointer<ListType> o, EnvironmentPointer env, bool tco);
+    ValuePointer funIf2        (Pointer<ListType> o, EnvironmentPointer env, bool tco);
+    ValuePointer funBegin      (Pointer<ListType> o, EnvironmentPointer env, bool tco);
 };
 
 #endif // EVALUATOR_H

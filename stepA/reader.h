@@ -1,24 +1,24 @@
 #ifndef READER_H
 #define READER_H
 
-#include "common.h"
+#include "type.h"
 #include "helper.h"
 
 class Analyzer
 {
 public:
-    ValueType analyze(String s);
+    ValuePointer analyze(String s);
 
 private:
     void match(String k);
     void match(String::value_type k);
     String::value_type lookahead() const;
 
-    ValueType atom();
-    ValueType list();
-    ValueType number();
-    ValueType string();
-    ValueType elem();
+    ValuePointer atom();
+    ValuePointer list();
+    ValuePointer number();
+    ValuePointer string();
+    ValuePointer elem();
 
     bool remain() const;
     void delSpace();
@@ -35,7 +35,7 @@ private:
 class Reader
 {
 public:
-    static ValueType read(String s);
+    static ValuePointer read(String s);
 };
 
 #endif // READER_H

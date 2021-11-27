@@ -1,6 +1,6 @@
 #include "printer.h"
 
-String Printer::print(ValueType obj)
+String Printer::print(ValuePointer obj)
 {
     switch(obj->type()) {
     case Type::TYPE_NULL:
@@ -135,9 +135,9 @@ String Printer::castAtom(Atom n)
 String Printer::castList(Pointer<ListType> n)
 {
     String ans = "(";
-    if(!Helper::isEmpty(n)) {
+    if(!ISEMPTY(n)) {
         bool first = true;
-        ValueType remain = Helper::foreach(n, [&](ValueType o) {
+        ValuePointer remain = FOREACH(o, n, {
             if(first) {
                 first = false;
             } else {
@@ -145,7 +145,7 @@ String Printer::castList(Pointer<ListType> n)
             }
             ans += print(o);
         });
-        if(!Helper::isEmpty(remain))
+        if(!ISEMPTY(remain))
             ans += " . " + print(remain);
     }
     ans += ")";

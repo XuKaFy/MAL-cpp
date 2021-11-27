@@ -1,4 +1,4 @@
-#include "common.h"
+#include "type.h"
 
 Type AbstractType::type() const
 {
@@ -10,7 +10,7 @@ AbstractType::~AbstractType()
     ;
 }
 
-ValueType  AbstractType::copy() const
+ValuePointer AbstractType::copy() const
 {
     return new AbstractType();
 }
@@ -20,7 +20,7 @@ Type NumberType::type() const
     return Type::TYPE_NUMBER;
 }
 
-ValueType NumberType::copy() const
+ValuePointer NumberType::copy() const
 {
     return new NumberType(m_num);
 }
@@ -53,7 +53,7 @@ Type AtomType::type() const
     return Type::TYPE_ATOM;
 }
 
-ValueType AtomType::copy() const
+ValuePointer AtomType::copy() const
 {
     return new AtomType(m_atom);
 }
@@ -73,7 +73,7 @@ AtomType::~AtomType()
     ;
 }
 
-ListType::ListType(ValueType first, ValueType second)
+ListType::ListType(ValuePointer first, ValuePointer second)
     : m_first(first), m_second(second) {
 }
 
@@ -82,9 +82,9 @@ Type ListType::type() const
     return Type::TYPE_LIST;
 }
 
-ValueType ListType::copy() const
+ValuePointer ListType::copy() const
 {
-    ValueType first, second;
+    ValuePointer first, second;
     if(m_first)
         first = m_first->copy();
     if(m_second)
@@ -92,22 +92,22 @@ ValueType ListType::copy() const
     return new ListType(first, second);
 }
 
-ValueType ListType::first() const
+ValuePointer ListType::first() const
 {
     return m_first;
 }
 
-void ListType::setFirst(ValueType first)
+void ListType::setFirst(ValuePointer first)
 {
     m_first = first;
 }
 
-ValueType ListType::second() const
+ValuePointer ListType::second() const
 {
     return m_second;
 }
 
-void ListType::setSecond(ValueType second)
+void ListType::setSecond(ValuePointer second)
 {
     m_second = second;
 }
@@ -126,7 +126,7 @@ Type StringType::type() const
     return Type::TYPE_STRING;
 }
 
-ValueType StringType::copy() const
+ValuePointer StringType::copy() const
 {
     return new StringType(m_str);
 }
@@ -146,7 +146,7 @@ StringType::~StringType()
     ;
 }
 
-LambdaType::LambdaType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env)
+LambdaType::LambdaType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env)
     : m_arg(arg), m_body(body), m_env(env) {
 }
 
@@ -155,9 +155,9 @@ Type LambdaType::type() const
     return Type::TYPE_LAMBDA;
 }
 
-ValueType LambdaType::copy() const
+ValuePointer LambdaType::copy() const
 {
-    return new LambdaType(m_arg->copy().convert<ListType>(), 
+    return new LambdaType(m_arg->copy().convert<ListType>(),
                           m_body->copy().convert<ListType>(),
                           m_env);
 }
@@ -182,12 +182,12 @@ void LambdaType::setBody(Pointer<ListType> body)
     m_body = body;
 }
 
-Pointer<Environment> LambdaType::environment() const
+EnvironmentPointer LambdaType::environment() const
 {
     return m_env;
 }
 
-void LambdaType::setEnvironment(Pointer<Environment> env)
+void LambdaType::setEnvironment(EnvironmentPointer env)
 {
     m_env = env;
 }
@@ -206,7 +206,7 @@ Type BuildinType::type() const
     return Type::TYPE_BUILDIN;
 }
 
-ValueType BuildinType::copy() const
+ValuePointer BuildinType::copy() const
 {
     return new BuildinType(m_f, m_name);
 }
@@ -216,7 +216,7 @@ String BuildinType::name() const
     return m_name;
 }
 
-ValueType BuildinType::process(Pointer<ListType> obj)
+ValuePointer BuildinType::process(Pointer<ListType> obj)
 {
     return m_f(obj);
 }
@@ -226,7 +226,7 @@ BuildinType::~BuildinType()
     ;
 }
 
-MacroType::MacroType(Pointer<ListType> arg, Pointer<ListType> body, Pointer<Environment> env)
+MacroType::MacroType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env)
     : LambdaType(arg, body, env) {
 }
 

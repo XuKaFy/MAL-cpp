@@ -2,33 +2,38 @@
 #include <string>
 
 #include "environment.h"
-#include "reader.h"
+#include "definition.h"
 #include "evaluator.h"
 #include "printer.h"
+#include "reader.h"
+#include "type.h"
 #include "core.h"
-#include "common.h"
 
 #define EOF_EXCEPTION Exception("Interface::read: EOF")
 
 class Interface {
 public:
     Interface() {
-        environment = new Environment();
+        environment = new EnvironmentType();
     }
+
     String read() {
         String str;
         if(!getline(std::cin, str))
             throw EOF_EXCEPTION;
         return str;
     }
-    ValueType eval(String exp) {
-        ValueType root = Reader::read(exp);
+
+    ValuePointer eval(String exp) {
+        ValuePointer root = Reader::read(exp);
         Printer::print(root);
         return evaluator.eval(root, environment);
     }
-    void print(ValueType obj) {
+
+    void print(ValuePointer obj) {
         std::cout << Printer::print(obj) << std::endl;
     }
+
     bool rep() {
         String str;
         std::cout << "user> ";
@@ -39,12 +44,13 @@ public:
         }
         try {
             print(eval(str));
-        } catch(ValueType k) {
+        } catch(ValuePointer k) {
             std::cout << "rep: Caught error: " + Printer::print(k) << std::endl;
             return false;
         }
         return true;
     }
+
     void loop() {
         bool flag = true;
         while(flag) {    
@@ -57,6 +63,7 @@ public:
             }
         }
     }
+
     void generateMainEnvironment() {
         try {
             Core::registerBasicFunction(environment);
@@ -71,8 +78,8 @@ public:
     }
 
 private:
-    Evaluator evaluator;
-    Pointer<Environment> environment;
+    Evaluator           evaluator;
+    EnvironmentPointer  environment;
 } interface;
 
 int main()

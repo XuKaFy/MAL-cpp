@@ -7,7 +7,7 @@
 
 #include <ctime>
 
-#include "common.h"
+#include "type.h"
 #include "memory.h"
 #include "helper.h"
 #include "reader.h"
@@ -17,8 +17,8 @@
 class Core
 {
 public:
-    static void registerBasicFunction(Pointer<Environment> env);
-    static void registerFunction(Pointer<Environment> env, String name, Function fun);
+    static void registerBasicFunction   (EnvironmentPointer env);
+    static void registerFunction        (EnvironmentPointer env, String name, Function fun);
 };
 
 #endif // CORE_H

@@ -1,21 +1,21 @@
 #include "reader.h"
 
-ValueType Analyzer::analyze(String s)
+ValuePointer Analyzer::analyze(String s)
 {
     m_s = s;
     m_pos = 0;
     m_len = s.size();
 
-    ValueType ans = elem();
+    ValuePointer ans = elem();
     if(remain()) {
-        Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+        Pointer<ListType> root = Memory::dispatchList();
         Pointer<ListType> current = root;
         current = Helper::append(current, ans);
         while(remain()) {
             ans = elem();
             current = Helper::append(current, ans);
         }
-        current->setSecond(Helper::constantFalse());
+        current->setSecond(FALSE);
         return VALUE(BEGIN(root));
     }
     return ans;
@@ -32,7 +32,7 @@ void Analyzer::delSpace()
         match(lookahead());
 }
 
-ValueType Analyzer::number()
+ValuePointer Analyzer::number()
 {
     Number k = 0;
     bool read = false;
@@ -43,10 +43,10 @@ ValueType Analyzer::number()
     }
     if(!read)
         throw Exception("Analyzer::number: No Number");
-    return VALUE(Memory::dispatch(k));
+    return VALUE(Memory::dispatchNumber(k));
 }
 
-ValueType Analyzer::atom()
+ValuePointer Analyzer::atom()
 {
     String s;
     if(remain() && isAtomHead(lookahead())) {
@@ -56,27 +56,27 @@ ValueType Analyzer::atom()
             s += lookahead();
             match(lookahead());
         }
-        return Memory::dispatch(s).convert<AbstractType>();
+        return VALUE(Memory::dispatchAtom(s));
     }
     throw Exception("Analyzer::atom: No Atom");
 }
 
-ValueType Analyzer::list()
+ValuePointer Analyzer::list()
 {
     match('(');
-    Pointer<ListType> root = Memory::dispatch(ValueType(), ValueType());
+    Pointer<ListType> root = Memory::dispatchList();
     Pointer<ListType> current = root;
     while(remain() && lookahead() != ')') {
         current = Helper::append(current, elem());
         delSpace();
     }
-    if(Helper::car(current))
+    if(CAR(current))
         current->setSecond(FALSE);
     match(')');
     return VALUE(root);
 }
 
-ValueType Analyzer::string()
+ValuePointer Analyzer::string()
 {
     String s;
     match('"');
@@ -94,10 +94,10 @@ ValueType Analyzer::string()
         }
     }
     match('"');
-    return VALUE(Memory::dispatch(s, true));
+    return VALUE(Memory::dispatchString(s));
 }
 
-ValueType Analyzer::elem()
+ValuePointer Analyzer::elem()
 {
     delSpace();
     if(!remain())
@@ -179,7 +179,7 @@ void Analyzer::match(String k)
         match(i);
 }
 
-ValueType Reader::read(String s)
+ValuePointer Reader::read(String s)
 {
     Analyzer az;
     return az.analyze(s);

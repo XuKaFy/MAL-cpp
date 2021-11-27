@@ -8,7 +8,10 @@
 //#define EVAL_DEBUG
 //#define EVALLAMBDA_DEBUG
 
-// MEMORY
+// Memory
 //#define DISPATCH_DEBUG
+
+// Environment
+//#define ENVIRONMENT_DEBUG
 
 #endif // DEBUG_H

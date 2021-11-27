@@ -1,6 +1,6 @@
 #include "memory.h"
 
-Pointer<AbstractType> Memory::dispatch()
+Pointer<AbstractType> Memory::dispatchVoid()
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH AbstractType\n");
@@ -8,7 +8,7 @@ Pointer<AbstractType> Memory::dispatch()
     return new AbstractType();
 }
 
-Pointer<AtomType> Memory::dispatch(Atom atom)
+Pointer<AtomType> Memory::dispatchAtom(Atom atom)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH AtomType %s\n", atom.c_str());
@@ -16,7 +16,7 @@ Pointer<AtomType> Memory::dispatch(Atom atom)
     return new AtomType(atom);
 }
 
-Pointer<BuildinType> Memory::dispatch(Function fun, String name)
+Pointer<BuildinType> Memory::dispatchBuildin(Function fun, String name)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH BuildinType %s\n", name.c_str());
@@ -24,7 +24,7 @@ Pointer<BuildinType> Memory::dispatch(Function fun, String name)
     return new BuildinType(fun, name);
 }
 
-Pointer<ListType> Memory::dispatch(ValueType first, ValueType second)
+Pointer<ListType> Memory::dispatchList(ValuePointer first, ValuePointer second)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH ListType %p, %p\n", first, second);
@@ -32,9 +32,9 @@ Pointer<ListType> Memory::dispatch(ValueType first, ValueType second)
     return new ListType(first, second);
 }
 
-Pointer<LambdaType> Memory::dispatch(Pointer<ListType> args, 
-                                     Pointer<ListType> body, 
-                                     Pointer<Environment> env)
+Pointer<LambdaType> Memory::dispatchLambda(Pointer<ListType>  args, 
+                                           Pointer<ListType>  body,
+                                           EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH LambdaType \n\t%s \n\t%s\n", Printer::print(args).c_str(),
@@ -43,9 +43,9 @@ Pointer<LambdaType> Memory::dispatch(Pointer<ListType> args,
     return new LambdaType(args, body, env);
 }
 
-Pointer<MacroType> Memory::dispatch(Pointer<ListType> args, 
-                                    Pointer<ListType> body, 
-                                    Pointer<Environment> env, bool)
+Pointer<MacroType> Memory::dispatchMacro(Pointer<ListType>  args, 
+                                         Pointer<ListType>  body,
+                                         EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH MacroType \n\t%s \n\t%s\n",  Printer::print(args).c_str(),
@@ -54,7 +54,7 @@ Pointer<MacroType> Memory::dispatch(Pointer<ListType> args,
     return new MacroType(args, body, env);
 }
 
-Pointer<NumberType> Memory::dispatch(Number num)
+Pointer<NumberType> Memory::dispatchNumber(Number num)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH NumberType %f\n", num);
@@ -62,7 +62,7 @@ Pointer<NumberType> Memory::dispatch(Number num)
     return new NumberType(num);
 }
 
-Pointer<StringType> Memory::dispatch(String str, bool)
+Pointer<StringType> Memory::dispatchString(String str)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH StringType %s\n", str.c_str());
@@ -70,10 +70,10 @@ Pointer<StringType> Memory::dispatch(String str, bool)
     return new StringType(str);
 }
 
-Pointer<Environment> Memory::dispatch(Pointer<Environment> env)
+EnvironmentPointer Memory::dispatchEnvironment(EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH Environment parent = %p\n", env);
 #endif
-    return new Environment(env);
+    return new EnvironmentType(env);
 }

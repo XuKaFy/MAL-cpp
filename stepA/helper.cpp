@@ -1,16 +1,16 @@
 #include "helper.h"
 
-ValueType Helper::car(Pointer<ListType> o)
+ValuePointer Helper::car(Pointer<ListType> o)
 {
     return o->first();
 }
 
-ValueType Helper::cdr(Pointer<ListType> o)
+ValuePointer Helper::cdr(Pointer<ListType> o)
 {
     return o->second();
 }
 
-bool Helper::atom(ValueType o)
+bool Helper::atom(ValuePointer o)
 {
     if(o->type() == Type::TYPE_ATOM)
         return true;
@@ -19,7 +19,7 @@ bool Helper::atom(ValueType o)
     return false;
 }
 
-bool Helper::eq(ValueType a1, ValueType a2)
+bool Helper::eq(ValuePointer a1, ValuePointer a2)
 {
     if(!a1 && !a2)
         return true;
@@ -49,21 +49,21 @@ bool Helper::eq(ValueType a1, ValueType a2)
                 && GETLAMBDA(a1)->arg() == GETLAMBDA(a2)->arg();  
     case Type::TYPE_MACRO:
         return GETMACRO(a2)->body() == GETMACRO(a2)->body()
-                && GETMACRO(a1)->arg() == GETMACRO(a2)->arg();  
+                && GETMACRO(a1)->arg() == GETMACRO(a2)->arg();
     }
     return false;
 }
 
-Pointer<ListType> Helper::cons(ValueType a1, ValueType a2)
+Pointer<ListType> Helper::cons(ValuePointer a1, ValuePointer a2)
 {
-    return Memory::dispatch(a1, a2);
+    return Memory::dispatchList(a1, a2);
 }
 
-ValueType Helper::get(Pointer<ListType>& o)
+ValuePointer Helper::get(Pointer<ListType>& o)
 {
-    if(isEmpty(o.convert<AbstractType>()))
+    if(isEmpty(o))
         throw Exception("Helper::get: Can't get 1 elem");
-    ValueType f = car(o);
+    ValuePointer f = car(o);
     next(o);
     return f;
 }
@@ -73,7 +73,7 @@ void Helper::next(Pointer<ListType> &o)
     o = GETLIST(cdr(o));
 }
 
-bool Helper::isEmpty(ValueType o)
+bool Helper::isEmpty(ValuePointer o)
 {
     if(o->type() != Type::TYPE_LIST)
         return false;
@@ -108,7 +108,7 @@ bool Helper::isSingle(Pointer<ListType> o)
     return isEmpty(cdr(o));
 }
 
-bool Helper::isSelfEvaluating(ValueType o)
+bool Helper::isSelfEvaluating(ValuePointer o)
 {
     if(o->type() == Type::TYPE_NUMBER)
         return true;
@@ -123,12 +123,12 @@ bool Helper::isSelfEvaluating(ValueType o)
     return false;
 }
 
-bool Helper::isTrue(ValueType o)
+bool Helper::isTrue(ValuePointer o)
 {
     return !isFalse(o);
 }
 
-bool Helper::isFalse(ValueType o)
+bool Helper::isFalse(ValuePointer o)
 {
     return isEmpty(o);
 }
@@ -144,28 +144,28 @@ bool Helper::isFlat(Pointer<ListType> o)
     return isSingle(o);
 }
 
-ValueType Helper::constantVoid()
+ValuePointer Helper::constantVoid()
 {
-    static Pointer<AbstractType> val(Memory::dispatch());
+    static Pointer<AbstractType> val(Memory::dispatchVoid());
     return val;
 }
 
-ValueType Helper::constantTrue()
+ValuePointer Helper::constantTrue()
 {
-    static Pointer<AtomType> val(Memory::dispatch("t"));
-    return val.convert<AbstractType>();
+    static Pointer<AtomType> val(Memory::dispatchAtom("t"));
+    return VALUE(val);
 }
 
-ValueType Helper::constantFalse()
+ValuePointer Helper::constantFalse()
 {
-    static Pointer<ListType> val(Memory::dispatch(ValueType(), ValueType()));
-    return val.convert<AbstractType>();
+    static Pointer<ListType> val(Memory::dispatchList());
+    return VALUE(val);
 }
 
-ValueType Helper::foreach(Pointer<ListType> o, std::function<void(ValueType o)> f)
+ValuePointer Helper::foreach(Pointer<ListType> o, std::function<void(ValuePointer o)> f)
 {
     if(isEmpty(o))
-        return o.convert<AbstractType>();
+        return VALUE(o);
     while(!isLast(o)) {
         f(car(o));
         next(o);
@@ -174,13 +174,13 @@ ValueType Helper::foreach(Pointer<ListType> o, std::function<void(ValueType o)> 
     return cdr(o);
 }
 
-Pointer<ListType> Helper::append(Pointer<ListType> o, ValueType n)
+Pointer<ListType> Helper::append(Pointer<ListType> o, ValuePointer n)
 {
     if(isEmpty(o)) {
         o->setFirst(n);
         return o;
     }
-    Pointer<ListType> back = Memory::dispatch(n, ValueType());
+    Pointer<ListType> back = Memory::dispatchList(n);
     o->setSecond(VALUE(back));
     return back;
 }
