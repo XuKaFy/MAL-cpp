@@ -22,7 +22,9 @@ public:
     #endif
     }
 
-    ~Environment() {
+    void clear() {
+        m_map.clear();
+        m_parent.release();
     }
 
     Pointer<Environment<T>> parent() const {

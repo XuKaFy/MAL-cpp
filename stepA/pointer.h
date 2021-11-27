@@ -6,6 +6,8 @@
 
 #include "definition.h"
 
+#include "debug.h"
+
 template<typename T>
 class Pointer
 {
@@ -67,13 +69,6 @@ public:
         return *m_count;
     }
 
-private:
-    Pointer(T* pointer, int* count)
-        : m_pointer(pointer), m_count(count) {
-        assert(m_count != nullptr);
-        ++(*m_count);
-    }
-
     void release() {
         if(m_count == nullptr)
             return ;
@@ -89,6 +84,16 @@ private:
             m_count = nullptr;
             m_pointer = nullptr;
         }
+    }
+
+private:
+    Pointer(T* pointer, int* count)
+        : m_pointer(pointer), m_count(count) {
+        assert(m_count != nullptr);
+        ++(*m_count);
+#ifdef POINTER_DEBUG
+        printf("POINTER %p COPY --- COUNT = %d\n", m_pointer, *m_count);
+#endif
     }
 
     void create(T* pointer) {

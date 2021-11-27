@@ -15,7 +15,7 @@ LABEL_AGAIN:
         return o;
     }
     if(!root && tco) {
-        throw (StackFrameType{o, env});
+        throw (StackFrame{o, env});
     }
     try {
         ValuePointer res = nullptr;
@@ -30,7 +30,7 @@ LABEL_AGAIN:
             throw Exception("Evaluator::eval: Can't execute");
         }
         return res;
-    } catch (StackFrameType s) {
+    } catch (StackFrame s) {
         o = s.o;
         env = s.env;
         goto LABEL_AGAIN;
@@ -38,7 +38,7 @@ LABEL_AGAIN:
     return VOID;
 }
 
-ValuePointer Evaluator::apply(Pointer<ListType> l, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
 {
     if(ISEMPTY(l)) {
         throw Exception("Evaluator::apply: Can't execute");
@@ -109,12 +109,12 @@ ValuePointer Evaluator::apply(Pointer<ListType> l, EnvironmentPointer env, bool 
     return VOID;
 }
 
-Pointer<ListType> Evaluator::listOfValues(Pointer<ListType> l, EnvironmentPointer env)
+ListPointer Evaluator::listOfValues(ListPointer l, EnvironmentPointer env)
 {
     if(ISEMPTY(l))
         return l;
-    Pointer<ListType> root = Memory::dispatchList();
-    Pointer<ListType> current = root;
+    ListPointer root = Memory::dispatchList();
+    ListPointer current = root;
     ValuePointer remain = FOREACH(o, l, {
         current = Helper::append(current, eval(o, env, true, true));
     });
@@ -122,14 +122,14 @@ Pointer<ListType> Evaluator::listOfValues(Pointer<ListType> l, EnvironmentPointe
     return root;
 }
 
-ValuePointer Evaluator::funQuote(Pointer<ListType> o)
+ValuePointer Evaluator::funQuote(ListPointer o)
 {
     if(!Helper::isSingle(o))
         throw Exception("Evaluator::funQuote: Length of args error");
     return CAR(o);
 }
 
-ValuePointer Evaluator::funDef(Pointer<ListType> o, EnvironmentPointer env)
+ValuePointer Evaluator::funDef(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = funBegin(o, env, false);
@@ -137,7 +137,7 @@ ValuePointer Evaluator::funDef(Pointer<ListType> o, EnvironmentPointer env)
     return a2;
 }
 
-ValuePointer Evaluator::funSet(Pointer<ListType> o, EnvironmentPointer env)
+ValuePointer Evaluator::funSet(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = funBegin(o, env, false);
@@ -145,7 +145,7 @@ ValuePointer Evaluator::funSet(Pointer<ListType> o, EnvironmentPointer env)
     return a2;
 }
 
-ValuePointer Evaluator::funDefMacro(Pointer<ListType> o, EnvironmentPointer env)
+ValuePointer Evaluator::funDefMacro(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer name = GET(o);
     ValuePointer args = GET(o);
@@ -156,10 +156,10 @@ ValuePointer Evaluator::funDefMacro(Pointer<ListType> o, EnvironmentPointer env)
     return ans;
 }
 
-ValuePointer Evaluator::funTry(Pointer<ListType> o, EnvironmentPointer env)
+ValuePointer Evaluator::funTry(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer tryBody = GET(o);
-    Pointer<ListType> catchList = GETLIST(GET(o));
+    ListPointer catchList = GETLIST(GET(o));
     if(!ISEMPTY(o))
         throw Exception("Evaluator::funTry: Wrong format");
     Atom catchSymbol = GETATOM(GET(catchList));
@@ -181,7 +181,7 @@ ValuePointer Evaluator::funTry(Pointer<ListType> o, EnvironmentPointer env)
     return VOID;
 }
 
-ValuePointer Evaluator::funLambda(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funLambda(ListPointer o, EnvironmentPointer env, bool tco)
 {
     ValuePointer a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
@@ -194,7 +194,7 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
     if(o->type() != Type::TYPE_LIST) {
         return o;
     }
-    Pointer<ListType> l = GETLIST(o);
+    ListPointer l = GETLIST(o);
     if(ISEMPTY(l)) {
         return FALSE;
     }
@@ -207,7 +207,7 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
         } else if(name == "splice-unquote") {
             NEXT(l);
             SINGLE(it, l);
-            Pointer<ListType> ans = GETLIST(eval(it, env, false, true));
+            ListPointer ans = GETLIST(eval(it, env, false, true));
             if(ISEMPTY(ans))
                 return FALSE;
             if(!ISLIST(ans))
@@ -215,12 +215,12 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
             throw GETLIST(ans->copy());
         }
     }
-    Pointer<ListType> root = Memory::dispatchList();
-    Pointer<ListType> current = root;
+    ListPointer root = Memory::dispatchList();
+    ListPointer current = root;
     ValuePointer remain = FOREACH(o, l, {
         try {
             current = Helper::append(current, funQuasiquote(o, env));
-        } catch (Pointer<ListType> splice) {
+        } catch (ListPointer splice) {
             if(ISEMPTY(root)) {
                 root = current = splice;
             } else {
@@ -236,19 +236,19 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
     return VALUE(root);
 }
 
-ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, Pointer<ListType> args, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, EnvironmentPointer env, bool tco)
 {
 #ifdef EVALLAMBDA_DEBUG
     printf("EVAL LAMBDA\n");
-    printf("    BODY<%s>\n", Printer::print(lam->body()).c_str());
-    printf("    ARGS<%s>\n", Printer::print(lam->arg()).c_str());
-    printf("    GIVEN<%s>\n", Printer::print(args).c_str());
+    printf("    BODY<%s>\n", Printer::castList(lam->body()).c_str());
+    printf("    ARGS<%s>\n", Printer::castList(lam->arg()).c_str());
+    printf("    GIVEN<%s>\n", Printer::castList(args).c_str());
 #endif
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(lam->environment());
-    Pointer<ListType> lamPointer = lam->arg();
-    Pointer<ListType> argsPointer = args;
+    ListPointer lamPointer = lam->arg();
+    ListPointer argsPointer = args;
     while(!ISEMPTY(lamPointer) && !ISEMPTY(argsPointer)) {
         Atom name = GETATOM(CAR(lamPointer));
         if(name == "&") {
@@ -280,7 +280,7 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, Pointer<ListType> ar
     return funBegin(lam->body(), childEnv, tco); 
 }
 
-ValuePointer Evaluator::funCond(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)
 {
     if(ISEMPTY(o)) {
         return FALSE;
@@ -296,7 +296,7 @@ ValuePointer Evaluator::funCond(Pointer<ListType> o, EnvironmentPointer env, boo
     return FALSE;
 }
 
-ValuePointer Evaluator::funIf(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env, bool tco)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = GET(o);
@@ -314,7 +314,7 @@ ValuePointer Evaluator::funIf(Pointer<ListType> o, EnvironmentPointer env, bool 
     return FALSE;
 }
 
-ValuePointer Evaluator::funIf2(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funIf2(ListPointer o, EnvironmentPointer env, bool tco)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = GET(o);
@@ -327,13 +327,13 @@ ValuePointer Evaluator::funIf2(Pointer<ListType> o, EnvironmentPointer env, bool
     return nullptr;
 }
 
-ValuePointer Evaluator::funLet(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
 {
     ValuePointer a1 = GET(o);
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-    Pointer<ListType> args = GETLIST(a1);
+    ListPointer args = GETLIST(a1);
     while(!ISEMPTY(args)) {
-        Pointer<ListType> m = GETLIST(GET(args));
+        ListPointer m = GETLIST(GET(args));
         Atom b1 = GETATOM(GET(m));
         ValuePointer b2 = GET(m);
         if(!ISEMPTY(m)) {
@@ -344,7 +344,7 @@ ValuePointer Evaluator::funLet(Pointer<ListType> o, EnvironmentPointer env, bool
     return funBegin(o, childEnv, tco); // (let ((x 1) (y 2)) (+ x y))
 }
 
-ValuePointer Evaluator::funBegin(Pointer<ListType> o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funBegin(ListPointer o, EnvironmentPointer env, bool tco)
 {
     if(ISEMPTY(o) || !ISLIST(o))
         throw Exception("Evaluator::funBegin: Args given wrong");

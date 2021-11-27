@@ -24,32 +24,32 @@ Pointer<BuildinType> Memory::dispatchBuildin(Function fun, String name)
     return new BuildinType(fun, name);
 }
 
-Pointer<ListType> Memory::dispatchList(ValuePointer first, ValuePointer second)
+ListPointer Memory::dispatchList(ValuePointer first, ValuePointer second)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH ListType %p, %p\n", first, second);
+    printf("DISPATCH ListType %p, %p\n", first.get(), second.get());
 #endif
     return new ListType(first, second);
 }
 
-Pointer<LambdaType> Memory::dispatchLambda(Pointer<ListType>  args, 
-                                           Pointer<ListType>  body,
+Pointer<LambdaType> Memory::dispatchLambda(ListPointer  args, 
+                                           ListPointer  body,
                                            EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH LambdaType \n\t%s \n\t%s\n", Printer::print(args).c_str(),
-                                                  Printer::print(body).c_str());
+    printf("DISPATCH LambdaType \n\t%s \n\t%s\n", Printer::castList(args).c_str(),
+                                                  Printer::castList(body).c_str());
 #endif
     return new LambdaType(args, body, env);
 }
 
-Pointer<MacroType> Memory::dispatchMacro(Pointer<ListType>  args, 
-                                         Pointer<ListType>  body,
+Pointer<MacroType> Memory::dispatchMacro(ListPointer  args, 
+                                         ListPointer  body,
                                          EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH MacroType \n\t%s \n\t%s\n",  Printer::print(args).c_str(),
-                                                  Printer::print(body).c_str());
+    printf("DISPATCH MacroType \n\t%s \n\t%s\n",  Printer::castList(args).c_str(),
+                                                  Printer::castList(body).c_str());
 #endif
     return new MacroType(args, body, env);
 }
@@ -73,7 +73,7 @@ Pointer<StringType> Memory::dispatchString(String str)
 EnvironmentPointer Memory::dispatchEnvironment(EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH Environment parent = %p\n", env);
+    printf("DISPATCH Environment parent = %p\n", env.get());
 #endif
     return new EnvironmentType(env);
 }

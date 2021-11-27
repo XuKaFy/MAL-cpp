@@ -1,11 +1,11 @@
 #include "helper.h"
 
-ValuePointer Helper::car(Pointer<ListType> o)
+ValuePointer Helper::car(ListPointer o)
 {
     return o->first();
 }
 
-ValuePointer Helper::cdr(Pointer<ListType> o)
+ValuePointer Helper::cdr(ListPointer o)
 {
     return o->second();
 }
@@ -54,12 +54,12 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
     return false;
 }
 
-Pointer<ListType> Helper::cons(ValuePointer a1, ValuePointer a2)
+ListPointer Helper::cons(ValuePointer a1, ValuePointer a2)
 {
     return Memory::dispatchList(a1, a2);
 }
 
-ValuePointer Helper::get(Pointer<ListType>& o)
+ValuePointer Helper::get(ListPointer& o)
 {
     if(isEmpty(o))
         throw Exception("Helper::get: Can't get 1 elem");
@@ -68,7 +68,7 @@ ValuePointer Helper::get(Pointer<ListType>& o)
     return f;
 }
 
-void Helper::next(Pointer<ListType> &o)
+void Helper::next(ListPointer &o)
 {
     o = GETLIST(cdr(o));
 }
@@ -80,12 +80,12 @@ bool Helper::isEmpty(ValuePointer o)
     return isEmpty(GETLIST(o));
 }
 
-bool Helper::isEmpty(Pointer<ListType> o)
+bool Helper::isEmpty(ListPointer o)
 {
     return !car(o) && !cdr(o);
 }
 
-bool Helper::isLast(Pointer<ListType> o)
+bool Helper::isLast(ListPointer o)
 {
     if(!cdr(o))
         return true;
@@ -94,14 +94,14 @@ bool Helper::isLast(Pointer<ListType> o)
     return isEmpty(cdr(o));
 }
 
-bool Helper::isList(Pointer<ListType> o)
+bool Helper::isList(ListPointer o)
 {
     if(!isLast(o))
         return isList(GETLIST(cdr(o)));
     return isSingle(o);
 }
 
-bool Helper::isSingle(Pointer<ListType> o)
+bool Helper::isSingle(ListPointer o)
 {
     if(isEmpty(o))
         return false;
@@ -133,7 +133,7 @@ bool Helper::isFalse(ValuePointer o)
     return isEmpty(o);
 }
 
-bool Helper::isFlat(Pointer<ListType> o)
+bool Helper::isFlat(ListPointer o)
 {
     if(isEmpty(o))
         return true;
@@ -158,11 +158,11 @@ ValuePointer Helper::constantTrue()
 
 ValuePointer Helper::constantFalse()
 {
-    static Pointer<ListType> val(Memory::dispatchList());
+    static ListPointer val(Memory::dispatchList());
     return VALUE(val);
 }
 
-ValuePointer Helper::foreach(Pointer<ListType> o, std::function<void(ValuePointer o)> f)
+ValuePointer Helper::foreach(ListPointer o, std::function<void(ValuePointer o)> f)
 {
     if(isEmpty(o))
         return VALUE(o);
@@ -174,13 +174,13 @@ ValuePointer Helper::foreach(Pointer<ListType> o, std::function<void(ValuePointe
     return cdr(o);
 }
 
-Pointer<ListType> Helper::append(Pointer<ListType> o, ValuePointer n)
+ListPointer Helper::append(ListPointer o, ValuePointer n)
 {
     if(isEmpty(o)) {
         o->setFirst(n);
         return o;
     }
-    Pointer<ListType> back = Memory::dispatchList(n);
+    ListPointer back = Memory::dispatchList(n);
     o->setSecond(VALUE(back));
     return back;
 }

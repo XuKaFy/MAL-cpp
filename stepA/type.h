@@ -15,11 +15,12 @@ class       AbstractType;
 class       ListType;
 
 typedef     Pointer<AbstractType>                           ValuePointer;
+typedef     Pointer<ListType>                               ListPointer;
 typedef     Environment<ValuePointer>                       EnvironmentType;
 typedef     Pointer<EnvironmentType>                        EnvironmentPointer;
 typedef     std::function<ValuePointer(Pointer<ListType>)>  Function;
 
-struct StackFrameType {
+struct StackFrame {
     ValuePointer        o;
     EnvironmentPointer  env;
 };

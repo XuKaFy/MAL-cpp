@@ -62,6 +62,7 @@ public:
                 std::cout << e << std::endl;
             }
         }
+        environment->clear();
     }
 
     void generateMainEnvironment() {

@@ -132,7 +132,7 @@ String Printer::castAtom(Atom n)
     return n;
 }
 
-String Printer::castList(Pointer<ListType> n)
+String Printer::castList(ListPointer n)
 {
     String ans = "(";
     if(!ISEMPTY(n)) {

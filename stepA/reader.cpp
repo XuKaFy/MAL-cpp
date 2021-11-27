@@ -8,8 +8,8 @@ ValuePointer Analyzer::analyze(String s)
 
     ValuePointer ans = elem();
     if(remain()) {
-        Pointer<ListType> root = Memory::dispatchList();
-        Pointer<ListType> current = root;
+        ListPointer root = Memory::dispatchList();
+        ListPointer current = root;
         current = Helper::append(current, ans);
         while(remain()) {
             ans = elem();
@@ -64,8 +64,8 @@ ValuePointer Analyzer::atom()
 ValuePointer Analyzer::list()
 {
     match('(');
-    Pointer<ListType> root = Memory::dispatchList();
-    Pointer<ListType> current = root;
+    ListPointer root = Memory::dispatchList();
+    ListPointer current = root;
     while(remain() && lookahead() != ')') {
         current = Helper::append(current, elem());
         delSpace();

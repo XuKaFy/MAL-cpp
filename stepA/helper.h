@@ -32,7 +32,7 @@
 #define VOID                Helper::constantVoid()
 #define IF(x)               ((x) ? TRUE : FALSE)
 
-#define MAKE_LIST(a, b)      (Memory::dispatchList(VALUE(a), VALUE(b)))
+#define MAKE_LIST(a, b)     (Memory::dispatchList(VALUE(a), VALUE(b)))
 
 #define BEGIN(x)            MAKE_LIST(Memory::dispatchAtom("begin"),             x)
 #define QUOTE(x)            MAKE_LIST(Memory::dispatchAtom("quote"),             MAKE_LIST(x, FALSE))
@@ -52,37 +52,37 @@
 #define NONEARG(o) \
     if(!ISEMPTY(o)) \
         throw Exception("NONEARG: Shouldn't give arg");
-#define FUNCTION(o) [](Pointer<ListType> o) -> ValuePointer
+#define FUNCTION(o) [](ListPointer o) -> ValuePointer
 #define FOREACH(o, m, block) (Helper::foreach(m, [&](ValuePointer o) -> void block))
 
 class Helper
 {
 public:
-    static ValuePointer             car    (Pointer<ListType> o);
-    static ValuePointer             cdr    (Pointer<ListType> o);
+    static ValuePointer             car    (ListPointer o);
+    static ValuePointer             cdr    (ListPointer o);
     static bool                     atom   (ValuePointer o);
     static bool                     eq     (ValuePointer a1, ValuePointer a2);
-    static Pointer<ListType>        cons   (ValuePointer a1, ValuePointer a2);
+    static ListPointer              cons   (ValuePointer a1, ValuePointer a2);
 
-    static ValuePointer             get    (Pointer<ListType> &o);
-    static void                     next   (Pointer<ListType> &o);
+    static ValuePointer             get    (ListPointer &o);
+    static void                     next   (ListPointer &o);
 
     static bool isEmpty          (ValuePointer o);
-    static bool isEmpty          (Pointer<ListType> o);
-    static bool isLast           (Pointer<ListType> o);
-    static bool isList           (Pointer<ListType> o);
-    static bool isSingle         (Pointer<ListType> o);
+    static bool isEmpty          (ListPointer o);
+    static bool isLast           (ListPointer o);
+    static bool isList           (ListPointer o);
+    static bool isSingle         (ListPointer o);
     static bool isSelfEvaluating (ValuePointer o);
     static bool isTrue           (ValuePointer o);
     static bool isFalse          (ValuePointer o);
-    static bool isFlat           (Pointer<ListType> o);
+    static bool isFlat           (ListPointer o);
 
     static ValuePointer constantVoid();
     static ValuePointer constantTrue();
     static ValuePointer constantFalse();
     
-    static Pointer<ListType>        append  (Pointer<ListType> o, ValuePointer n);
-    static ValuePointer             foreach (Pointer<ListType> o, std::function<void(ValuePointer o)> f);
+    static ListPointer  append   (ListPointer o, ValuePointer n);
+    static ValuePointer foreach  (ListPointer o, std::function<void(ValuePointer o)> f);
 };
 
 #endif //HELPER_H
