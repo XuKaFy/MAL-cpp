@@ -1,0 +1,17 @@
+(def! create-accumulator (fn* ()
+    (def! value 0)
+    (def! accumulator (fn* (delta) 
+        (set! value (+ value delta))
+        value
+    ))
+    accumulator
+))
+
+(def! a (create-accumulator))
+(def! b (create-accumulator))
+
+(println (a 1))
+(println (a 3))
+(println (b 2))
+
+"test_A end"

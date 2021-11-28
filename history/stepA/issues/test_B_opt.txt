@@ -1,0 +1,279 @@
+user> (load-file "tests/test_B.mal") 
+    list<[0], [0]>
+    Symbol<load-file>
+    string<tests/test_B.mal>
+    list<[15828224], [0]>
+    list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+    list<[0], [0]>
+    string<(println `((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0))
+(println
+    (
+        (lambda (x all)
+            (print-string "Now, x = ")
+            (println x)
+            (if (empty? x)
+                all
+                (apply-self (cdr x) (+ all (car x)))
+            )
+        )
+        (list 1 2 3 4 5)
+        0
+    )
+)
+
+"test_B.txt end">
+    list<[0], [0]>
+    Symbol<println>
+    list<[0], [0]>
+    list<[0], [0]>
+    Symbol<lambda>
+    list<[0], [0]>
+    Symbol<x>
+    Symbol<all>
+    list<[15828736], [0]>
+    list<[15830784], [0]>
+    list<[0], [0]>
+    Symbol<if>
+    list<[0], [0]>
+    Symbol<empty?>
+    Symbol<x>
+    list<[15827776], [0]>
+    list<[15831024], [0]>
+    Symbol<all>
+    list<[15827520], [0]>
+    list<[0], [0]>
+    Symbol<apply-self>
+    list<[0], [0]>
+    Symbol<cdr>
+    Symbol<x>
+    list<[15828672], [0]>
+    list<[15830160], [0]>
+    list<[0], [0]>
+    Symbol<+>
+    Symbol<all>
+    list<[15827648], [0]>
+    list<[0], [0]>
+    Symbol<car>
+    Symbol<x>
+    list<[15828864], [0]>
+    list<[15830448], [0]>
+    list<[15830304], [0]>
+    list<[15830208], [0]>
+    list<[15830832], [0]>
+    list<[0], [0]>
+    Symbol<list>
+    number<1.000000>
+    list<[15832192], [0]>
+    number<2.000000>
+    list<[15832640], [0]>
+    number<3.000000>
+    list<[15832288], [0]>
+    number<4.000000>
+    list<[15832256], [0]>
+    number<5.000000>
+    list<[15832512], [0]>
+    list<[15829200], [0]>
+    number<0.000000>
+    list<[15832768], [0]>
+    list<[15830016], [14689808]>
+    Symbol<quasiquote>
+    list<[15827264], [15836864]>
+    list<[15835616], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    Symbol<println>
+    list<[0], [0]>
+    list<[0], [0]>
+    Symbol<lambda>
+    list<[0], [0]>
+    Symbol<x>
+    Symbol<all>
+    list<[15828032], [0]>
+    list<[15836192], [0]>
+    list<[0], [0]>
+    Symbol<print-string>
+    string<Now, x = >
+    list<[15827456], [0]>
+    list<[15836096], [0]>
+    list<[0], [0]>
+    Symbol<println>
+    Symbol<x>
+    list<[15840000], [0]>
+    list<[15835904], [0]>
+    list<[0], [0]>
+    Symbol<if>
+    list<[0], [0]>
+    Symbol<empty?>
+    Symbol<x>
+    list<[15837760], [0]>
+    list<[15836912], [0]>
+    Symbol<all>
+    list<[15838720], [0]>
+    list<[0], [0]>
+    Symbol<apply-self>
+    list<[0], [0]>
+    Symbol<cdr>
+    Symbol<x>
+    list<[15839552], [0]>
+    list<[15835664], [0]>
+    list<[0], [0]>
+    Symbol<+>
+    Symbol<all>
+    list<[15837824], [0]>
+    list<[0], [0]>
+    Symbol<car>
+    Symbol<x>
+    list<[15840896], [0]>
+    list<[15835712], [0]>
+    list<[15836048], [0]>
+    list<[15835376], [0]>
+    list<[15835424], [0]>
+    list<[0], [0]>
+    Symbol<list>
+    number<1.000000>
+    list<[15832384], [0]>
+    number<2.000000>
+    list<[15832736], [0]>
+    number<3.000000>
+    list<[15832800], [0]>
+    number<4.000000>
+    list<[15832416], [0]>
+    number<5.000000>
+    list<[15832704], [0]>
+    list<[15836000], [0]>
+    number<0.000000>
+    list<[15832448], [0]>
+    list<[15837104], [0]>
+    list<[15837152], [0]>
+    string<test_B.txt end>
+    list<[15840640], [0]>
+    Symbol<begin>
+    list<[15837888], [15837056]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15828736], [0]>
+    list<[15842656], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15827776], [0]>
+    list<[15842896], [0]>
+    list<[15827520], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15828672], [0]>
+    list<[15842416], [0]>
+    list<[0], [0]>
+    list<[15827648], [0]>
+    list<[0], [0]>
+    list<[15828864], [0]>
+    list<[15843280], [0]>
+    list<[15841552], [0]>
+    list<[15841696], [0]>
+    list<[15843088], [0]>
+    list<[0], [0]>
+    list<[15832192], [0]>
+    list<[15832640], [0]>
+    list<[15832288], [0]>
+    list<[15832256], [0]>
+    list<[15832512], [0]>
+    list<[15842704], [0]>
+    list<[15832768], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0)    null
+
+    list<[0], [0]>
+    lambda<((x all)) - ((print-string "Now, x = ") (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x)))))>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832736], [0]>
+    list<[15832800], [0]>
+    list<[15832416], [0]>
+    list<[15832704], [0]>
+    list<[15832448], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+(1 2 3 4 5)
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832384], [0]>
+    number<1.000000>
+    list<[15832576], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+(2 3 4 5)
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832736], [0]>
+    number<3.000000>
+    list<[15832896], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+(3 4 5)
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832800], [0]>
+    number<6.000000>
+    list<[15832480], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+(4 5)
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832416], [0]>
+    number<10.000000>
+    list<[15832320], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+(5)
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[0], [0]>
+    list<[15832704], [0]>
+    number<15.000000>
+    list<[15832032], [0]>
+    environment<parent = 15826080>
+    list<[0], [0]>
+Now, x =     list<[0], [0]>
+    environment<parent = 4325640>
+    list<[0], [0]>
+()
+    list<[0], [0]>
+    Symbol<t>
+    environment<parent = 4325640>
+    list<[0], [0]>
+15
+"test_B.txt end"

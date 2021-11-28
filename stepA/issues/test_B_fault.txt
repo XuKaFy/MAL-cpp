@@ -1,7 +1,0 @@
-user> (load-file "tests/test_B.mal") 
-((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0)
-"鐜板湪鐨剎涓?APPLY-SELF<#<lambda:((x all) (begin (print "鐜板湪鐨剎涓?) (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))))>> -> ((2 3 4 5) 1)
-APPLY-SELF<#<lambda:((x all) (begin (print "鐜板湪鐨剎涓?) (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))))>> -> ((3 4 5) 3)
-APPLY-SELF<#<lambda:((x all) (begin (print "鐜板湪鐨剎涓?) (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))))>> -> ((4 5) 6)
-APPLY-SELF<#<lambda:((x all) (begin (print "鐜板湪鐨剎涓?) (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))))>> -> ((5) 10)
-APPLY-SELF<#<lambda:((x all) (begin (print "鐜板湪鐨剎涓?) (println x) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))))>> -> (() 15)

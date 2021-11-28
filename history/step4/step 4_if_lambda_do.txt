@@ -1,0 +1,16 @@
+第四步需要实现：
+
+	(if)：已经在第三步中实现
+	(print ...)：这个函数返回值是nil，直接输出到stdout
+	(list? ...)：直接调用isList
+	(empty? ...)：直接调用isEmpty
+	(eq ...)：已经在第三步中实现过
+	(< ...) (> ...) (>= ...) (<= ...)：在main的global functions中实现
+	(true? ...)：在main的global functions中实现
+	(false? ...)：在main的global functions中实现
+	(begin ...)：在Evaluator中添加，同时let、define、lambda也原生支持隐式begin了
+	string类支持：已经在第二步实现
+
+同时，把一些内建函数的返回值进行修改，如果没有输出就返回new AbstractType。Printer函数对于AbstrctType的态处理是不输出任何字符。
+
+修改了一个小bug：转义只在输出字符串本身时转义。

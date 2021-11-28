@@ -1,3 +1,0 @@
-(println (quote (hello world)))
-
-"test_1 end"

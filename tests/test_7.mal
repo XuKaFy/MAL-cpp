@@ -1,0 +1,13 @@
+(def! lst (quote (b c)))
+
+(quasiquote (a lst d))
+(quasiquote (a (unquote lst) d))
+(quasiquote ((splice-unquote lst) d))
+(quasiquote (a (splice-unquote lst) d))
+
+(println `(a lst d))
+(println `(a ~lst d))
+(println `(~@ lst d))
+(println `(a ~@lst d))
+
+"test_7 end"
