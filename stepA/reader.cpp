@@ -21,6 +21,8 @@ ValuePointer Analyzer::analyze(String s)
         current->setSecond(FALSE);
         return VALUE(BEGIN(root));
     }
+    if(ans.empty())
+        return VOID;
     return ans;
 }
 

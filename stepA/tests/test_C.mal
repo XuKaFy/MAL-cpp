@@ -57,8 +57,8 @@
         )
     )
 )
-
-(println (my-cond
+; Similar to "cond"
+(println (my-cond ; The difinition
     (false 1)
     (true 5)
     (false 3)

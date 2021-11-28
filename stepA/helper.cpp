@@ -120,6 +120,8 @@ bool Helper::isSelfEvaluating(ValuePointer o)
         return true;
     if(o->type() == Type::TYPE_MACRO)
         return true;
+    if(o->type() == Type::TYPE_NULL)
+        return true;
     return false;
 }
 
