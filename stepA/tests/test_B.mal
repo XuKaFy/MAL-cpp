@@ -1,7 +1,7 @@
-(println `((lambda (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0))
+(println `((fn* (x all) (if (empty? x) all (apply-self (cdr x) (+ all (car x))))) (list 1 2 3 4 5) 0))
 (println 
     (
-        (lambda (x all) 
+        (fn* (x all) 
             (print-string "Now, x = ")
             (println x)
             (if (empty? x) 

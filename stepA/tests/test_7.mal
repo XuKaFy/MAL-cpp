@@ -1,4 +1,4 @@
-(define lst (quote (b c)))
+(def! lst (quote (b c)))
 
 (quasiquote (a lst d))
 (quasiquote (a (unquote lst) d))

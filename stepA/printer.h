@@ -13,7 +13,7 @@ public:
     static String printWithEscape(String str);
 
     static String castNumber(Number n);
-    static String castAtom(Atom n);
+    static String castSymbol(Symbol n);
     static String castList(ListPointer n);
     static String castBuildinFunction(Pointer<BuildinType> n);
     static String castString(String n);

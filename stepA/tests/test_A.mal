@@ -1,14 +1,14 @@
-(define create-accumulator (lambda ()
-    (define value 0)
-    (define accumulator (lambda (delta) 
-        (set value (+ value delta))
+(def! create-accumulator (fn* ()
+    (def! value 0)
+    (def! accumulator (fn* (delta) 
+        (set! value (+ value delta))
         value
     ))
     accumulator
 ))
 
-(define a (create-accumulator))
-(define b (create-accumulator))
+(def! a (create-accumulator))
+(def! b (create-accumulator))
 
 (println (a 1))
 (println (a 3))

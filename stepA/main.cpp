@@ -70,9 +70,9 @@ public:
             Core::registerBasicFunction(environment);
             environment->setValue("true", eval("(quote t)"));
             environment->setValue("false", eval("(quote ())"));
-            environment->setValue("not", eval("(lambda (x) (if x false true))"));
-            environment->setValue("println", eval("(lambda (x) (print x) (newline))"));
-            environment->setValue("load-file", eval("(lambda (x) (eval (translate-from-string (read-file x))))"));
+            environment->setValue("not", eval("(fn* (x) (if x false true))"));
+            environment->setValue("println", eval("(fn* (x) (print x) (newline))"));
+            environment->setValue("load-file", eval("(fn* (x) (eval (translate-from-string (read-file x))))"));
         } catch (Exception e) {
             std::cout << e << std::endl;
         }

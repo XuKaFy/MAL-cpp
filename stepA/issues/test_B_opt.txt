@@ -1,6 +1,6 @@
 user> (load-file "tests/test_B.mal") 
     list<[0], [0]>
-    atom<load-file>
+    Symbol<load-file>
     string<tests/test_B.mal>
     list<[15828224], [0]>
     list<[0], [0]>
@@ -25,45 +25,45 @@ user> (load-file "tests/test_B.mal")
 
 "test_B.txt end">
     list<[0], [0]>
-    atom<println>
+    Symbol<println>
     list<[0], [0]>
     list<[0], [0]>
-    atom<lambda>
+    Symbol<lambda>
     list<[0], [0]>
-    atom<x>
-    atom<all>
+    Symbol<x>
+    Symbol<all>
     list<[15828736], [0]>
     list<[15830784], [0]>
     list<[0], [0]>
-    atom<if>
+    Symbol<if>
     list<[0], [0]>
-    atom<empty?>
-    atom<x>
+    Symbol<empty?>
+    Symbol<x>
     list<[15827776], [0]>
     list<[15831024], [0]>
-    atom<all>
+    Symbol<all>
     list<[15827520], [0]>
     list<[0], [0]>
-    atom<apply-self>
+    Symbol<apply-self>
     list<[0], [0]>
-    atom<cdr>
-    atom<x>
+    Symbol<cdr>
+    Symbol<x>
     list<[15828672], [0]>
     list<[15830160], [0]>
     list<[0], [0]>
-    atom<+>
-    atom<all>
+    Symbol<+>
+    Symbol<all>
     list<[15827648], [0]>
     list<[0], [0]>
-    atom<car>
-    atom<x>
+    Symbol<car>
+    Symbol<x>
     list<[15828864], [0]>
     list<[15830448], [0]>
     list<[15830304], [0]>
     list<[15830208], [0]>
     list<[15830832], [0]>
     list<[0], [0]>
-    atom<list>
+    Symbol<list>
     number<1.000000>
     list<[15832192], [0]>
     number<2.000000>
@@ -78,60 +78,60 @@ user> (load-file "tests/test_B.mal")
     number<0.000000>
     list<[15832768], [0]>
     list<[15830016], [14689808]>
-    atom<quasiquote>
+    Symbol<quasiquote>
     list<[15827264], [15836864]>
     list<[15835616], [0]>
     list<[0], [0]>
     list<[0], [0]>
-    atom<println>
+    Symbol<println>
     list<[0], [0]>
     list<[0], [0]>
-    atom<lambda>
+    Symbol<lambda>
     list<[0], [0]>
-    atom<x>
-    atom<all>
+    Symbol<x>
+    Symbol<all>
     list<[15828032], [0]>
     list<[15836192], [0]>
     list<[0], [0]>
-    atom<print-string>
+    Symbol<print-string>
     string<Now, x = >
     list<[15827456], [0]>
     list<[15836096], [0]>
     list<[0], [0]>
-    atom<println>
-    atom<x>
+    Symbol<println>
+    Symbol<x>
     list<[15840000], [0]>
     list<[15835904], [0]>
     list<[0], [0]>
-    atom<if>
+    Symbol<if>
     list<[0], [0]>
-    atom<empty?>
-    atom<x>
+    Symbol<empty?>
+    Symbol<x>
     list<[15837760], [0]>
     list<[15836912], [0]>
-    atom<all>
+    Symbol<all>
     list<[15838720], [0]>
     list<[0], [0]>
-    atom<apply-self>
+    Symbol<apply-self>
     list<[0], [0]>
-    atom<cdr>
-    atom<x>
+    Symbol<cdr>
+    Symbol<x>
     list<[15839552], [0]>
     list<[15835664], [0]>
     list<[0], [0]>
-    atom<+>
-    atom<all>
+    Symbol<+>
+    Symbol<all>
     list<[15837824], [0]>
     list<[0], [0]>
-    atom<car>
-    atom<x>
+    Symbol<car>
+    Symbol<x>
     list<[15840896], [0]>
     list<[15835712], [0]>
     list<[15836048], [0]>
     list<[15835376], [0]>
     list<[15835424], [0]>
     list<[0], [0]>
-    atom<list>
+    Symbol<list>
     number<1.000000>
     list<[15832384], [0]>
     number<2.000000>
@@ -149,7 +149,7 @@ user> (load-file "tests/test_B.mal")
     list<[15837152], [0]>
     string<test_B.txt end>
     list<[15840640], [0]>
-    atom<begin>
+    Symbol<begin>
     list<[15837888], [15837056]>
     list<[0], [0]>
     list<[0], [0]>
@@ -272,7 +272,7 @@ Now, x =     list<[0], [0]>
     list<[0], [0]>
 ()
     list<[0], [0]>
-    atom<t>
+    Symbol<t>
     environment<parent = 4325640>
     list<[0], [0]>
 15

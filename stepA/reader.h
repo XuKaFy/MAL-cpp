@@ -14,18 +14,19 @@ private:
     void match(String::value_type k);
     String::value_type lookahead() const;
 
-    ValuePointer atom();
+    ValuePointer symbol();
     ValuePointer list();
     ValuePointer number();
     ValuePointer string();
     ValuePointer elem();
+    void         comment();
 
     bool remain() const;
     void delSpace();
 
     static bool isSymbol(String::value_type c);
-    static bool isAtomHead(String::value_type c);
-    static bool isAtomBody(String::value_type c);
+    static bool isSymbolHead(String::value_type c);
+    static bool isSymbolBody(String::value_type c);
 
     String m_s;
     size_t m_pos;

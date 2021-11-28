@@ -8,12 +8,12 @@ Pointer<AbstractType> Memory::dispatchVoid()
     return new AbstractType();
 }
 
-Pointer<AtomType> Memory::dispatchAtom(Atom atom)
+Pointer<SymbolType> Memory::dispatchSymbol(Symbol Symbol)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH AtomType %s\n", atom.c_str());
+    printf("DISPATCH SymbolType %s\n", Symbol.c_str());
 #endif
-    return new AtomType(atom);
+    return new SymbolType(Symbol);
 }
 
 Pointer<BuildinType> Memory::dispatchBuildin(Function fun, String name)

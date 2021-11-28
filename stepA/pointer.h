@@ -33,6 +33,10 @@ public:
         release();
     }
 
+    bool empty() {
+        return m_pointer == nullptr;
+    }
+
     template<typename U>
     Pointer<U> convert() const {
         assert(m_count != nullptr);

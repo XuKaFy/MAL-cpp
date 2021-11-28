@@ -5,7 +5,7 @@
         "type_traits": "cpp",
         "iosfwd": "cpp",
         "array": "cpp",
-        "atomic": "cpp",
+        "Symbolic": "cpp",
         "*.tcc": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",

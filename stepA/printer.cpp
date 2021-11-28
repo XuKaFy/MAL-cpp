@@ -5,8 +5,8 @@ String Printer::print(ValuePointer obj)
     switch(obj->type()) {
     case Type::TYPE_NULL:
         return "";
-    case Type::TYPE_ATOM:
-        return castAtom(GETATOM(obj));
+    case Type::TYPE_SYMBOL:
+        return castSymbol(GETSYMBOL(obj));
     case Type::TYPE_NUMBER:
         return castNumber(GETNUMBER(obj));
     case Type::TYPE_LIST:
@@ -125,7 +125,7 @@ String Printer::castNumber(Number n)
     return std::to_string(n);
 }
 
-String Printer::castAtom(Atom n)
+String Printer::castSymbol(Symbol n)
 {
     return n;
 }

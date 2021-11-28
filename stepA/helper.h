@@ -10,7 +10,7 @@
 #define VALUE(o)            (CONVERT(o,    AbstractType)              )
 #define GETNUMBER(o)        (CONVERT(o,    NumberType)     ->number() )
 #define GETSTRING(o)        (CONVERT(o,    StringType)     ->string() )
-#define GETATOM(o)          (CONVERT(o,    AtomType)       ->atom()   )
+#define GETSYMBOL(o)        (CONVERT(o,    SymbolType)     ->symbol() )
 #define GETBUILDIN(o)       (CONVERT(o,    BuildinType)               )
 #define GETLAMBDA(o)        (CONVERT(o,    LambdaType)                )
 #define GETLIST(o)          (CONVERT(o,    ListType)                  )
@@ -34,11 +34,11 @@
 
 #define MAKE_LIST(a, b)     (Memory::dispatchList(VALUE(a), VALUE(b)))
 
-#define BEGIN(x)            MAKE_LIST(Memory::dispatchAtom("begin"),             x)
-#define QUOTE(x)            MAKE_LIST(Memory::dispatchAtom("quote"),             MAKE_LIST(x, FALSE))
-#define UNQUOTE(x)          MAKE_LIST(Memory::dispatchAtom("unquote"),           MAKE_LIST(x, FALSE))
-#define SPLICE_UNQUOTE(x)   MAKE_LIST(Memory::dispatchAtom("splice-unquote"),    MAKE_LIST(x, FALSE))
-#define QUASIQUOTE(x)       MAKE_LIST(Memory::dispatchAtom("quasiquote"),        MAKE_LIST(x, FALSE))
+#define BEGIN(x)            MAKE_LIST(Memory::dispatchSymbol(SYM_BEGIN),        x)
+#define QUOTE(x)            MAKE_LIST(Memory::dispatchSymbol(SYM_QUOTE),        MAKE_LIST(x, FALSE))
+#define UNQUOTE(x)          MAKE_LIST(Memory::dispatchSymbol(SYM_UQ),           MAKE_LIST(x, FALSE))
+#define SPLICE_UNQUOTE(x)   MAKE_LIST(Memory::dispatchSymbol(SYM_SUQ),          MAKE_LIST(x, FALSE))
+#define QUASIQUOTE(x)       MAKE_LIST(Memory::dispatchSymbol(SYM_QQ),           MAKE_LIST(x, FALSE))
 
 #define SINGLE(ans, o) \
     if(ISEMPTY(o) || !Helper::isSingle(o)) \
@@ -73,7 +73,7 @@ class Helper
 public:
     static ValuePointer             car    (ListPointer o);
     static ValuePointer             cdr    (ListPointer o);
-    static bool                     atom   (ValuePointer o);
+    static bool                     Symbol   (ValuePointer o);
     static bool                     eq     (ValuePointer a1, ValuePointer a2);
     static ListPointer              cons   (ValuePointer a1, ValuePointer a2);
 

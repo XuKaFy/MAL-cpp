@@ -1,8 +1,8 @@
-(define-macro infix (a opr b) (list opr a b))
+(defmacro! infix (a opr b) (list opr a b))
 (infix 1 + 2)
 (infix 3 + (infix 5 * 7))
 
-(define-macro my-cond (x)
+(defmacro! my-cond (x)
     (if (empty? x) 
         ''()
         `(if ~(car (car x))

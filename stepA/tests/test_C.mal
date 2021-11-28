@@ -1,5 +1,5 @@
-(define fun
-    (lambda (K & remain)
+(def! fun
+    (fn* (K & remain)
         (println K)
         (println remain)
     )
@@ -9,46 +9,46 @@
 (fun "hello world" 1 2 3 4 5)
 
 (print-string "TEST 2\n")
-(try
+(try*
     (fun "hello world")
-    (catch X (println X))
+    (catch* X (println X))
 )
 
 (print-string "TEST 3\n")
-(try
+(try*
     (fun "hello world" 1)
-    (catch X (println X))
+    (catch* X (println X))
 )
 
 (print-string "TEST 4\n")
-(try
-    (begin
-        (define fun2
-            (lambda (K & remain remain2)
+(try*
+    (do
+        (def! fun2
+            (fn* (K & remain remain2)
                 (println K)
                 (println remain)
             )
         )
         (fun2 "hello world" 1)
     )
-    (catch X (println X))
+    (catch* X (println X))
 )
 
 (print-string "TEST 5\n")
-(try
-    (begin
-        (define fun3
-            (lambda (K &)
+(try*
+    (do
+        (def! fun3
+            (fn* (K &)
                 (println K)
             )
         )
         (fun3 "hello world" 1)
     )
-    (catch X (println X))
+    (catch* X (println X))
 )
 
 (print-string "TEST 6\n")
-(define-macro my-cond (& x)
+(defmacro! my-cond (& x)
     (if (empty? x) 
         ''()
         `(if ~(car (car x))

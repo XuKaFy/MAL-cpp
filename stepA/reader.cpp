@@ -6,14 +6,17 @@ ValuePointer Analyzer::analyze(String s)
     m_pos = 0;
     m_len = s.size();
 
-    ValuePointer ans = elem();
+    ValuePointer ans = nullptr;
+    while(ans.empty() && remain())
+        ans = elem();
     if(remain()) {
         ListPointer root = Memory::dispatchList();
         ListPointer current = root;
         current = Helper::append(current, ans);
         while(remain()) {
             ans = elem();
-            current = Helper::append(current, ans);
+            if(!ans.empty())
+                current = Helper::append(current, ans);
         }
         current->setSecond(FALSE);
         return VALUE(BEGIN(root));
@@ -52,19 +55,19 @@ ValuePointer Analyzer::number()
     return VALUE(Memory::dispatchNumber(k));
 }
 
-ValuePointer Analyzer::atom()
+ValuePointer Analyzer::symbol()
 {
     String s;
-    if(remain() && isAtomHead(lookahead())) {
+    if(remain() && isSymbolHead(lookahead())) {
         s += lookahead();
         match(lookahead());
-        while(remain() && isAtomBody(lookahead())) {
+        while(remain() && isSymbolBody(lookahead())) {
             s += lookahead();
             match(lookahead());
         }
-        return VALUE(Memory::dispatchAtom(s));
+        return VALUE(Memory::dispatchSymbol(s));
     }
-    throw Exception("Analyzer::atom: No Atom");
+    throw Exception("Analyzer::Symbol: No Symbol");
 }
 
 ValuePointer Analyzer::list()
@@ -73,7 +76,9 @@ ValuePointer Analyzer::list()
     ListPointer root = Memory::dispatchList();
     ListPointer current = root;
     while(remain() && lookahead() != ')') {
-        current = Helper::append(current, elem());
+        ValuePointer a = elem();
+        if(!a.empty())
+            current = Helper::append(current, a);
         delSpace();
     }
     if(CAR(current))
@@ -112,26 +117,36 @@ ValuePointer Analyzer::elem()
         return list();
     } else if(isdigit(lookahead())) {
         return number();
-    } else if(isAtomHead(lookahead())) {
-        return atom();
+    } else if(isSymbolHead(lookahead())) {
+        return symbol();
     } else if(lookahead() == '"') {
         return string();
     } else if(lookahead() == '\'') {
         match(lookahead());
         return VALUE(QUOTE(elem()));
-    } if(lookahead() == '`') {
+    } if(lookahead() == SYM_SIM_QQ[0]) {
         match(lookahead());
         return VALUE(QUASIQUOTE(elem()));
-    } if(lookahead() == '~') {
+    } if(lookahead() == SYM_SIM_SUQ[0]) {
         match(lookahead());
-        if(lookahead() == '@') {
+        if(lookahead() == SYM_SIM_SUQ[1]) {
             match(lookahead());
             return VALUE(SPLICE_UNQUOTE(elem()));
         }
         return VALUE(UNQUOTE(elem()));
+    } else if(lookahead() == SYM_COMMENT[0]) {
+        match(lookahead());
+        comment();
+        return nullptr;
     } else {
         throw Exception("Analyzer::elem: Can't match an elem");
     }
+}
+
+void Analyzer::comment()
+{
+    while(remain() && lookahead() != '\n')
+        match(lookahead());
 }
 
 bool Analyzer::isSymbol(String::value_type c)
@@ -153,12 +168,12 @@ bool Analyzer::isSymbol(String::value_type c)
     return false;
 }
 
-bool Analyzer::isAtomHead(String::value_type c)
+bool Analyzer::isSymbolHead(String::value_type c)
 {
     return isSymbol(c) || isalpha(c);
 }
 
-bool Analyzer::isAtomBody(String::value_type c)
+bool Analyzer::isSymbolBody(String::value_type c)
 {
     return isalnum(c) || isSymbol(c);
 }

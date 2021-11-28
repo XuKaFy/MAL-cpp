@@ -10,9 +10,9 @@ ValuePointer Helper::cdr(ListPointer o)
     return o->second();
 }
 
-bool Helper::atom(ValuePointer o)
+bool Helper::Symbol(ValuePointer o)
 {
-    if(o->type() == Type::TYPE_ATOM)
+    if(o->type() == Type::TYPE_SYMBOL)
         return true;
     if(isEmpty(o))
         return true;
@@ -28,8 +28,8 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
     if(a1->type() != a2->type())
         return false;
     switch(a1->type()) {
-    case Type::TYPE_ATOM:
-        return GETATOM(a1) == GETATOM(a2);
+    case Type::TYPE_SYMBOL:
+        return GETSYMBOL(a1) == GETSYMBOL(a2);
     case Type::TYPE_BUILDIN:
         return GETBUILDIN(a1)->name() == GETBUILDIN(a2)->name();
     case Type::TYPE_LIST:
@@ -137,7 +137,7 @@ bool Helper::isFlat(ListPointer o)
 {
     if(isEmpty(o))
         return true;
-    if(car(o)->type() != Type::TYPE_ATOM)
+    if(car(o)->type() != Type::TYPE_SYMBOL)
         return false;
     if(!isLast(o))
         return isFlat(GETLIST(cdr(o)));
@@ -152,7 +152,7 @@ ValuePointer Helper::constantVoid()
 
 ValuePointer Helper::constantTrue()
 {
-    static Pointer<AtomType> val(Memory::dispatchAtom("t"));
+    static Pointer<SymbolType> val(Memory::dispatchSymbol("t"));
     return VALUE(val);
 }
 

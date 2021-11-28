@@ -20,8 +20,8 @@ LABEL_AGAIN:
     try {
         ValuePointer res = nullptr;
         switch(o->type()) {
-        case Type::TYPE_ATOM:
-            res = env->getValue(GETATOM(o));
+        case Type::TYPE_SYMBOL:
+            res = env->getValue(GETSYMBOL(o));
             break;
         case Type::TYPE_LIST:
             res = apply(GETLIST(o), env, tco);
@@ -42,52 +42,52 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
 {
     if(ISEMPTY(l))
         throw Exception("Evaluator::apply: Can't execute");
-    if(CAR(l)->type() == Type::TYPE_ATOM) {
-        Atom name = GETATOM(CAR(l));
-        if(name == "quote") {
+    if(CAR(l)->type() == Type::TYPE_SYMBOL) {
+        Symbol name = GETSYMBOL(CAR(l));
+        if(name == SYM_QUOTE) {
             NEXT(l);
             return funQuote(l);
-        } else if(name == "cond") {
+        } else if(name == SYM_COND) {
             NEXT(l);
             return funCond(l, env, tco);
-        } else if(name == "if") {
+        } else if(name == SYM_IF) {
             NEXT(l);
             return funIf(l, env, tco);
-        } else if(name == "lambda") {
+        } else if(name == SYM_LAMBDA) {
             NEXT(l);
             return funLambda(l, env, tco);
-        } else if(name == "define") {
+        } else if(name == SYM_DEFINE) {
             NEXT(l);
             return funDef(l, env);
-        } else if(name == "set") {
+        } else if(name == SYM_SET) {
             NEXT(l);
             return funSet(l, env);
-        } else if(name == "define-macro") {
+        } else if(name == SYM_DEMACRO) {
             NEXT(l);
             return funDefMacro(l, env);
-        } else if(name == "let") {
+        } else if(name == SYM_LET) {
             NEXT(l);
             return funLet(l, env, tco);
-        } else if(name == "begin") {
+        } else if(name == SYM_BEGIN) {
             NEXT(l);
             return funBegin(l, env, tco);
-        } else if(name == "apply") {
+        } else if(name == SYM_APPLY) {
             NEXT(l);
             return apply(l, env, tco);
-        } else if(name == "eval") {
+        } else if(name == SYM_EVAL) {
             NEXT(l);
             SINGLE(it, l);
             it = eval(it, env, true, true); // (eval (list + 1 2 3)) -> (eval '(+ 1 2 3))
             return eval(it, env, tco);
-        } else if(name == "quasiquote") {
+        } else if(name == SYM_QQ) {
             NEXT(l);
             SINGLE(it, l);
             return funQuasiquote(it, env);
-        } else if(name == "throw") {
+        } else if(name == SYM_THROW) {
             NEXT(l);
             SINGLE(it, l);
             throw(eval(it, env, true, true));
-        } else if(name == "try") {
+        } else if(name == SYM_TRY) {
             NEXT(l);
             return funTry(l, env);
         }
@@ -132,7 +132,7 @@ ValuePointer Evaluator::funDef(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = funBegin(o, env, false);
-    env->setValue(GETATOM(a1), a2);
+    env->setValue(GETSYMBOL(a1), a2);
     return a2;
 }
 
@@ -140,7 +140,7 @@ ValuePointer Evaluator::funSet(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = funBegin(o, env, false);
-    env->setExistValue(GETATOM(a1), a2);
+    env->setExistValue(GETSYMBOL(a1), a2);
     return a2;
 }
 
@@ -151,7 +151,7 @@ ValuePointer Evaluator::funDefMacro(ListPointer o, EnvironmentPointer env)
     if(!Helper::isFlat(GETLIST(args)))
         throw Exception("Evaluator::funDefMacro: Not a list");
     ValuePointer ans = VALUE(Memory::dispatchMacro(GETLIST(args), o, env));
-    env->setValue(GETATOM(name), ans);
+    env->setValue(GETSYMBOL(name), ans);
     return ans;
 }
 
@@ -159,17 +159,17 @@ ValuePointer Evaluator::funTry(ListPointer o, EnvironmentPointer env)
 {
     DOUBLE(tryBody, catchListValue, o)
     TRIBLE_FROM_VALUE(catchSymbol, catchName, catchBody, catchListValue)
-    if(GETATOM(catchSymbol) != "catch")
+    if(GETSYMBOL(catchSymbol) != SYM_CATCH)
         throw Exception("Evaluator::funTry: Wrong format");
     try {
         return eval(tryBody, env, true, true);
     } catch(ValuePointer k) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-        childEnv->setValue(GETATOM(catchName), k);
+        childEnv->setValue(GETSYMBOL(catchName), k);
         return eval(catchBody, childEnv, true, true);
     } catch(Exception e) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
-        childEnv->setValue(GETATOM(catchName), VALUE(Memory::dispatchString(e)));
+        childEnv->setValue(GETSYMBOL(catchName), VALUE(Memory::dispatchString(e)));
         return eval(catchBody, childEnv, true, true);
     }
     return VOID;
@@ -191,13 +191,13 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
     ListPointer l = GETLIST(o);
     if(ISEMPTY(l))
         return FALSE;
-    if(CAR(l)->type() == Type::TYPE_ATOM) {
-        Atom name = GETATOM(CAR(l));
-        if(name == "unquote") {
+    if(CAR(l)->type() == Type::TYPE_SYMBOL) {
+        Symbol name = GETSYMBOL(CAR(l));
+        if(name == SYM_UQ) {
             NEXT(l);
             SINGLE(it, l);
             return eval(it, env, false, true);
-        } else if(name == "splice-unquote") {
+        } else if(name == SYM_SUQ) {
             NEXT(l);
             SINGLE(it, l);
             ListPointer ans = GETLIST(eval(it, env, false, true));
@@ -243,11 +243,11 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
     ListPointer lamPointer = lam->arg();
     ListPointer argsPointer = args;
     while(!ISEMPTY(lamPointer)) {
-        Atom name = GETATOM(CAR(lamPointer));
-        if(name == "&") {
+        Symbol name = GETSYMBOL(CAR(lamPointer));
+        if(name == SYM_VARIADIC) {
             NEXT(lamPointer);
             SINGLE(it, lamPointer);
-            name = GETATOM(it);
+            name = GETSYMBOL(it);
             childEnv->setValue(name, VALUE(argsPointer));
             return funBegin(lam->body(), childEnv, tco);
         }
@@ -315,7 +315,7 @@ ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
     FOREACH(m, args, {
         DOUBLE_FROM_VALUE(b1, b2, m)
-        childEnv->setValue(GETATOM(b1), b2);
+        childEnv->setValue(GETSYMBOL(b1), b2);
     });
     return funBegin(o, childEnv, tco); // (let ((x 1) (y 2)) (+ x y))
 }

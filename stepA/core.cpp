@@ -47,7 +47,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return VALUE(CONS(a1->copy(), a2->copy()));
     });
 
-    registerFunction(env, "eq", FUNCTION(o) {
+    registerFunction(env, SYM_EQ, FUNCTION(o) {
         DOUBLE(a1, a2, o);
         return IF(EQ(a1, a2));
     });
@@ -74,9 +74,9 @@ void Core::registerBasicFunction(EnvironmentPointer env)
                   !ISEMPTY(CDR(GETLIST(it))));
     });
 
-    registerFunction(env, "atom?", FUNCTION(o) {
+    registerFunction(env, "symbol?", FUNCTION(o) {
         SINGLE(it, o);
-        return IF(it->type() == Type::TYPE_ATOM);
+        return IF(it->type() == Type::TYPE_SYMBOL);
     });
 
     registerFunction(env, "string?", FUNCTION(o) {
@@ -84,7 +84,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return IF(it->type() == Type::TYPE_STRING);
     });
 
-    registerFunction(env, "lambda?", FUNCTION(o) {
+    registerFunction(env, "fn?", FUNCTION(o) {
         SINGLE(it, o);
         return IF(it->type() == Type::TYPE_LAMBDA);
     });

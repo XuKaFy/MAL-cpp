@@ -53,20 +53,20 @@ private:
     Number m_num;
 };
 
-class AtomType : public AbstractType
+class SymbolType : public AbstractType
 {
 public:
-    AtomType(Atom n = Atom());
+    SymbolType(Symbol n = Symbol());
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
-    Atom                    atom() const;
-    void                    setAtom(Atom n);
+    Symbol                  symbol() const;
+    void                    setSymbol(Symbol n);
 
-    virtual ~AtomType();
+    virtual ~SymbolType();
 
 private:
-    Atom m_atom;
+    Symbol m_symbol;
 };
 
 class ListType : public AbstractType
@@ -96,8 +96,8 @@ public:
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
-    Atom                    string() const;
-    void                    setString(Atom n);
+    Symbol                    string() const;
+    void                    setString(Symbol n);
 
     virtual ~StringType();
 

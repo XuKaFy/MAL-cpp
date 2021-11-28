@@ -44,31 +44,31 @@ NumberType::~NumberType()
     ;
 }
 
-AtomType::AtomType(Atom n)
-    : m_atom(n) {
+SymbolType::SymbolType(Symbol n)
+    : m_symbol(n) {
 }
 
-Type AtomType::type() const
+Type SymbolType::type() const
 {
-    return Type::TYPE_ATOM;
+    return Type::TYPE_SYMBOL;
 }
 
-ValuePointer AtomType::copy() const
+ValuePointer SymbolType::copy() const
 {
-    return new AtomType(m_atom);
+    return new SymbolType(m_symbol);
 }
 
-Atom AtomType::atom() const
+Symbol SymbolType::symbol() const
 {
-    return m_atom;
+    return m_symbol;
 }
 
-void AtomType::setAtom(Atom n)
+void SymbolType::setSymbol(Symbol n)
 {
-    m_atom = n;
+    m_symbol = n;
 }
 
-AtomType::~AtomType()
+SymbolType::~SymbolType()
 {
     ;
 }

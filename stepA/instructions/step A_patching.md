@@ -5,13 +5,13 @@
 1. 关键字：`Evaluator`
 
     * apply
-    * begin
-    * define
-    * define-macro
+    * def!
+    * defmacro!
+    * do
     * eval
-    * lambda
-    * let
-    * set
+    * fn*
+    * let*
+    * set!
     * quote
     * quasiquote
     * splice-unquote
@@ -29,16 +29,16 @@
     * <=
     * \>
     * <
-    * atom
-    * atom?
+    * =
+    * symbol
+    * symbol?
     * buildin?
     * car
     * cdr
     * cons
     * empty?
-    * eq
     * false?
-    * lambda?
+    * fn?
     * list
     * list?
     * macro?

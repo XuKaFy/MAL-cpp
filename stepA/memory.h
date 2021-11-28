@@ -14,7 +14,7 @@ class Memory
 {
 public:
     static Pointer<AbstractType>        dispatchVoid        ();
-    static Pointer<AtomType>            dispatchAtom        (Atom num);
+    static Pointer<SymbolType>          dispatchSymbol      (Symbol num);
     static Pointer<BuildinType>         dispatchBuildin     (Function fun, String name);
     static ListPointer                  dispatchList        (ValuePointer first    = nullptr, 
                                                              ValuePointer second   = nullptr);
