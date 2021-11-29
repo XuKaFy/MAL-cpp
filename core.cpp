@@ -79,6 +79,21 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return IF(it->type() == Type::TYPE_SYMBOL);
     });
 
+    registerFunction(env, "map?", FUNCTION(o) {
+        SINGLE(it, o);
+        return IF(it->type() == Type::TYPE_HASHMAP);
+    });
+
+    registerFunction(env, "vector?", FUNCTION(o) {
+        SINGLE(it, o);
+        return IF(it->type() == Type::TYPE_VECTOR);
+    });
+
+    registerFunction(env, "keyword?", FUNCTION(o) {
+        SINGLE(it, o);
+        return IF(it->type() == Type::TYPE_KEYWORD);
+    });
+
     registerFunction(env, "string?", FUNCTION(o) {
         SINGLE(it, o);
         return IF(it->type() == Type::TYPE_STRING);
@@ -202,6 +217,40 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     registerFunction(env, "time", FUNCTION(o) {
         NONEARG(o)
         return VALUE(Memory::dispatchNumber(Number(time(0))));
+    });
+
+    registerFunction(env, "nth", FUNCTION(o) {
+        DOUBLE(a1, a2, o)
+        if(GETINTEGER(a2) < 0)
+            throw Exception("Core::nth: pos less than 0");
+        if((size_t)GETINTEGER(a2) >= GETVECTOR(a1).size())
+            throw Exception("Core::nth: pos more than max");
+        return GETVECTOR(a1)[GETINTEGER(a2)];
+    });
+
+    registerFunction(env, "count", FUNCTION(o) {
+        SINGLE(a1, o)
+        switch(a1->type()) {
+        case Type::TYPE_LIST:
+            return VALUE(Memory::dispatchInteger(Helper::count(GETLIST(a1))));
+        case Type::TYPE_VECTOR:
+            return VALUE(Memory::dispatchInteger(GETVECTOR(a1).size()));
+        case Type::TYPE_HASHMAP:
+            return VALUE(Memory::dispatchInteger(GETMAP(a1).size()));
+        default:
+            throw Exception("Core::count: Not countable");
+        }
+        return VOID;
+    });
+
+    registerFunction(env, "concat", FUNCTION(o) {
+        DOUBLE(a1, a2, o)
+        return VOID;
+    });
+
+    registerFunction(env, "sequential?", FUNCTION(o) {
+        SINGLE(a1, o)
+        return IF(a1->type() == Type::TYPE_LIST || a1->type() == Type::TYPE_VECTOR);
     });
 }
 

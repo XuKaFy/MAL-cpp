@@ -25,7 +25,11 @@ public:
                                                              ListPointer  body,
                                                              EnvironmentPointer env);
     static Pointer<NumberType>          dispatchNumber      (Number num);
+    static Pointer<IntegerType>         dispatchInteger     (Integer num);
     static Pointer<StringType>          dispatchString      (String str);
+    static Pointer<VectorType>          dispatchVector      (Vector vec);
+    static Pointer<MapType>             dispatchMap         (Map map);
+    static Pointer<KeywordType>         dispatchKeyword     (Keyword key);
 
     static EnvironmentPointer           dispatchEnvironment (EnvironmentPointer env);
 };

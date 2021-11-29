@@ -9,6 +9,8 @@ String Printer::print(ValuePointer obj)
         return castSymbol(GETSYMBOL(obj));
     case Type::TYPE_NUMBER:
         return castNumber(GETNUMBER(obj));
+    case Type::TYPE_INTEGER:
+        return castInteger(GETINTEGER(obj));
     case Type::TYPE_LIST:
         return castList(GETLIST(obj));
     case Type::TYPE_BUILDIN:
@@ -19,6 +21,12 @@ String Printer::print(ValuePointer obj)
         return castLambda(GETLAMBDA(obj));
     case Type::TYPE_MACRO:
         return castMacro(GETMACRO(obj));
+    case Type::TYPE_VECTOR:
+        return castVector(GETVECTOR(obj));
+    case Type::TYPE_HASHMAP:
+        return castMap(GETMAP(obj));
+    case Type::TYPE_KEYWORD:
+        return castKeyword(GETKEYWORD(obj));
     }
     return "#<error: print an unknown type>";
 }
@@ -46,7 +54,7 @@ int Printer::octNumber(String::value_type c)
     return ans;
 }
 
-String Printer::printWithEscape(String s)
+String Printer::printWithEscape(const String &s)
 {
     String ans;
     for(size_t i=0; i<s.size(); ++i) {
@@ -125,7 +133,12 @@ String Printer::castNumber(Number n)
     return std::to_string(n);
 }
 
-String Printer::castSymbol(Symbol n)
+String Printer::castInteger(Integer n)
+{
+    return std::to_string(n);
+}
+
+String Printer::castSymbol(const Symbol &n)
 {
     return n;
 }
@@ -150,7 +163,7 @@ String Printer::castList(ListPointer n)
     return ans;
 }
 
-String Printer::castString(String n)
+String Printer::castString(const String &n)
 {
     return '"' + n + '"';
 }
@@ -182,4 +195,41 @@ String Printer::castMacro(Pointer<MacroType>n)
     ans += " (begin " + in;
     ans += "))>";
     return ans;
+}
+
+String Printer::castVector(const Vector& n)
+{
+    String ans = "[";
+    bool first = true;
+    for(auto i : n) {
+        if(first) {
+            first = false;
+        } else {
+            ans += ", ";
+        }
+        ans += print(i);
+    }
+    ans += "]";
+    return ans;
+}
+
+String Printer::castMap(const Map& n)
+{
+    String ans = "{";
+    bool first = true;
+    for(auto i : n) {
+        if(first) {
+            first = false;
+        } else {
+            ans += " ";
+        }
+        ans += castKeyword(i.first) + " " + print(i.second);
+    }
+    ans += "}";
+    return ans;
+}
+
+String Printer::castKeyword(const Keyword& key)
+{
+    return ":" + castSymbol(key);
 }

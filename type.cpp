@@ -15,6 +15,10 @@ ValuePointer AbstractType::copy() const
     return new AbstractType();
 }
 
+NumberType::NumberType(Number n)
+    : m_number(n) {
+}
+
 Type NumberType::type() const
 {
     return Type::TYPE_NUMBER;
@@ -22,21 +26,7 @@ Type NumberType::type() const
 
 ValuePointer NumberType::copy() const
 {
-    return new NumberType(m_num);
-}
-
-NumberType::NumberType(Number n)
-    : m_num(n) {
-}
-
-Number NumberType::number() const
-{
-    return m_num;
-}
-
-void NumberType::setNumber(Number n)
-{
-    m_num = n;
+    return new NumberType(m_number);
 }
 
 NumberType::~NumberType()
@@ -44,7 +34,7 @@ NumberType::~NumberType()
     ;
 }
 
-SymbolType::SymbolType(Symbol n)
+SymbolType::SymbolType(const Symbol &n)
     : m_symbol(n) {
 }
 
@@ -58,19 +48,26 @@ ValuePointer SymbolType::copy() const
     return new SymbolType(m_symbol);
 }
 
-Symbol SymbolType::symbol() const
-{
-    return m_symbol;
-}
-
-void SymbolType::setSymbol(Symbol n)
-{
-    m_symbol = n;
-}
-
 SymbolType::~SymbolType()
 {
     ;
+}
+
+VectorType::VectorType(const Vector &v)
+    : m_vector(v) {
+}
+
+Type VectorType::type() const
+{
+    return Type::TYPE_VECTOR;
+}
+
+ValuePointer VectorType::copy() const
+{
+    Vector v;
+    for(auto i : m_vector)
+        v.push_back(i->copy());
+    return new VectorType(v);
 }
 
 ListType::ListType(ValuePointer first, ValuePointer second)
@@ -92,33 +89,13 @@ ValuePointer ListType::copy() const
     return new ListType(first, second);
 }
 
-ValuePointer ListType::first() const
-{
-    return m_first;
-}
-
-void ListType::setFirst(ValuePointer first)
-{
-    m_first = first;
-}
-
-ValuePointer ListType::second() const
-{
-    return m_second;
-}
-
-void ListType::setSecond(ValuePointer second)
-{
-    m_second = second;
-}
-
 ListType::~ListType()
 {
     ;
 }
 
-StringType::StringType(String n)
-    : m_str(n) {
+StringType::StringType(const String &n)
+    : SymbolType(n) {
 }
 
 Type StringType::type() const
@@ -128,17 +105,7 @@ Type StringType::type() const
 
 ValuePointer StringType::copy() const
 {
-    return new StringType(m_str);
-}
-
-String StringType::string() const
-{
-    return m_str;
-}
-
-void StringType::setString(String n)
-{
-    m_str = n;
+    return new StringType(symbol());
 }
 
 StringType::~StringType()
@@ -146,8 +113,27 @@ StringType::~StringType()
     ;
 }
 
+KeywordType::KeywordType(const String &n)
+    : SymbolType(n) {
+}
+
+Type KeywordType::type() const
+{
+    return Type::TYPE_KEYWORD;
+}
+
+ValuePointer KeywordType::copy() const
+{
+    return new KeywordType(symbol());
+}
+
+KeywordType::~KeywordType()
+{
+    ;
+}
+
 LambdaType::LambdaType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env)
-    : m_arg(arg), m_body(body), m_env(env) {
+    : m_arg(arg), m_body(body), m_environment(env) {
 }
 
 Type LambdaType::type() const
@@ -159,37 +145,7 @@ ValuePointer LambdaType::copy() const
 {
     return new LambdaType(m_arg->copy().convert<ListType>(),
                           m_body->copy().convert<ListType>(),
-                          m_env);
-}
-
-Pointer<ListType> LambdaType::arg() const
-{
-    return m_arg;
-}
-
-void LambdaType::setArg(Pointer<ListType> arg)
-{
-    m_arg = arg;
-}
-
-Pointer<ListType> LambdaType::body() const
-{
-    return m_body;
-}
-
-void LambdaType::setBody(Pointer<ListType> body)
-{
-    m_body = body;
-}
-
-EnvironmentPointer LambdaType::environment() const
-{
-    return m_env;
-}
-
-void LambdaType::setEnvironment(EnvironmentPointer env)
-{
-    m_env = env;
+                          m_environment);
 }
 
 LambdaType::~LambdaType()
@@ -197,7 +153,7 @@ LambdaType::~LambdaType()
     ;
 }
 
-BuildinType::BuildinType(Function f, String name)
+BuildinType::BuildinType(Function f, const String &name)
     : m_f(f), m_name(name) {
 }
 
@@ -209,11 +165,6 @@ Type BuildinType::type() const
 ValuePointer BuildinType::copy() const
 {
     return new BuildinType(m_f, m_name);
-}
-
-String BuildinType::name() const
-{
-    return m_name;
 }
 
 ValuePointer BuildinType::process(Pointer<ListType> obj)
@@ -236,6 +187,47 @@ Type MacroType::type() const
 }
 
 MacroType::~MacroType()
+{
+    ;
+}
+
+MapType::MapType(const Map& m)
+    : m_map(m) {
+}
+
+Type MapType::type() const
+{
+    return Type::TYPE_HASHMAP;
+}
+
+MapType::~MapType()
+{
+    ;
+}
+
+ValuePointer MapType::copy() const
+{
+    Map m;
+    for(auto i : m_map)
+        m[i.first] = i.second->copy();
+    return new MapType(m);
+}
+
+IntegerType::IntegerType(Integer integer)
+    : m_integer(integer) {
+}
+
+Type IntegerType::type() const
+{
+    return Type::TYPE_INTEGER;
+}
+
+ValuePointer IntegerType::copy() const
+{
+    return new IntegerType(m_integer);
+}
+
+IntegerType::~IntegerType()
 {
     ;
 }

@@ -10,15 +10,19 @@ class Printer
 {
 public:
     static String print(ValuePointer obj);
-    static String printWithEscape(String str);
+    static String printWithEscape(const String &str);
 
     static String castNumber(Number n);
-    static String castSymbol(Symbol n);
+    static String castInteger(Integer n);
+    static String castSymbol(const Symbol &n);
     static String castList(ListPointer n);
     static String castBuildinFunction(Pointer<BuildinType> n);
-    static String castString(String n);
+    static String castString(const String &n);
     static String castLambda(Pointer<LambdaType> n);
     static String castMacro(Pointer<MacroType> n);
+    static String castVector(const Vector &n);
+    static String castMap(const Map &n);
+    static String castKeyword(const Keyword &n);
 
 private:
     static String escape();

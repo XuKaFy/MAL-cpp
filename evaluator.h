@@ -18,7 +18,8 @@ public:
     ValuePointer eval          (ValuePointer o,     EnvironmentPointer env);
 
 private:
-    ValuePointer eval          (ValuePointer o,     EnvironmentPointer env,     bool tco,   bool root = false);
+    ValuePointer eval          (ValuePointer o,     EnvironmentPointer env,     bool tco,
+                                bool root = false);
     ValuePointer apply         (ListPointer  o,     EnvironmentPointer env,     bool tco);
 
     ListPointer  listOfValues  (ListPointer  o,     EnvironmentPointer env);

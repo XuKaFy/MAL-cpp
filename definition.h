@@ -5,19 +5,25 @@
 
 enum class Type {
     TYPE_NUMBER,
+    TYPE_INTEGER,
     TYPE_STRING,
     TYPE_SYMBOL,
     TYPE_LIST,
     TYPE_BUILDIN,
     TYPE_LAMBDA,
     TYPE_MACRO,
+    TYPE_KEYWORD,
+    TYPE_VECTOR,
+    TYPE_HASHMAP,
     TYPE_NULL,
 };
 
-typedef     std::string                                  String;
-typedef     double                                       Number;
-typedef     String                                       Symbol;
-typedef     String                                       Exception;
+typedef     std::string     String;
+typedef     double          Number;
+typedef     int             Integer;
+typedef     String          Symbol;
+typedef     String          Keyword;
+typedef     String          Exception;
 
 #define     SYM_QUOTE       "quote"
 #define     SYM_COND        "cond"

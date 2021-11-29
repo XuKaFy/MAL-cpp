@@ -10,7 +10,7 @@ ValuePointer Helper::cdr(ListPointer o)
     return o->second();
 }
 
-bool Helper::Symbol(ValuePointer o)
+bool Helper::symbol(ValuePointer o)
 {
     if(o->type() == Type::TYPE_SYMBOL)
         return true;
@@ -42,6 +42,8 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
         return true;
     case Type::TYPE_NUMBER:
         return GETNUMBER(a1) == GETNUMBER(a2);
+    case Type::TYPE_INTEGER:
+        return GETINTEGER(a1) == GETINTEGER(a2);
     case Type::TYPE_STRING:
         return GETSTRING(a1) == GETSTRING(a2);
     case Type::TYPE_LAMBDA:
@@ -50,8 +52,38 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
     case Type::TYPE_MACRO:
         return GETMACRO(a2)->body() == GETMACRO(a2)->body()
                 && GETMACRO(a1)->arg() == GETMACRO(a2)->arg();
+    case Type::TYPE_KEYWORD:
+        return GETKEYWORD(a1) == GETKEYWORD(a2);
+    case Type::TYPE_HASHMAP:
+        return eqHashmap(GETMAP(a1), GETMAP(a2));
+    case Type::TYPE_VECTOR:
+        return eqVector(GETVECTOR(a1), GETVECTOR(a2));
     }
     return false;
+}
+
+bool Helper::eqHashmap(const Map &a1, const Map& a2)
+{
+    if(a1.size() != a2.size())
+        return false;
+    for(auto i = a1.begin(), j = a2.begin(); i != a1.end(); ++i, ++j) {
+        if(i->first != j->first)
+            return false;
+        if(!eq(i->second, j->second))
+            return false;
+    }
+    return true;
+}
+
+bool Helper::eqVector(const Vector& a1, const Vector& a2)
+{
+    if(a1.size() != a2.size())
+        return false;
+    for(auto i = a1.begin(), j = a2.begin(); i != a1.end(); ++i, ++j) {
+        if(!eq(*i, *j))
+            return false;
+    }
+    return true;
 }
 
 ListPointer Helper::cons(ValuePointer a1, ValuePointer a2)
@@ -110,19 +142,9 @@ bool Helper::isSingle(ListPointer o)
 
 bool Helper::isSelfEvaluating(ValuePointer o)
 {
-    if(o->type() == Type::TYPE_NUMBER)
-        return true;
-    if(o->type() == Type::TYPE_STRING)
-        return true;
-    if(o->type() == Type::TYPE_BUILDIN)
-        return true;
-    if(o->type() == Type::TYPE_LAMBDA)
-        return true;
-    if(o->type() == Type::TYPE_MACRO)
-        return true;
-    if(o->type() == Type::TYPE_NULL)
-        return true;
-    return false;
+    if(o->type() == Type::TYPE_LIST || o->type() == Type::TYPE_SYMBOL)
+        return false;
+    return true;
 }
 
 bool Helper::isTrue(ValuePointer o)
@@ -150,6 +172,13 @@ ValuePointer Helper::constantVoid()
 {
     static Pointer<AbstractType> val(Memory::dispatchVoid());
     return val;
+}
+
+int Helper::count(ListPointer o)
+{
+    if(!isLast(o))
+        return count(GETLIST(cdr(o))) + 1;
+    return isEmpty(cdr(o))? 0 : 1;
 }
 
 ValuePointer Helper::constantTrue()

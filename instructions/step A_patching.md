@@ -36,7 +36,6 @@
     * car
     * cdr
     * cons
-    * empty?
     * false?
     * fn?
     * list
@@ -58,6 +57,16 @@
     * translate-from-string
     * translate-to-string
     * write-file
+
+    容器相关：
+
+    * nth
+    * first
+    * rest
+    * empty?
+    * count
+    * sequential?
+    * concat
 
     计时器：
 

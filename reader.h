@@ -18,6 +18,9 @@ private:
     ValuePointer list();
     ValuePointer number();
     ValuePointer string();
+    ValuePointer vector();
+    ValuePointer keyword();
+    ValuePointer map();
     ValuePointer elem();
     void         comment();
 

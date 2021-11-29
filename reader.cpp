@@ -39,7 +39,7 @@ void Analyzer::delSpace()
 
 ValuePointer Analyzer::number()
 {
-    Number k = 0;
+    Integer k = 0;
     bool read = false;
     while(remain() && isdigit(lookahead())) {
         k = k * 10 + lookahead() - '0';
@@ -50,11 +50,11 @@ ValuePointer Analyzer::number()
         throw Exception("Analyzer::number: No Number");
     if(remain() && lookahead() == '.') {
         match(lookahead());
-        Number m = GETNUMBER(number());
+        Number m = GETINTEGER(number());
         while(m > 1) m /= 10;
         return VALUE(Memory::dispatchNumber(k + m));
     }
-    return VALUE(Memory::dispatchNumber(k));
+    return VALUE(Memory::dispatchInteger(k));
 }
 
 ValuePointer Analyzer::symbol()
@@ -89,6 +89,20 @@ ValuePointer Analyzer::list()
     return VALUE(root);
 }
 
+ValuePointer Analyzer::vector()
+{
+    match('[');
+    Vector root;
+    while(remain() && lookahead() != ']') {
+        ValuePointer a = elem();
+        if(!a.empty())
+            root.push_back(a);
+        delSpace();
+    }
+    match(']');
+    return VALUE(Memory::dispatchVector(root));
+}
+
 ValuePointer Analyzer::string()
 {
     String s;
@@ -108,6 +122,29 @@ ValuePointer Analyzer::string()
     }
     match('"');
     return VALUE(Memory::dispatchString(s));
+}
+
+ValuePointer Analyzer::keyword()
+{
+    match(':');
+    return VALUE(Memory::dispatchKeyword(GETSYMBOL(symbol())));
+}
+
+ValuePointer Analyzer::map()
+{
+    match('{');
+    Map root;
+    while(remain() && lookahead() != '}') {
+        ValuePointer k = keyword();
+        delSpace();
+        ValuePointer v = elem();
+        if(v.empty())
+            throw Exception("Analyzer::map: How can elem be null?");
+        delSpace();
+        root[GETKEYWORD(k)] = v;
+    }
+    match('}');
+    return VALUE(Memory::dispatchMap(root));
 }
 
 ValuePointer Analyzer::elem()
@@ -140,6 +177,12 @@ ValuePointer Analyzer::elem()
         match(lookahead());
         comment();
         return nullptr;
+    } else if(lookahead() == '[') {
+        return VALUE(vector());
+    } else if(lookahead() == '{') {
+        return VALUE(map());
+    } else if(lookahead() == ':') {
+        return VALUE(keyword());
     } else {
         throw Exception("Analyzer::elem: Can't match an elem");
     }

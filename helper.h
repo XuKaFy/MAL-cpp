@@ -9,12 +9,16 @@
 
 #define VALUE(o)            (CONVERT(o,    AbstractType)              )
 #define GETNUMBER(o)        (CONVERT(o,    NumberType)     ->number() )
-#define GETSTRING(o)        (CONVERT(o,    StringType)     ->string() )
+#define GETINTEGER(o)       (CONVERT(o,    IntegerType)    ->integer())
+#define GETSTRING(o)        (CONVERT(o,    StringType)     ->symbol() )
 #define GETSYMBOL(o)        (CONVERT(o,    SymbolType)     ->symbol() )
 #define GETBUILDIN(o)       (CONVERT(o,    BuildinType)               )
 #define GETLAMBDA(o)        (CONVERT(o,    LambdaType)                )
 #define GETLIST(o)          (CONVERT(o,    ListType)                  )
 #define GETMACRO(o)         (CONVERT(o,    MacroType)                 )
+#define GETVECTOR(o)        (CONVERT(o,    VectorType)     ->vector() )
+#define GETKEYWORD(o)       (CONVERT(o,    KeywordType)    ->symbol() )
+#define GETMAP(o)           (CONVERT(o,    MapType)        ->map()    )
 
 #define CAR(o)              Helper::car(o)
 #define CDR(o)              Helper::cdr(o)
@@ -71,14 +75,16 @@
 class Helper
 {
 public:
-    static ValuePointer             car    (ListPointer o);
-    static ValuePointer             cdr    (ListPointer o);
-    static bool                     Symbol   (ValuePointer o);
-    static bool                     eq     (ValuePointer a1, ValuePointer a2);
-    static ListPointer              cons   (ValuePointer a1, ValuePointer a2);
+    static ValuePointer          car        (ListPointer o);
+    static ValuePointer          cdr        (ListPointer o);
+    static bool                  symbol     (ValuePointer o);
+    static bool                  eq         (ValuePointer a1,   ValuePointer a2);
+    static bool                  eqHashmap  (const Map &a1,     const Map& a2);
+    static bool                  eqVector   (const Vector& a1,  const Vector& a2);
+    static ListPointer           cons       (ValuePointer a1,   ValuePointer a2);
 
-    static ValuePointer             get    (ListPointer &o);
-    static void                     next   (ListPointer &o);
+    static ValuePointer          get    (ListPointer &o);
+    static void                  next   (ListPointer &o);
 
     static bool isEmpty          (ValuePointer o);
     static bool isEmpty          (ListPointer o);
@@ -89,6 +95,8 @@ public:
     static bool isTrue           (ValuePointer o);
     static bool isFalse          (ValuePointer o);
     static bool isFlat           (ListPointer o);
+
+    static int  count            (ListPointer o);
 
     static ValuePointer constantVoid();
     static ValuePointer constantTrue();

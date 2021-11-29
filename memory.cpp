@@ -62,12 +62,44 @@ Pointer<NumberType> Memory::dispatchNumber(Number num)
     return new NumberType(num);
 }
 
+Pointer<IntegerType> Memory::dispatchInteger(Integer num)
+{
+#ifdef DISPATCH_DEBUG
+    printf("DISPATCH IntegerType %d\n", num);
+#endif
+    return new IntegerType(num);
+}
+
 Pointer<StringType> Memory::dispatchString(String str)
 {
 #ifdef DISPATCH_DEBUG
     printf("DISPATCH StringType %s\n", str.c_str());
 #endif
     return new StringType(str);
+}
+
+Pointer<VectorType> Memory::dispatchVector(Vector vec)
+{
+#ifdef DISPATCH_DEBUG
+    printf("DISPATCH VectorType length = %d\n", (int)vec.size());
+#endif
+    return new VectorType(vec);
+}
+
+Pointer<MapType> Memory::dispatchMap(Map map)
+{
+#ifdef DISPATCH_DEBUG
+    printf("DISPATCH MapType length = %d\n", (int)map.size());
+#endif
+    return new MapType(map);
+}
+
+Pointer<KeywordType> Memory::dispatchKeyword(Keyword key)
+{
+#ifdef DISPATCH_DEBUG
+    printf("DISPATCH KeywordType = %s\n", key.c_str());
+#endif
+    return new KeywordType(key);
 }
 
 EnvironmentPointer Memory::dispatchEnvironment(EnvironmentPointer env)

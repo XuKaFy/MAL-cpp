@@ -1,0 +1,9 @@
+(println 123)
+(println 123.0)
+(println (nth [1 2 3 4 5] 2))
+(try*
+    (println (nth [1 2 3 4 5] 5))
+    (catch* X (println X))
+)
+
+"test_D end"

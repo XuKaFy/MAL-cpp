@@ -1,7 +1,9 @@
 #ifndef TYPE_H
 #define TYPE_H
 
-#include <map>
+#include <unordered_set>
+#include <unordered_map>
+#include <vector>
 #include <string>
 #include <functional>
 
@@ -16,6 +18,8 @@ class       ListType;
 
 typedef     Pointer<AbstractType>                           ValuePointer;
 typedef     Pointer<ListType>                               ListPointer;
+typedef     std::vector<ValuePointer>                       Vector;
+typedef     std::unordered_map<Keyword, ValuePointer>       Map;
 typedef     Environment<ValuePointer>                       EnvironmentType;
 typedef     Pointer<EnvironmentType>                        EnvironmentPointer;
 typedef     std::function<ValuePointer(Pointer<ListType>)>  Function;
@@ -24,6 +28,28 @@ struct StackFrame {
     ValuePointer        o;
     EnvironmentPointer  env;
 };
+
+#define ATTRIBUTE(type, nameB, name) \
+public: \
+    void set##nameB(type name) { \
+        m_##name = name; \
+    } \
+    const type& name() const { \
+        return m_##name; \
+    } \
+    type& name() { \
+        return m_##name; \
+    } \
+private: \
+    type m_##name;
+
+#define ATTRIBUTE_READONLY(type, name) \
+public: \
+    const type& name() const { \
+        return m_##name; \
+    } \
+private: \
+    type m_##name;
 
 class AbstractType
 {
@@ -44,83 +70,100 @@ public:
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
-    Number                  number() const;
-    void                    setNumber(Number n);
 
     virtual ~NumberType();
 
-private:
-    Number m_num;
+ATTRIBUTE(Number, Number, number);
+};
+
+class IntegerType : public AbstractType
+{
+public:
+    IntegerType(Integer n = Integer());
+
+    virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
+
+    virtual ~IntegerType();
+
+ATTRIBUTE(Integer, Integer, integer);
 };
 
 class SymbolType : public AbstractType
 {
 public:
-    SymbolType(Symbol n = Symbol());
+    SymbolType(const Symbol &n = Symbol());
 
-    virtual Type            type() const final;
-    virtual ValuePointer    copy() const final;
-    Symbol                  symbol() const;
-    void                    setSymbol(Symbol n);
+    virtual Type            type() const;
+    virtual ValuePointer    copy() const;
 
     virtual ~SymbolType();
 
-private:
-    Symbol m_symbol;
+ATTRIBUTE(Symbol, Symbol, symbol);
+};
+
+class VectorType : public AbstractType
+{
+public:
+    VectorType(const Vector &v = Vector());
+
+    virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
+
+ATTRIBUTE(Vector, Vector, vector)
 };
 
 class ListType : public AbstractType
 {
 public:
-    ListType(ValuePointer first, ValuePointer second);
+    ListType(ValuePointer first = nullptr, ValuePointer second = nullptr);
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
-
-    ValuePointer            first() const;
-    void                    setFirst(ValuePointer first);
-    ValuePointer            second() const;
-    void                    setSecond(ValuePointer second);
 
     virtual ~ListType();
 
-private:
-    ValuePointer m_first;
-    ValuePointer m_second;
+ATTRIBUTE(ValuePointer, First, first);
+ATTRIBUTE(ValuePointer, Second, second);
 };
 
-class StringType : public AbstractType
+class StringType : public SymbolType
 {
 public:
-    StringType(String n = String());
+    StringType(const String &n = String());
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
-    Symbol                    string() const;
-    void                    setString(Symbol n);
 
     virtual ~StringType();
+};
 
-private:
-    String m_str;
+class KeywordType : public SymbolType
+{
+public:
+    KeywordType(const String &n = String());
+
+    virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
+
+    virtual ~KeywordType();
 };
 
 class BuildinType : public AbstractType
 {
 public:
-    BuildinType(Function f, String name);
+    BuildinType(Function f, const String &name);
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
 
     ValuePointer            process(Pointer<ListType> obj);
-    String                  name() const;
 
     virtual ~BuildinType();
 
 private:
     Function m_f;
-    String m_name;
+ATTRIBUTE_READONLY(String, name);
 };
 
 class LambdaType : public AbstractType
@@ -131,21 +174,11 @@ public:
     virtual Type            type() const;
     virtual ValuePointer    copy() const final;
 
-    Pointer<ListType>       arg() const;
-    void                    setArg(Pointer<ListType> arg);
-
-    Pointer<ListType>       body() const;
-    void                    setBody(Pointer<ListType> body);
-
-    EnvironmentPointer      environment() const;
-    void                    setEnvironment(EnvironmentPointer env);
-
     virtual ~LambdaType();
 
-private:
-    Pointer<ListType>  m_arg;
-    Pointer<ListType>  m_body;
-    EnvironmentPointer m_env;
+ATTRIBUTE(ListPointer,          Arg,            arg)
+ATTRIBUTE(ListPointer,          Body,           body)
+ATTRIBUTE(EnvironmentPointer,   Environment,    environment)
 };
 
 class MacroType : public LambdaType
@@ -153,9 +186,22 @@ class MacroType : public LambdaType
 public:
     MacroType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env);
 
-    virtual Type type() const final;
+    virtual Type            type() const final;
 
     virtual ~MacroType();
+};
+
+class MapType : public AbstractType
+{
+public:
+    MapType(const Map &m);
+
+    virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
+
+    virtual ~MapType();
+
+ATTRIBUTE(Map, Map, map);
 };
 
 #endif // TYPE_H
