@@ -36,6 +36,8 @@ private:
     // throw StackFrame or Exception
     ValuePointer evalLambda    (Pointer<LambdaType> lam,    ListPointer args, 
                                 EnvironmentPointer env,     bool tco);
+    ValuePointer evalKeyword   (const Keyword &key, ListPointer  l,      EnvironmentPointer env);
+    ValuePointer evalHashmap   (const Map &map,     ListPointer  l,      EnvironmentPointer env);
 
     ValuePointer funCond       (ListPointer o,      EnvironmentPointer env,     bool tco);
     ValuePointer funLet        (ListPointer o,      EnvironmentPointer env,     bool tco);

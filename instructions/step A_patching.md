@@ -28,25 +28,33 @@
     * &
     * |
     * ^
+    * %
     * \>=
     * <=
     * \>
     * <
     * =
-    * symbol
-    * symbol?
     * buildin?
     * car
     * cdr
     * cons
     * false?
     * fn?
+    * hash-map
+    * keyword
+    * keyword?
     * list
     * list?
     * macro?
+    * map?
     * pair?
+    * string
     * string?
+    * symbol
+    * symbol?
     * true?
+    * vector
+    * vector?
 
     字符串相关：
 

@@ -6,4 +6,10 @@
     (catch* X (println X))
 )
 
+(def! m {:a 1 :b 2 :c 3})
+
+(println (assoc m :d 1 :e 4))
+(println (dissoc m :a :b))
+(println m)
+
 "test_D end"

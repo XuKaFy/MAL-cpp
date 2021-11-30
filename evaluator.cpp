@@ -102,6 +102,10 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
         return evalLambda(GETLAMBDA(fun), listOfValues(l, env), env, tco);
     case Type::TYPE_MACRO:
         return eval(evalLambda(GETMACRO(fun).convert<LambdaType>(), l, env, false), env, tco);
+    case Type::TYPE_KEYWORD:
+        return evalKeyword(GETKEYWORD(fun), listOfValues(l, env), env);
+    case Type::TYPE_HASHMAP:
+        return evalHashmap(GETMAP(fun), listOfValues(l, env), env);
     default:
         throw Exception("Evaluator::apply: Can't execute");
     }
@@ -261,6 +265,19 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
     if(!ISEMPTY(argsPointer))
         throw Exception("Evaluator::evalLambda: (2) Length of Args wrong");
     return funBegin(lam->body(), childEnv, tco); 
+}
+
+ValuePointer Evaluator::evalKeyword(const Keyword &key, ListPointer l, EnvironmentPointer env)
+{
+    SINGLE(it, l)
+    const Map &map = GETMAP(it);
+    return map.at(key);
+}
+
+ValuePointer Evaluator::evalHashmap(const Map &map, ListPointer l, EnvironmentPointer env)
+{
+    SINGLE(it, l)
+    return map.at(GETKEYWORD(it));
 }
 
 ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)

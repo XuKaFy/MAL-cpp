@@ -99,8 +99,58 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return VALUE(Memory::dispatchVector(v));
     });
 
-    registerFunction(env, "hashmap", FUNCTION(o) {
-    //    return VALUE(o);
+    registerFunction(env, "hash-map", FUNCTION(o) {
+        Map p;
+        Keyword key;
+        FOREACH(m, o, {
+            if(key.empty()) {
+                key = GETKEYWORD(m);
+            } else {
+                p[key] = m->copy();
+                key.clear();
+            }
+        });
+        if(!key.empty())
+            throw Exception("Core::hashmap: not match");
+        return VALUE(Memory::dispatchMap(p));
+    });
+
+    registerFunction(env, "get", FUNCTION(o) {
+        const Map& map = GETMAP(GET(o));
+        const Keyword& key = GETKEYWORD(GET(o));
+        if(ISEMPTY(o)) {
+            if(map.count(key) == 0) 
+                throw Exception("Core::get: No elem");
+            return map.at(key);
+        }
+        SINGLE(def, o);
+        if(map.count(key) == 0) 
+            return def;
+        return map.at(key);
+    });
+
+    registerFunction(env, "assoc", FUNCTION(o) {
+        Map map = GETMAP(GET(o)->copy());
+        Keyword key;
+        FOREACH(m, o, {
+            if(key.empty()) {
+                key = GETKEYWORD(m);
+            } else {
+                map[key] = m->copy();
+                key.clear();
+            }
+        });
+        if(!key.empty())
+            throw Exception("Core::assoc: Not match");
+        return VALUE(Memory::dispatchMap(map));
+    });
+
+    registerFunction(env, "dissoc", FUNCTION(o) {
+        Map map = GETMAP(GET(o)->copy());
+        FOREACH(m, o, {
+            map.erase(GETKEYWORD(m));
+        });
+        return VALUE(Memory::dispatchMap(map));
     });
 
 #define SYMBOL_CONVERT(name, retType) \
