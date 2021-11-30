@@ -7,8 +7,8 @@ String Printer::print_str(AbstractType *obj)
         return "nil";
     case Type::TYPE_ATOM:
         return castAtom(Helper::convert<AtomType*>(obj)->atom());
-    case Type::TYPE_NUMBER:
-        return castNumber(Helper::convert<NumberType*>(obj)->number());
+    case Type::TYPE_FLOAT:
+        return castFloat(Helper::convert<FloatType*>(obj)->number());
     case Type::TYPE_LIST:
         return castList((Helper::convert<ListType*>(obj)));
     case Type::TYPE_BUILDIN_FUNCTION:
@@ -19,7 +19,7 @@ String Printer::print_str(AbstractType *obj)
     return "nil";
 }
 
-String Printer::castNumber(Number n)
+String Printer::castFloat(Float n)
 {
     std::ostringstream s;
     s << n;

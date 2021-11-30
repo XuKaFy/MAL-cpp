@@ -24,7 +24,7 @@ public:
     static Pointer<MacroType>           dispatchMacro       (ListPointer  args,
                                                              ListPointer  body,
                                                              EnvironmentPointer env);
-    static Pointer<NumberType>          dispatchNumber      (Number num);
+    static Pointer<FloatType>          dispatchFloat      (Float num);
     static Pointer<IntegerType>         dispatchInteger     (Integer num);
     static Pointer<StringType>          dispatchString      (String str);
     static Pointer<VectorType>          dispatchVector      (Vector vec);

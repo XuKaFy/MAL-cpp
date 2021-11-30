@@ -15,21 +15,21 @@ ValuePointer AbstractType::copy() const
     return new AbstractType();
 }
 
-NumberType::NumberType(Number n)
+FloatType::FloatType(Float n)
     : m_number(n) {
 }
 
-Type NumberType::type() const
+Type FloatType::type() const
 {
-    return Type::TYPE_NUMBER;
+    return Type::TYPE_FLOAT;
 }
 
-ValuePointer NumberType::copy() const
+ValuePointer FloatType::copy() const
 {
-    return new NumberType(m_number);
+    return new FloatType(m_number);
 }
 
-NumberType::~NumberType()
+FloatType::~FloatType()
 {
     ;
 }

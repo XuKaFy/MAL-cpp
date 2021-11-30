@@ -39,7 +39,7 @@ void Analyzer::delSpace()
 
 ValuePointer Analyzer::number()
 {
-    Number k = 0;
+    Float k = 0;
     bool read = false;
     while(remain() && isdigit(lookahead())) {
         k = k * 10 + lookahead() - '0';
@@ -47,14 +47,14 @@ ValuePointer Analyzer::number()
         read = true;
     }
     if(!read)
-        throw Exception("Analyzer::number: No Number");
+        throw Exception("Analyzer::number: No Float");
     if(remain() && lookahead() == '.') {
         match(lookahead());
-        Number m = GETNUMBER(number());
+        Float m = GETFLOAT(number());
         while(m > 1) m /= 10;
-        return VALUE(Memory::dispatchNumber(k + m));
+        return VALUE(Memory::dispatchFloat(k + m));
     }
-    return VALUE(Memory::dispatchNumber(k));
+    return VALUE(Memory::dispatchFloat(k));
 }
 
 ValuePointer Analyzer::symbol()

@@ -4,7 +4,7 @@
 #include <string>
 
 enum class Type {
-    TYPE_NUMBER,
+    TYPE_FLOAT,
     TYPE_STRING,
     TYPE_SYMBOL,
     TYPE_LIST,
@@ -15,7 +15,7 @@ enum class Type {
 };
 
 typedef     std::string                                  String;
-typedef     double                                       Number;
+typedef     double                                       Float;
 typedef     String                                       Symbol;
 typedef     String                                       Exception;
 

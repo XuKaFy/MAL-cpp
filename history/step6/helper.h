@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define GETNUMBER(o) (Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number())
+#define GETFLOAT(o) (Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number())
 #define GETSTRING(o) (Helper::convert<StringType*>(o, Type::TYPE_STRING)->string())
 #define GETATOM(o) (Helper::convert<AtomType*>(o, Type::TYPE_ATOM)->atom())
 #define GETBUILDIN(o) (Helper::convert<BuildinFunctionType*>(o, Type::TYPE_BUILDIN_FUNCTION))

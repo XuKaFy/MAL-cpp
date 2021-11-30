@@ -3,27 +3,27 @@
 void Core::registerBasicFunction(EnvironmentPointer env)
 {
     registerFunction(env, "+", FUNCTION(o) {
-        Number num = 0;
-        FOREACH(m, o, { num += GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+        Float num = 0;
+        FOREACH(m, o, { num += GETFLOAT(m); });
+        return VALUE(Memory::dispatchFloat(num));
     });
 
     registerFunction(env, "*", FUNCTION(o) {
-        Number num = 1;
-        FOREACH(m, o, { num *= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+        Float num = 1;
+        FOREACH(m, o, { num *= GETFLOAT(m); });
+        return VALUE(Memory::dispatchFloat(num));
     });
 
     registerFunction(env, "-", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num -= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+        Float num = GETFLOAT(GET(o));
+        FOREACH(m, o, { num -= GETFLOAT(m); });
+        return VALUE(Memory::dispatchFloat(num));
     });
 
     registerFunction(env, "/", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num /= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+        Float num = GETFLOAT(GET(o));
+        FOREACH(m, o, { num /= GETFLOAT(m); });
+        return VALUE(Memory::dispatchFloat(num));
     });
 
     registerFunction(env, "car", FUNCTION(o) {
@@ -91,7 +91,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, "number?", FUNCTION(o) {
         SINGLE(it, o);
-        return IF(it->type() == Type::TYPE_NUMBER);
+        return IF(it->type() == Type::TYPE_FLOAT);
     });
 
     registerFunction(env, "macro?", FUNCTION(o) {
@@ -116,22 +116,22 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, ">", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) > GETNUMBER(a2));
+        return IF(GETFLOAT(a1) > GETFLOAT(a2));
     });
 
     registerFunction(env, "<", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) < GETNUMBER(a2));
+        return IF(GETFLOAT(a1) < GETFLOAT(a2));
     });
 
     registerFunction(env, "<=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) <= GETNUMBER(a2));
+        return IF(GETFLOAT(a1) <= GETFLOAT(a2));
     });
 
     registerFunction(env, ">=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) >= GETNUMBER(a2));
+        return IF(GETFLOAT(a1) >= GETFLOAT(a2));
     });
 
     registerFunction(env, "print", FUNCTION(o) {
@@ -201,7 +201,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, "time", FUNCTION(o) {
         NONEARG(o)
-        return VALUE(Memory::dispatchNumber(Number(time(0))));
+        return VALUE(Memory::dispatchFloat(Float(time(0))));
     });
 }
 

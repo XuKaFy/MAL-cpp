@@ -12,7 +12,7 @@ public:
     static String print(ValuePointer obj);
     static String printWithEscape(String str);
 
-    static String castNumber(Number n);
+    static String castFloat(Float n);
     static String castSymbol(Symbol n);
     static String castList(ListPointer n);
     static String castBuildinFunction(Pointer<BuildinType> n);
@@ -22,8 +22,8 @@ public:
 
 private:
     static String escape();
-    static int    hexNumber(String::value_type c);
-    static int    octNumber(String::value_type c);
+    static int    hexFloat(String::value_type c);
+    static int    octFloat(String::value_type c);
 
 };
 

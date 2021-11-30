@@ -87,45 +87,45 @@ public:
     void generateMainEnvironment() {
         environment.setValue("+", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = 0;
+                Float num = 0;
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num += Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num += Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "plus"
         ));
         environment.setValue("*", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = 1;
+                Float num = 1;
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num *= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num *= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "mult"
         ));
         environment.setValue("-", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
+                Float num = Helper::convert<FloatType*>(Helper::car(o), Type::TYPE_FLOAT)
                             ->number();
                 Helper::next(o);
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num -= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num -= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "sub"
         ));
         environment.setValue("/", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
+                Float num = Helper::convert<FloatType*>(Helper::car(o), Type::TYPE_FLOAT)
                             ->number();
                 Helper::next(o);
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num /= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num /= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "div"
         ));

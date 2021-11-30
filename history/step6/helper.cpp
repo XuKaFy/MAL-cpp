@@ -40,8 +40,8 @@ bool Helper::eq(AbstractType* a1, AbstractType* a2)
         return true;
     case Type::TYPE_NULL:
         return true;
-    case Type::TYPE_NUMBER:
-        return GETNUMBER(a1) == GETNUMBER(a2);
+    case Type::TYPE_FLOAT:
+        return GETFLOAT(a1) == GETFLOAT(a2);
     case Type::TYPE_STRING:
         return GETSTRING(a1) == GETSTRING(a2);
     case Type::TYPE_LAMBDA:
@@ -103,7 +103,7 @@ bool Helper::isSingle(ListType* o)
 
 bool Helper::isSelfEvaluating(AbstractType* o)
 {
-    if(o->type() == Type::TYPE_NUMBER)
+    if(o->type() == Type::TYPE_FLOAT)
         return true;
     if(o->type() == Type::TYPE_STRING)
         return true;

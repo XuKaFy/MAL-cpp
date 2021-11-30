@@ -22,7 +22,7 @@ void Analyzer::delSpace()
 
 AbstractType* Analyzer::number()
 {
-    Number k = 0;
+    Float k = 0;
     bool read = false;
     while(remain() && isdigit(lookahead())) {
         k = k * 10 + lookahead() - '0';
@@ -31,7 +31,7 @@ AbstractType* Analyzer::number()
     }
     if(!read)
         throw Exception::EXP_ANA_NONE;
-    return new NumberType(k);
+    return new FloatType(k);
 }
 
 AbstractType* Analyzer::atom()
@@ -152,7 +152,7 @@ String Analyzer::escape()
         if(isdigit(lookahead())) {
             int con = 0;
             for(int i=0; i<2; ++i)
-                con = con * 8 + octNumber();
+                con = con * 8 + octFloat();
             ans += con;
         } else {
             ans += '\0';
@@ -165,12 +165,12 @@ String Analyzer::escape()
         if(lookahead() == 'x') {
             match('x');
             for(int i=0; i<2; ++i)
-                con = con * 16 + hexNumber();
+                con = con * 16 + hexFloat();
             ans += String::value_type(con / 16);
             ans += String::value_type(con % 16);
         } else {
             for(int i=0; i<3; ++i)
-                con = con * 8 + octNumber();
+                con = con * 8 + octFloat();
             ans += con;
         }
         break;
@@ -178,7 +178,7 @@ String Analyzer::escape()
     return ans;
 }
 
-int Analyzer::hexNumber()
+int Analyzer::hexFloat()
 {
     int ans = 0;
     if(isdigit(lookahead())) {
@@ -192,7 +192,7 @@ int Analyzer::hexNumber()
     return ans;
 }
 
-int Analyzer::octNumber()
+int Analyzer::octFloat()
 {
     if(!isdigit(lookahead()))
         throw Exception::EXP_ANA_ESCAPE_ERROR;

@@ -2,29 +2,64 @@
 
 void Core::registerBasicFunction(EnvironmentPointer env)
 {
-    registerFunction(env, "+", FUNCTION(o) {
-        Number num = 0;
-        FOREACH(m, o, { num += GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+#define REGISTER_INTEGER_FUN(sgn) \
+    registerFunction(env, #sgn, FUNCTION(o) { \
+        Integer num = GETINTEGER(GET(o)); \
+        FOREACH(m, o, { num sgn##= GETINTEGER(m); }); \
+        return VALUE(Memory::dispatchInteger(num)); \
     });
 
-    registerFunction(env, "*", FUNCTION(o) {
-        Number num = 1;
-        FOREACH(m, o, { num *= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
+#define REGISTER_NUMBER_FUN(sgn) \
+    registerFunction(env, #sgn, FUNCTION(o) { \
+        Type ansType = CAR(o)->type(); \
+        Integer ans1 = 0; \
+        Float  ans2 = 0; \
+        switch(CAR(o)->type()) { \
+        case Type::TYPE_INTEGER: \
+            ans1 = GETINTEGER(GET(o)); \
+            break; \
+        case Type::TYPE_FLOAT: \
+            ans2 = GETFLOAT(GET(o)); \
+            break; \
+        default: \
+            throw Exception("Core::FLOAT_FUN: Not a number"); \
+        } \
+        FOREACH(m, o, { \
+            switch(m->type()) { \
+            case Type::TYPE_INTEGER: \
+                if(ansType == Type::TYPE_INTEGER) \
+                    ans1 sgn##= GETINTEGER(m); \
+                else \
+                    ans2 sgn##= GETINTEGER(m); \
+                break; \
+            case Type::TYPE_FLOAT: \
+                if(ansType == Type::TYPE_INTEGER && m->type() == Type::TYPE_FLOAT) { \
+                    ans2 = ans1; \
+                    ansType = Type::TYPE_FLOAT; \
+                } \
+                if(ansType == Type::TYPE_INTEGER) \
+                    ans1 sgn##= GETFLOAT(m); \
+                else \
+                    ans2 sgn##= GETFLOAT(m); \
+                break; \
+            default: \
+                throw Exception("Core::FLOAT_FUN: Not a number"); \
+            } \
+        }); \
+        if(ansType == Type::TYPE_INTEGER) \
+            return VALUE(Memory::dispatchInteger(ans1)); \
+        return VALUE(Memory::dispatchFloat(ans2)); \
     });
 
-    registerFunction(env, "-", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num -= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
-    });
+    REGISTER_NUMBER_FUN(+)
+    REGISTER_NUMBER_FUN(-)
+    REGISTER_NUMBER_FUN(*)
+    REGISTER_NUMBER_FUN(/)
 
-    registerFunction(env, "/", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num /= GETNUMBER(m); });
-        return VALUE(Memory::dispatchNumber(num));
-    });
+    REGISTER_INTEGER_FUN(^)
+    REGISTER_INTEGER_FUN(|)
+    REGISTER_INTEGER_FUN(&)
+    REGISTER_INTEGER_FUN(%)
 
     registerFunction(env, "car", FUNCTION(o) {
         SINGLE(it, o);
@@ -53,8 +88,40 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     });
 
     registerFunction(env, "list", FUNCTION(o) {
-        return VALUE(o);
+        return VALUE(o->copy());
     });
+
+    registerFunction(env, "vector", FUNCTION(o) {
+        Vector v;
+        FOREACH(m, o, {
+            v.push_back(m->copy());
+        });
+        return VALUE(Memory::dispatchVector(v));
+    });
+
+    registerFunction(env, "hashmap", FUNCTION(o) {
+    //    return VALUE(o);
+    });
+
+#define SYMBOL_CONVERT(name, retType) \
+    registerFunction(env, name, FUNCTION(o) { \
+        SINGLE(it, o) \
+        String ans; \
+        switch(it->type()) { \
+        case Type::TYPE_SYMBOL: \
+        case Type::TYPE_KEYWORD: \
+        case Type::TYPE_STRING: \
+            ans = GETSYMBOL(it); \
+            break; \
+        default: \
+            throw Exception("Core::SYMBOL_CONVERT: Not a string type"); \
+        } \
+        return VALUE(Memory::dispatch##retType(ans)); \
+    });
+
+    SYMBOL_CONVERT("keyword", Keyword)
+    SYMBOL_CONVERT("symbol",  Symbol)
+    SYMBOL_CONVERT("string",  String)
 
     registerFunction(env, "empty?", FUNCTION(o) {
         SINGLE(it, o);
@@ -106,7 +173,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, "number?", FUNCTION(o) {
         SINGLE(it, o);
-        return IF(it->type() == Type::TYPE_NUMBER);
+        return IF(it->type() == Type::TYPE_FLOAT);
     });
 
     registerFunction(env, "macro?", FUNCTION(o) {
@@ -129,24 +196,28 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return IF(ISFALSE(a1));
     });
 
+#define GETNUM(x) (x->type() == Type::TYPE_INTEGER? GETINTEGER(x): \
+                  (x->type() == Type::TYPE_FLOAT?  GETFLOAT(x) : \
+                   throw Exception("Core::GETNUM: Not a number")))
+
     registerFunction(env, ">", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) > GETNUMBER(a2));
+        return IF(GETNUM(a1) > GETNUM(a2));
     });
 
     registerFunction(env, "<", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) < GETNUMBER(a2));
+        return IF(GETNUM(a1) < GETNUM(a2));
     });
 
     registerFunction(env, "<=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) <= GETNUMBER(a2));
+        return IF(GETNUM(a1) <= GETNUM(a2));
     });
 
     registerFunction(env, ">=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) >= GETNUMBER(a2));
+        return IF(GETNUM(a1) >= GETNUM(a2));
     });
 
     registerFunction(env, "print", FUNCTION(o) {
@@ -216,7 +287,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, "time", FUNCTION(o) {
         NONEARG(o)
-        return VALUE(Memory::dispatchNumber(Number(time(0))));
+        return VALUE(Memory::dispatchFloat(Float(time(0))));
     });
 
     registerFunction(env, "nth", FUNCTION(o) {

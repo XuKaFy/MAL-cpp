@@ -34,7 +34,7 @@ void Analyzer::delSpace()
 
 AbstractType* Analyzer::number()
 {
-    Number k = 0;
+    Float k = 0;
     bool read = false;
     while(remain() && isdigit(lookahead())) {
         k = k * 10 + lookahead() - '0';
@@ -42,8 +42,8 @@ AbstractType* Analyzer::number()
         read = true;
     }
     if(!read)
-        throw Exception("Analyzer::number: No Number");
-    return new NumberType(k);
+        throw Exception("Analyzer::number: No Float");
+    return new FloatType(k);
 }
 
 AbstractType* Analyzer::atom()

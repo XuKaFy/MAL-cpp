@@ -12,10 +12,10 @@ public:
 
 private:
     String escape();
-    int hexNumber(String::value_type c);
-    int octNumber(String::value_type c);
+    int hexFloat(String::value_type c);
+    int octFloat(String::value_type c);
 
-    String castNumber(Number n);
+    String castFloat(Float n);
     String castAtom(Atom n);
     String castList(ListType *n);
     String castBuildinFunction(BuildinFunctionType *n);

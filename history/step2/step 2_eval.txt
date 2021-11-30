@@ -1,6 +1,6 @@
 在第二步中，我们需要读入四种基本类型：
 
-	Number
+	Float
 	List
 	Atom
 	String

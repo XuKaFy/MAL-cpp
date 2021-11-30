@@ -54,12 +54,12 @@ Pointer<MacroType> Memory::dispatchMacro(ListPointer  args,
     return new MacroType(args, body, env);
 }
 
-Pointer<NumberType> Memory::dispatchNumber(Number num)
+Pointer<FloatType> Memory::dispatchFloat(Float num)
 {
 #ifdef DISPATCH_DEBUG
-    printf("DISPATCH NumberType %f\n", num);
+    printf("DISPATCH FloatType %f\n", num);
 #endif
-    return new NumberType(num);
+    return new FloatType(num);
 }
 
 Pointer<IntegerType> Memory::dispatchInteger(Integer num)

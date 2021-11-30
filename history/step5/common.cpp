@@ -5,21 +5,21 @@ Type AbstractType::type() const
     return Type::TYPE_NULL;
 }
 
-Type NumberType::type() const
+Type FloatType::type() const
 {
-    return Type::TYPE_NUMBER;
+    return Type::TYPE_FLOAT;
 }
 
-NumberType::NumberType(Number n)
+FloatType::FloatType(Float n)
     : m_num(n) {
 }
 
-Number NumberType::number() const
+Float FloatType::number() const
 {
     return m_num;
 }
 
-void NumberType::setNumber(Number n)
+void FloatType::setFloat(Float n)
 {
     m_num = n;
 }
@@ -170,8 +170,8 @@ bool Helper::eq(AbstractType* a1, AbstractType* a2)
         return true;
     case Type::TYPE_NULL:
         return true;
-    case Type::TYPE_NUMBER:
-        return convert<NumberType*>(a1)->number() == convert<NumberType*>(a2)->number();
+    case Type::TYPE_FLOAT:
+        return convert<FloatType*>(a1)->number() == convert<FloatType*>(a2)->number();
     case Type::TYPE_STRING:
         return convert<StringType*>(a1)->string() == convert<StringType*>(a2)->string();  
     case Type::TYPE_LAMBDA:
@@ -233,7 +233,7 @@ bool Helper::isSingle(ListType* o)
 
 bool Helper::isSelfEvaluating(AbstractType* o)
 {
-    if(o->type() == Type::TYPE_NUMBER)
+    if(o->type() == Type::TYPE_FLOAT)
         return true;
     if(o->type() == Type::TYPE_STRING)
         return true;

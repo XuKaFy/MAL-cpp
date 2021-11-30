@@ -8,7 +8,7 @@
 #define CONVERT(o, type)    (o.convert<type>())
 
 #define VALUE(o)            (CONVERT(o,    AbstractType)              )
-#define GETNUMBER(o)        (CONVERT(o,    NumberType)     ->number() )
+#define GETFLOAT(o)        (CONVERT(o,    FloatType)     ->number() )
 #define GETSTRING(o)        (CONVERT(o,    StringType)     ->string() )
 #define GETSYMBOL(o)        (CONVERT(o,    SymbolType)     ->symbol() )
 #define GETBUILDIN(o)       (CONVERT(o,    BuildinType)               )

@@ -37,8 +37,8 @@ private:
     AbstractType* elem();
 
     String escape();
-    int hexNumber();
-    int octNumber();
+    int hexFloat();
+    int octFloat();
 
     bool remain() const;
     void delSpace();

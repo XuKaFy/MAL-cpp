@@ -97,45 +97,45 @@ public:
     void generateMainEnvironment() {
         environment.setValue("+", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = 0;
+                Float num = 0;
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num += Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num += Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "+"
         ));
         environment.setValue("*", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = 1;
+                Float num = 1;
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num *= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num *= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "*"
         ));
         environment.setValue("-", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
+                Float num = Helper::convert<FloatType*>(Helper::car(o), Type::TYPE_FLOAT)
                             ->number();
                 Helper::next(o);
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num -= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num -= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "-"
         ));
         environment.setValue("/", new BuildinFunctionType(
             [](ListType* o) -> AbstractType* {
-                Number num = Helper::convert<NumberType*>(Helper::car(o), Type::TYPE_NUMBER)
+                Float num = Helper::convert<FloatType*>(Helper::car(o), Type::TYPE_FLOAT)
                             ->number();
                 Helper::next(o);
                 Helper::foreach(o, [&](AbstractType* o) {
-                    num /= Helper::convert<NumberType*>(o, Type::TYPE_NUMBER)->number();
+                    num /= Helper::convert<FloatType*>(o, Type::TYPE_FLOAT)->number();
                 });
-                return new NumberType(num);
+                return new FloatType(num);
             },
             "/"
         ));
@@ -248,8 +248,8 @@ public:
                 AbstractType* a2 = Helper::get(o);
                 if(!Helper::isEmpty(o))
                     throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
+                Float b1 = Helper::convert<FloatType*>(a1, Type::TYPE_FLOAT)->number();
+                Float b2 = Helper::convert<FloatType*>(a2, Type::TYPE_FLOAT)->number();
                 if(b1 > b2)
                     return Helper::constantTrue();
                 return Helper::constantFalse();
@@ -262,8 +262,8 @@ public:
                 AbstractType* a2 = Helper::get(o);
                 if(!Helper::isEmpty(o))
                     throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
+                Float b1 = Helper::convert<FloatType*>(a1, Type::TYPE_FLOAT)->number();
+                Float b2 = Helper::convert<FloatType*>(a2, Type::TYPE_FLOAT)->number();
                 if(b1 < b2)
                     return Helper::constantTrue();
                 return Helper::constantFalse();
@@ -276,8 +276,8 @@ public:
                 AbstractType* a2 = Helper::get(o);
                 if(!Helper::isEmpty(o))
                     throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
+                Float b1 = Helper::convert<FloatType*>(a1, Type::TYPE_FLOAT)->number();
+                Float b2 = Helper::convert<FloatType*>(a2, Type::TYPE_FLOAT)->number();
                 if(b1 >= b2)
                     return Helper::constantTrue();
                 return Helper::constantFalse();
@@ -290,8 +290,8 @@ public:
                 AbstractType* a2 = Helper::get(o);
                 if(!Helper::isEmpty(o))
                     throw Exception::EXP_BUILDIN_FUNCTION_LENGTH_ERROR;
-                Number b1 = Helper::convert<NumberType*>(a1, Type::TYPE_NUMBER)->number();
-                Number b2 = Helper::convert<NumberType*>(a2, Type::TYPE_NUMBER)->number();
+                Float b1 = Helper::convert<FloatType*>(a1, Type::TYPE_FLOAT)->number();
+                Float b2 = Helper::convert<FloatType*>(a2, Type::TYPE_FLOAT)->number();
                 if(b1 <= b2)
                     return Helper::constantTrue();
                 return Helper::constantFalse();

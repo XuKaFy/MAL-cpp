@@ -63,17 +63,17 @@ private:
     Type m_type;
 };
 
-class NumberType : public AbstractType
+class FloatType : public AbstractType
 {
 public:
-    NumberType(Number n = Number());
+    FloatType(Float n = Float());
 
     virtual Type            type() const final;
     virtual ValuePointer    copy() const final;
 
-    virtual ~NumberType();
+    virtual ~FloatType();
 
-ATTRIBUTE(Number, Number, number);
+ATTRIBUTE(Float, Float, number);
 };
 
 class IntegerType : public AbstractType

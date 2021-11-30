@@ -7,8 +7,8 @@ String Printer::print(AbstractType *obj)
         return "";
     case Type::TYPE_ATOM:
         return castAtom(Helper::convert<AtomType*>(obj)->atom());
-    case Type::TYPE_NUMBER:
-        return castNumber(Helper::convert<NumberType*>(obj)->number());
+    case Type::TYPE_FLOAT:
+        return castFloat(Helper::convert<FloatType*>(obj)->number());
     case Type::TYPE_LIST:
         return castList((Helper::convert<ListType*>(obj)));
     case Type::TYPE_BUILDIN_FUNCTION:
@@ -21,7 +21,7 @@ String Printer::print(AbstractType *obj)
     return "#<error: print an unknown type>";
 }
 
-int Printer::hexNumber(String::value_type c)
+int Printer::hexFloat(String::value_type c)
 {
     int ans = 0;
     if(isdigit(c)) {
@@ -34,7 +34,7 @@ int Printer::hexNumber(String::value_type c)
     return ans;
 }
 
-int Printer::octNumber(String::value_type c)
+int Printer::octFloat(String::value_type c)
 {
     if(!isdigit(c))
         throw Exception::EXP_ANA_ESCAPE_ERROR;
@@ -93,7 +93,7 @@ String Printer::printWithEscape(StringType* str)
             if(isdigit(s[i])) {
                 int con = 0;
                 for(int j=0; j<2; ++j)
-                    con = con * 8 + octNumber(s[i]);
+                    con = con * 8 + octFloat(s[i]);
                 ans += con;
             } else {
                 ans += '\0';
@@ -106,12 +106,12 @@ String Printer::printWithEscape(StringType* str)
             if(s[i] == 'x') {
                 ++i;
                 for(int j=0; j<2; ++j, ++i)
-                    con = con * 16 + hexNumber(s[i]);
+                    con = con * 16 + hexFloat(s[i]);
                 ans += String::value_type(con / 16);
                 ans += String::value_type(con % 16);
             } else {
                 for(int j=0; j<3; ++j, ++i)
-                    con = con * 8 + octNumber(s[i]);
+                    con = con * 8 + octFloat(s[i]);
                 ans += con;
             }
             break;
@@ -120,7 +120,7 @@ String Printer::printWithEscape(StringType* str)
     return ans;
 }
 
-String Printer::castNumber(Number n)
+String Printer::castFloat(Float n)
 {
     std::ostringstream s;
     s << n;

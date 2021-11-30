@@ -22,7 +22,7 @@ void Analyzer::delSpace()
 
 AbstractType* Analyzer::number()
 {
-    Number k = 0;
+    Float k = 0;
     bool read = false;
     while(remain() && isdigit(lookahead())) {
         k = k * 10 + lookahead() - '0';
@@ -31,7 +31,7 @@ AbstractType* Analyzer::number()
     }
     if(!read)
         throw Exception::EXP_ANA_NONE;
-    return new NumberType(k);
+    return new FloatType(k);
 }
 
 AbstractType* Analyzer::atom()

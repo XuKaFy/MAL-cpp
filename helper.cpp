@@ -40,8 +40,8 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
         return true;
     case Type::TYPE_NULL:
         return true;
-    case Type::TYPE_NUMBER:
-        return GETNUMBER(a1) == GETNUMBER(a2);
+    case Type::TYPE_FLOAT:
+        return GETFLOAT(a1) == GETFLOAT(a2);
     case Type::TYPE_INTEGER:
         return GETINTEGER(a1) == GETINTEGER(a2);
     case Type::TYPE_STRING:

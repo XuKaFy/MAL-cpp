@@ -3,24 +3,24 @@
 void Core::registerBasicFunction(Environment* env)
 {
     registerFunction(env, "+", FUNCTION(o) {
-        Number num = 0;
-        FOREACH(m, o, { num += GETNUMBER(m); });
-        return new NumberType(num);
+        Float num = 0;
+        FOREACH(m, o, { num += GETFLOAT(m); });
+        return new FloatType(num);
     });
     registerFunction(env, "*", FUNCTION(o) {
-        Number num = 1;
-        FOREACH(m, o, { num *= GETNUMBER(m); });
-        return new NumberType(num);
+        Float num = 1;
+        FOREACH(m, o, { num *= GETFLOAT(m); });
+        return new FloatType(num);
     });
     registerFunction(env, "-", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num -= GETNUMBER(m); });
-        return new NumberType(num);
+        Float num = GETFLOAT(GET(o));
+        FOREACH(m, o, { num -= GETFLOAT(m); });
+        return new FloatType(num);
     });
     registerFunction(env, "/", FUNCTION(o) {
-        Number num = GETNUMBER(GET(o));
-        FOREACH(m, o, { num /= GETNUMBER(m); });
-        return new NumberType(num);
+        Float num = GETFLOAT(GET(o));
+        FOREACH(m, o, { num /= GETFLOAT(m); });
+        return new FloatType(num);
     });
     registerFunction(env, "car", FUNCTION(o) {
         SINGLE(it, o);
@@ -70,19 +70,19 @@ void Core::registerBasicFunction(Environment* env)
     });
     registerFunction(env, ">", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) > GETNUMBER(a2));
+        return IF(GETFLOAT(a1) > GETFLOAT(a2));
     });
     registerFunction(env, "<", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) < GETNUMBER(a2));
+        return IF(GETFLOAT(a1) < GETFLOAT(a2));
     });
     registerFunction(env, "<=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) <= GETNUMBER(a2));
+        return IF(GETFLOAT(a1) <= GETFLOAT(a2));
     });
     registerFunction(env, ">=", FUNCTION(o) {
         DOUBLE(a1, a2, o);
-        return IF(GETNUMBER(a1) >= GETNUMBER(a2));
+        return IF(GETFLOAT(a1) >= GETFLOAT(a2));
     });
     registerFunction(env, "print", FUNCTION(o) {
         FOREACH(m, o, { std::cout << Printer::print(m); });

@@ -1,11 +1,11 @@
 在第一步中，我们需要读入三种基本类型：
 
-	Number
+	Float
 	List
 	Atom
 
 注意，这份代码并不是先token化再词法分析再构成AST，而是只写一个预测分析器，在预测分析中顺便构建AST树。
 
-为了储存一个AST，我们定义节点基类AbstractType，由此派生出NumberType，ListType和AtomType。
+为了储存一个AST，我们定义节点基类AbstractType，由此派生出FloatType，ListType和AtomType。
 
 对于ListType，其内部储存的是一个类型为AbstractType*的值对(A, B)，在表示空表时AB均为nullptr，表示单个值时B为空表“()”，表示pair时AB分别代表两个值。一个“真链表”每个节点的B要么是空表“()”，要么指向下一个节点；一个“假链表”的最后一个节点的B不是空表“()”。

@@ -10,7 +10,7 @@ public:
     String print_str(AbstractType *obj);
 
 private:
-    String castNumber(Number n);
+    String castFloat(Float n);
     String castAtom(Atom n);
     String castList(AbstractType *n); // Assume that n is type "ListType"
 };

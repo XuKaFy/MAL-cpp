@@ -5,7 +5,7 @@
 #include <vector>
 
 class AbstractType;
-class NumberType;
+class FloatType;
 class AtomType;
 class ListType;
 
@@ -19,13 +19,13 @@ enum class Exception {
 
 enum class TokenType {
     TOKEN_OPERATOR,
-    TOKEN_NUMBER,
+    TOKEN_FLOAT,
     TOKEN_ATOM,
     TOKEN_STRING,
 };
 
 enum class Type {
-    TYPE_NUMBER,
+    TYPE_FLOAT,
     TYPE_STRING,
     TYPE_ATOM,
     TYPE_LIST,
@@ -40,7 +40,7 @@ struct Pair {
 };
 
 typedef     std::string         String;
-typedef     double              Number;
+typedef     double              Float;
 typedef     String              Atom;
 typedef     Pair                List;
 
@@ -53,16 +53,16 @@ private:
     Type m_type;
 };
 
-class NumberType : public AbstractType
+class FloatType : public AbstractType
 {
 public:
-    NumberType(Number n = Number());
+    FloatType(Float n = Float());
     virtual Type type() const final;
-    Number number() const;
-    void setNumber(Number n);
+    Float number() const;
+    void setFloat(Float n);
 
 private:
-    Number m_num;
+    Float m_num;
 };
 
 class AtomType : public AbstractType

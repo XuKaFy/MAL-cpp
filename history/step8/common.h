@@ -7,14 +7,14 @@
 #include <functional>
 
 class AbstractType;
-class NumberType;
+class FloatType;
 class AtomType;
 class ListType;
 class LambdaType;
 class BuildinFunctionType;
 
 enum class Type {
-    TYPE_NUMBER,
+    TYPE_FLOAT,
     TYPE_STRING,
     TYPE_ATOM,
     TYPE_LIST,
@@ -32,7 +32,7 @@ struct Pair {
 };
 
 typedef     std::string                                 String;
-typedef     double                                      Number;
+typedef     double                                      Float;
 typedef     String                                      Atom;
 typedef     Pair                                        List;
 typedef     std::map<String, AbstractType*>             Map;
@@ -51,19 +51,19 @@ private:
     Type m_type;
 };
 
-class NumberType : public AbstractType
+class FloatType : public AbstractType
 {
 public:
-    NumberType(Number n = Number());
+    FloatType(Float n = Float());
     virtual Type type() const final;
     virtual AbstractType* copy() const final;
-    Number number() const;
-    void setNumber(Number n);
+    Float number() const;
+    void setFloat(Float n);
 
-    virtual ~NumberType();
+    virtual ~FloatType();
 
 private:
-    Number m_num;
+    Float m_num;
 };
 
 class AtomType : public AbstractType
