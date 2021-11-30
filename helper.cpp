@@ -107,9 +107,16 @@ void Helper::next(ListPointer &o)
 
 bool Helper::isEmpty(ValuePointer o)
 {
-    if(o->type() != Type::TYPE_LIST)
+    switch(o->type()) {
+    case Type::TYPE_LIST:
+        return isEmpty(GETLIST(o));
+    case Type::TYPE_VECTOR:
+        return GETVECTOR(o).empty();
+    case Type::TYPE_HASHMAP:
+        return GETMAP(o).empty();
+    default:
         return false;
-    return isEmpty(GETLIST(o));
+    }
 }
 
 bool Helper::isEmpty(ListPointer o)
@@ -176,9 +183,20 @@ ValuePointer Helper::constantVoid()
 
 int Helper::count(ListPointer o)
 {
+    if(isEmpty(o))
+        return 0;
     if(!isLast(o))
         return count(GETLIST(cdr(o))) + 1;
-    return isEmpty(cdr(o))? 0 : 1;
+    return isEmpty(cdr(o))? 1 : 2;
+}
+
+ValuePointer Helper::nth(ListPointer o, int cnt)
+{
+    if(cnt == 0)
+        return car(o);
+    if(isLast(o))
+        throw Exception("Helper::nth: More than max length");
+    return nth(GETLIST(cdr(o)), cnt - 1);
 }
 
 ValuePointer Helper::constantTrue()

@@ -7,7 +7,7 @@
 class Analyzer
 {
 public:
-    ValuePointer analyze(String s);
+    ValuePointer analyze(String::iterator &begin, String::iterator end);
 
 private:
     void match(String k);
@@ -31,9 +31,8 @@ private:
     static bool isSymbolHead(String::value_type c);
     static bool isSymbolBody(String::value_type c);
 
-    String m_s;
-    size_t m_pos;
-    size_t m_len;
+    String::iterator m_begin;
+    String::iterator m_end;
 };
 
 class Reader

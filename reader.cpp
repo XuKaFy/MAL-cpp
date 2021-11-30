@@ -1,34 +1,18 @@
 #include "reader.h"
 
-ValuePointer Analyzer::analyze(String s)
+ValuePointer Analyzer::analyze(String::iterator &begin, String::iterator end)
 {
-    m_s = s;
-    m_pos = 0;
-    m_len = s.size();
+    m_begin = begin;
+    m_end = end;
 
-    ValuePointer ans = nullptr;
-    while(ans.empty() && remain())
-        ans = elem();
-    if(remain()) {
-        ListPointer root = Memory::dispatchList();
-        ListPointer current = root;
-        current = Helper::append(current, ans);
-        while(remain()) {
-            ans = elem();
-            if(!ans.empty())
-                current = Helper::append(current, ans);
-        }
-        current->setSecond(FALSE);
-        return VALUE(BEGIN(root));
-    }
-    if(ans.empty())
-        return VOID;
+    ValuePointer ans = elem();
+    begin = m_begin;
     return ans;
 }
 
 bool Analyzer::remain() const
 {
-    return m_pos < m_len;
+    return m_begin != m_end;
 }
 
 void Analyzer::delSpace()
@@ -174,7 +158,6 @@ ValuePointer Analyzer::elem()
         }
         return VALUE(UNQUOTE(elem()));
     } else if(lookahead() == SYM_COMMENT[0]) {
-        match(lookahead());
         comment();
         return nullptr;
     } else if(lookahead() == '[') {
@@ -190,6 +173,7 @@ ValuePointer Analyzer::elem()
 
 void Analyzer::comment()
 {
+    match(';');
     while(remain() && lookahead() != '\n')
         match(lookahead());
 }
@@ -226,16 +210,15 @@ bool Analyzer::isSymbolBody(String::value_type c)
 
 String::value_type Analyzer::lookahead() const
 {
-    if(m_pos == m_len) {
+    if(!remain())
         throw Exception("Analyzer::lookahead: At the end");
-    }
-    return m_s[m_pos];
+    return *m_begin;
 }
 
 void Analyzer::match(String::value_type k)
 {
     if(k == lookahead()) {
-        ++m_pos;
+        ++m_begin;
     } else {
         throw Exception("Analyzer::match: Wrong match");
     }
@@ -250,5 +233,17 @@ void Analyzer::match(String k)
 ValuePointer Reader::read(String s)
 {
     Analyzer az;
-    return az.analyze(s);
+    String::iterator b = s.begin();
+    ListPointer root = Memory::dispatchList();
+    ListPointer current = root;
+    while(b != s.end()) {
+        ValuePointer v = az.analyze(b, s.end());
+        if(!v.empty())
+            current = Helper::append(current, v);
+    }
+    if(ISEMPTY(root))
+        return VOID;
+    if(CAR(current))
+        current->setSecond(FALSE);
+    return VALUE(BEGIN(root));
 }

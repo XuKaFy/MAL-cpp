@@ -175,6 +175,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
 
     registerFunction(env, "empty?", FUNCTION(o) {
         SINGLE(it, o);
+        
         return IF(ISEMPTY(it));
     });
 
@@ -244,6 +245,11 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     registerFunction(env, "false?", FUNCTION(o) {
         SINGLE(a1, o);
         return IF(ISFALSE(a1));
+    });
+
+    registerFunction(env, "nil?", FUNCTION(o) {
+        SINGLE(a1, o);
+        return IF(a1->type() == Type::TYPE_NULL);
     });
 
 #define GETNUM(x) (x->type() == Type::TYPE_INTEGER? GETINTEGER(x): \
@@ -344,9 +350,17 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         DOUBLE(a1, a2, o)
         if(GETINTEGER(a2) < 0)
             throw Exception("Core::nth: pos less than 0");
-        if((size_t)GETINTEGER(a2) >= GETVECTOR(a1).size())
-            throw Exception("Core::nth: pos more than max");
-        return GETVECTOR(a1)[GETINTEGER(a2)];
+        switch(a1->type()) {
+        case Type::TYPE_VECTOR:
+            if((size_t)GETINTEGER(a2) >= GETVECTOR(a1).size())
+                throw Exception("Core::nth: pos more than max");
+            return GETVECTOR(a1)[GETINTEGER(a2)];
+        case Type::TYPE_LIST:
+            return Helper::nth(GETLIST(a1), GETINTEGER(a2));
+        default:
+            throw Exception("Core::nth: not a sequence");
+        }
+        return VOID;
     });
 
     registerFunction(env, "count", FUNCTION(o) {
@@ -372,6 +386,35 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     registerFunction(env, "sequential?", FUNCTION(o) {
         SINGLE(a1, o)
         return IF(a1->type() == Type::TYPE_LIST || a1->type() == Type::TYPE_VECTOR);
+    });
+
+    registerFunction(env, "contains?", FUNCTION(o) {
+        DOUBLE(a1, a2, o);
+        return IF(GETMAP(a1).count(GETKEYWORD(a2)));
+    });
+
+    registerFunction(env, "keys", FUNCTION(o) {
+        SINGLE(a1, o);    
+        ListPointer root = Memory::dispatchList();
+        ListPointer current = root;
+        const Map& map = GETMAP(a1);
+        for(auto i : map)
+            current = Helper::append(current, VALUE(Memory::dispatchKeyword(i.first)));
+        if(CAR(current))
+            current->setSecond(FALSE);
+        return VALUE(root);
+    });
+
+    registerFunction(env, "values", FUNCTION(o) {
+        SINGLE(a1, o);    
+        ListPointer root = Memory::dispatchList();
+        ListPointer current = root;
+        const Map& map = GETMAP(a1);
+        for(auto i : map)
+            current = Helper::append(current, i.second->copy());
+        if(CAR(current))
+            current->setSecond(FALSE);
+        return VALUE(root);
     });
 }
 

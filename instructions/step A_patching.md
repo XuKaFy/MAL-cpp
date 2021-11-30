@@ -47,6 +47,7 @@
     * list?
     * macro?
     * map?
+    * nil?
     * pair?
     * string
     * string?

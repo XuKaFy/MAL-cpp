@@ -292,7 +292,7 @@ ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)
             return res;
         NEXT(o);
     }
-    return FALSE;
+    return VOID;
 }
 
 ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env, bool tco)
@@ -310,7 +310,7 @@ ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env, bool tco)
     } else if(a3) {
         return eval(a3, env, tco);
     }
-    return FALSE;
+    return VOID;
 }
 
 ValuePointer Evaluator::funIf2(ListPointer o, EnvironmentPointer env, bool tco)

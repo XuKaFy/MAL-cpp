@@ -1,0 +1,12 @@
+(def! popsicle-map
+  (hash-map :red :cherry :green :apple :purple :grape))
+
+(println (get popsicle-map :green));
+(println (popsicle-map :green))
+(println (:green popsicle-map))
+
+(println (contains? popsicle-map :green)) ; -> true
+(println (keys popsicle-map)) ; -> (:red :green :purple)
+(println (values popsicle-map)) ; -> (:cherry :apple :grape)
+
+"test_E end"

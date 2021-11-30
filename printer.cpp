@@ -4,7 +4,7 @@ String Printer::print(ValuePointer obj)
 {
     switch(obj->type()) {
     case Type::TYPE_NULL:
-        return "";
+        return "nil";
     case Type::TYPE_SYMBOL:
         return castSymbol(GETSYMBOL(obj));
     case Type::TYPE_FLOAT:
@@ -205,7 +205,7 @@ String Printer::castVector(const Vector& n)
         if(first) {
             first = false;
         } else {
-            ans += ", ";
+            ans += " ";
         }
         ans += print(i);
     }

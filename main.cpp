@@ -26,7 +26,6 @@ public:
 
     ValuePointer eval(String exp) {
         ValuePointer root = Reader::read(exp);
-        Printer::print(root);
         return evaluator.eval(root, environment);
     }
 

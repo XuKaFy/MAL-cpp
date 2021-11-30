@@ -96,7 +96,8 @@ public:
     static bool isFalse          (ValuePointer o);
     static bool isFlat           (ListPointer o);
 
-    static int  count            (ListPointer o);
+    static int           count   (ListPointer o);
+    static ValuePointer  nth     (ListPointer o, int cnt);
 
     static ValuePointer constantVoid();
     static ValuePointer constantTrue();
