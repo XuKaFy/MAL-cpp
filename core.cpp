@@ -383,6 +383,62 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return VOID;
     });
 
+    registerFunction(env, "conj", FUNCTION(o) {
+        ValuePointer v = GET(o);
+        switch(v->type()) {
+        case Type::TYPE_LIST: {
+                ListPointer l = GETLIST(v->copy());
+                FOREACH(m, o, {
+                    l = Memory::dispatchList(m, VALUE(l));
+                });
+                v = VALUE(l);
+            }
+            break;
+        case Type::TYPE_VECTOR: {
+                Vector vec = GETVECTOR(v);
+                FOREACH(m, o, {
+                    vec.push_back(m->copy());
+                });
+                v = VALUE(Memory::dispatchVector(vec));
+            }
+            break;
+        case Type::TYPE_HASHMAP: {
+                Map map = GETMAP(v);
+                Keyword key;
+                FOREACH(m, o, {
+                    if(key.empty()) {
+                        key = GETKEYWORD(m);
+                    } else {
+                        map[key] = m->copy();
+                        key.clear();
+                    }
+                });
+                if(!key.empty())
+                    throw Exception("Core::conj: Key-Value cannot match");
+                v = VALUE(Memory::dispatchMap(map));
+            }
+            break;
+        default:
+            throw Exception("Core::conj: Cannot conj into this type");
+        }
+        return v;    
+    });
+
+    registerFunction(env, "seq", FUNCTION(o) {
+        SINGLE(a1, o)
+        const Map& map = GETMAP(a1);
+        ListPointer root = Memory::dispatchList();
+        ListPointer current = root;
+        for(auto i : map) {
+            Vector v;
+            v.push_back(VALUE(Memory::dispatchKeyword(i.first)));
+            v.push_back(i.second->copy());
+            current = Helper::append(current, VALUE(Memory::dispatchVector(v)));
+        }
+        current->setSecond(FALSE);
+        return VALUE(root);
+    });
+
     registerFunction(env, "sequential?", FUNCTION(o) {
         SINGLE(a1, o)
         return IF(a1->type() == Type::TYPE_LIST || a1->type() == Type::TYPE_VECTOR);
