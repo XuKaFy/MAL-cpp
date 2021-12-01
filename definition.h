@@ -42,6 +42,7 @@ typedef     String          Exception;
 #define     SYM_THROW       "throw"
 #define     SYM_TRY         "try*"
 #define     SYM_CATCH       "catch*"
+#define     SYM_MACROEXP    "macroexpand"
 #define     SYM_EQ          "="
 #define     SYM_VARIADIC    "&"
 #define     SYM_SIM_QQ      "`"

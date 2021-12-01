@@ -90,6 +90,11 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
         } else if(name == SYM_TRY) {
             NEXT(l);
             return funTry(l, env);
+        } else if(name == SYM_MACROEXP) {
+            NEXT(l);
+            SINGLE(it, l);
+            it = eval(it, env, true, true);
+            return macroExpand(it, env);
         }
     }
     ValuePointer fun = eval(CAR(l), env, false);
@@ -346,4 +351,29 @@ ValuePointer Evaluator::funBegin(ListPointer o, EnvironmentPointer env, bool tco
         NEXT(o);
     }
     return eval(CAR(o), env, tco);
+}
+
+ValuePointer Evaluator::macroExpand(ValuePointer o, EnvironmentPointer env)
+{
+    if(o->type() != Type::TYPE_LIST || ISEMPTY(o)) {
+        return o->copy();
+    }
+    ListPointer l = GETLIST(o);
+    ValuePointer v = CAR(l);
+    try {
+        if(v->type() == Type::TYPE_SYMBOL &&
+        env->getValue(GETSYMBOL(v))->type() == Type::TYPE_MACRO) {
+            Pointer<MacroType> fun = GETMACRO(env->getValue(GETSYMBOL(v)));
+            NEXT(l);
+            return evalLambda(fun.convert<LambdaType>(), l, env, false);
+        }
+    } catch(Exception e) {
+    }
+    ListPointer root = Memory::dispatchList();
+    ListPointer current = root;
+    ValuePointer remain = FOREACH(m, l, {
+        current = Helper::append(current, macroExpand(m, env));
+    });
+    current->setSecond(macroExpand(remain, env));
+    return VALUE(root);
 }

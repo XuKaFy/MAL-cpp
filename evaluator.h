@@ -8,6 +8,7 @@
 
 #include "debug.h"
 
+#include "printer.h"
 #ifdef EVAL_DEBUG
 #include "printer.h"
 #endif
@@ -44,6 +45,8 @@ private:
     ValuePointer funIf         (ListPointer o,      EnvironmentPointer env,     bool tco);
     ValuePointer funIf2        (ListPointer o,      EnvironmentPointer env,     bool tco);
     ValuePointer funBegin      (ListPointer o,      EnvironmentPointer env,     bool tco);
+
+    ValuePointer macroExpand   (ValuePointer   o,   EnvironmentPointer env);
 };
 
 #endif // EVALUATOR_H

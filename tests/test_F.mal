@@ -1,0 +1,9 @@
+(defmacro! inc (var)
+  (list 'setq var (list '1+ var)))
+
+(defmacro! inc2 (v1 v2)
+  (list 'progn (list 'inc v1) (list 'inc v2)))
+
+(println (macroexpand '(inc2 a b))) ; => (progn (inc a) (inc b))
+
+"test_F end"

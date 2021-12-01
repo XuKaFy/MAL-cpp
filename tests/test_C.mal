@@ -66,5 +66,6 @@
 ))
 
 (println (my-cond ('t 1)))
+(println (macroexpand (my-cond ('t 1))))
 
 "test_C end"
