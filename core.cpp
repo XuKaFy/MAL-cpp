@@ -379,8 +379,14 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     });
 
     registerFunction(env, "concat", FUNCTION(o) {
-        DOUBLE(a1, a2, o)
-        return VOID;
+        ListPointer root = Helper::toList(GET(o));
+        ListPointer current = root;
+        FOREACH(m, o, {
+            while(!Helper::isLast(current))
+                NEXT(current);
+            current->setSecond(VALUE(Helper::toList(m)));
+        });
+        return VALUE(root);
     });
 
     registerFunction(env, "conj", FUNCTION(o) {

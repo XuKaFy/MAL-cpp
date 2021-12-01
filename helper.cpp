@@ -199,6 +199,28 @@ ValuePointer Helper::nth(ListPointer o, int cnt)
     return nth(GETLIST(cdr(o)), cnt - 1);
 }
 
+ListPointer Helper::toList(ValuePointer o)
+{
+    switch(o->type()) {
+    case Type::TYPE_LIST:
+        return GETLIST(o->copy());
+    case Type::TYPE_VECTOR: {
+            ListPointer root = Memory::dispatchList();
+            ListPointer current = root;
+            const Vector& vec = GETVECTOR(o);
+            for(auto i : vec) {
+                current = Helper::append(current, i->copy());
+            }
+            current->setSecond(FALSE);
+            return root;
+        }
+        break;
+    default:
+        throw Exception("Helper::toList: Cannot convert to list");
+    }
+    return nullptr;
+}
+
 ValuePointer Helper::constantTrue()
 {
     static Pointer<SymbolType> val(Memory::dispatchSymbol("t"));

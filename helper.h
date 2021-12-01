@@ -98,6 +98,7 @@ public:
 
     static int           count   (ListPointer o);
     static ValuePointer  nth     (ListPointer o, int cnt);
+    static ListPointer   toList  (ValuePointer o);
 
     static ValuePointer constantVoid();
     static ValuePointer constantTrue();
