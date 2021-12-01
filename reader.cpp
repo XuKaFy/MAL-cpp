@@ -135,7 +135,7 @@ ValuePointer Analyzer::elem()
 {
     delSpace();
     if(!remain())
-        throw Exception("Analyzer::elem: No elem");
+        return nullptr;
     if(lookahead() == '(') {
         return list();
     } else if(isdigit(lookahead())) {

@@ -9,21 +9,21 @@
 class Printer
 {
 public:
-    static String print(ValuePointer obj);
+    static String print(ValuePointer obj, bool readably = false);
     static String printWithEscape(const String &str);
 
-    static String castFloat(Float n);
-    static String castInteger(Integer n);
-    static String castSymbol(const Symbol &n);
-    static String castList(ListPointer n);
-    static String castBuildinFunction(Pointer<BuildinType> n);
-    static String castString(const String &n);
-    static String castLambda(Pointer<LambdaType> n);
-    static String castMacro(Pointer<MacroType> n);
-    static String castVector(const Vector &n);
-    static String castMap(const Map &n);
-    static String castKeyword(const Keyword &n);
-    static String castAtom(ValuePointer ref);
+    static String castFloat             (Float n,                   bool readably);
+    static String castInteger           (Integer n,                 bool readably);
+    static String castSymbol            (const Symbol &n,           bool readably);
+    static String castList              (ListPointer n,             bool readably);
+    static String castBuildinFunction   (Pointer<BuildinType> n,    bool readably);
+    static String castString            (const String &n,           bool readably);
+    static String castLambda            (Pointer<LambdaType> n,     bool readably);
+    static String castMacro             (Pointer<MacroType> n,      bool readably);
+    static String castVector            (const Vector &n,           bool readably);
+    static String castMap               (const Map &n,              bool readably);
+    static String castKeyword           (const Keyword &n,          bool readably);
+    static String castAtom              (ValuePointer ref,          bool readably);
 
 private:
     static String escape();

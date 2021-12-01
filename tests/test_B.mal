@@ -2,7 +2,7 @@
 (println 
     (
         (fn* (x all) 
-            (print-string "Now, x = ")
+            (print "Now, x = ")
             (println x)
             (if (empty? x) 
                 all 

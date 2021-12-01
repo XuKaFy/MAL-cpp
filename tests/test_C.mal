@@ -5,22 +5,22 @@
     )
 )
 
-(print-string "TEST 1\n")
+(print "TEST 1\n")
 (fun "hello world" 1 2 3 4 5)
 
-(print-string "TEST 2\n")
+(print "TEST 2\n")
 (try*
     (fun "hello world")
     (catch* X (println X))
 )
 
-(print-string "TEST 3\n")
+(print "TEST 3\n")
 (try*
     (fun "hello world" 1)
     (catch* X (println X))
 )
 
-(print-string "TEST 4\n")
+(print "TEST 4\n")
 (try*
     (do
         (def! fun2
@@ -34,7 +34,7 @@
     (catch* X (println X))
 )
 
-(print-string "TEST 5\n")
+(print "TEST 5\n")
 (try*
     (do
         (def! fun3
@@ -47,7 +47,7 @@
     (catch* X (println X))
 )
 
-(print-string "TEST 6\n")
+(print "TEST 6\n")
 (defmacro! my-cond (& x)
     (if (empty? x) 
         ''()

@@ -276,68 +276,136 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return IF(GETNUM(a1) >= GETNUM(a2));
     });
 
-    registerFunction(env, "print", FUNCTION(o) {
-        FOREACH(m, o, { std::cout << Printer::print(m); });
-        return VOID;
-    });
-
     registerFunction(env, "newline", FUNCTION(o) {
         NONEARG(o)
         std::cout << std::endl;
         return VOID;
     });
 
-    registerFunction(env, "read", FUNCTION(o) {
+    registerFunction(env, "readline", FUNCTION(o) {
         NONEARG(o)
         String s;
         getline(std::cin, s);
         return Reader::read(s);
     });
 
-    registerFunction(env, "read-string", FUNCTION(o) {
-        NONEARG(o)
-        String s;
-        getline(std::cin, s);
-        return VALUE(Memory::dispatchString(s));
+    registerFunction(env, "print-str", FUNCTION(o) {
+        bool first = true;
+        std::stringstream ss;
+        FOREACH(m, o, { 
+            if(first) {
+                first = false;
+            } else {
+                ss << " ";
+            }
+            ss << Printer::print(m, false);
+        });
+        return VALUE(Memory::dispatchString(ss.str()));
     });
 
-    registerFunction(env, "print-string", FUNCTION(o) {
-        FOREACH(m, o, { std::cout << Printer::printWithEscape(GETSTRING(m)); });
+    registerFunction(env, "pr-str", FUNCTION(o) {
+        bool first = true;
+        std::stringstream ss;
+        FOREACH(m, o, {
+            if(first) {
+                first = false;
+            } else {
+                ss << " ";
+            }
+            ss << Printer::print(m, true);
+        });
+        return VALUE(Memory::dispatchString(ss.str()));
+    });
+
+    registerFunction(env, "print", FUNCTION(o) {
+        bool first = true;
+        FOREACH(m, o, { 
+            if(first) {
+                first = false;
+            } else {
+                std::cout << " ";
+            }
+            std::cout << Printer::print(m, false);
+        });
         return VOID;
+    });
+
+    registerFunction(env, "pr", FUNCTION(o) {
+        bool first = true;
+        FOREACH(m, o, {
+            if(first) {
+                first = false;
+            } else {
+                std::cout << " ";
+            }
+            std::cout << Printer::print(m, true);
+        });
+        return VOID;
+    });
+
+    registerFunction(env, "println", FUNCTION(o) {
+        bool first = true;
+        FOREACH(m, o, { 
+            if(first) {
+                first = false;
+            } else {
+                std::cout << " ";
+            }
+            std::cout << Printer::print(m, false);
+        });
+        std::cout << std::endl;
+        return VOID;
+    });
+
+    registerFunction(env, "prn", FUNCTION(o) {
+        bool first = true;
+        FOREACH(m, o, {
+            if(first) {
+                first = false;
+            } else {
+                std::cout << " ";
+            }
+            std::cout << Printer::print(m, true);
+        });
+        std::cout << std::endl;
+        return VOID;
+    });
+
+    registerFunction(env, "str", FUNCTION(o) {
+        std::stringstream ss;
+        FOREACH(m, o, {
+            ss << Printer::print(m, false);
+        });
+        return VALUE(Memory::dispatchString(ss.str()));
     });
 
     registerFunction(env, "join-string", FUNCTION(o) {
         String ans;
         FOREACH(m, o, { ans += GETSTRING(m); });
         return VALUE(Memory::dispatchString(ans));
-    });
+    });//(load-file "tests/test_D.mal")
 
-    registerFunction(env, "translate-from-string", FUNCTION(o) {
+    registerFunction(env, "read-string", FUNCTION(o) {
         SINGLE(a1, o);
         return Reader::read(GETSTRING(a1));
     });
 
-    registerFunction(env, "translate-to-string", FUNCTION(o) {
-        SINGLE(a1, o);
-        return VALUE(Memory::dispatchString(Printer::print(a1)));
-    });
-
-    registerFunction(env, "read-file", FUNCTION(o) {
+    registerFunction(env, "slurp", FUNCTION(o) {
         SINGLE(a1, o);
         std::ifstream stm(GETSTRING(a1));
         if(!stm.is_open())
-            throw Exception("Core::read-file: File not existed");
+            throw Exception("Core::slurp: File not existed");
         std::stringstream buffer;
         buffer << stm.rdbuf();
         return VALUE(Memory::dispatchString(buffer.str()));
     });
 
-    registerFunction(env, "write-file", FUNCTION(o) {
+    registerFunction(env, "spit", FUNCTION(o) {
         DOUBLE(a1, a2, o);
         std::ofstream stm(GETSTRING(a1));
         if(!stm.is_open())
-            throw Exception("Core::write-file: File not existed");
-        stm << Printer::print(a2);
+            throw Exception("Core::spit: File not existed");
+        stm << GETSTRING(a2);
         return VOID;
     });
 

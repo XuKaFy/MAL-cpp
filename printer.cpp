@@ -1,34 +1,34 @@
 #include "printer.h"
 
-String Printer::print(ValuePointer obj)
+String Printer::print(ValuePointer obj, bool readably)
 {
     switch(obj->type()) {
     case Type::TYPE_NULL:
         return "nil";
     case Type::TYPE_SYMBOL:
-        return castSymbol(GETSYMBOL(obj));
+        return castSymbol(GETSYMBOL(obj), readably);
     case Type::TYPE_FLOAT:
-        return castFloat(GETFLOAT(obj));
+        return castFloat(GETFLOAT(obj), readably);
     case Type::TYPE_INTEGER:
-        return castInteger(GETINTEGER(obj));
+        return castInteger(GETINTEGER(obj), readably);
     case Type::TYPE_LIST:
-        return castList(GETLIST(obj));
+        return castList(GETLIST(obj), readably);
     case Type::TYPE_BUILDIN:
-        return castBuildinFunction(GETBUILDIN(obj));
+        return castBuildinFunction(GETBUILDIN(obj), readably);
     case Type::TYPE_STRING:
-        return castString(GETSTRING(obj));
+        return castString(GETSTRING(obj), readably);
     case Type::TYPE_LAMBDA:
-        return castLambda(GETLAMBDA(obj));
+        return castLambda(GETLAMBDA(obj), readably);
     case Type::TYPE_MACRO:
-        return castMacro(GETMACRO(obj));
+        return castMacro(GETMACRO(obj), readably);
     case Type::TYPE_VECTOR:
-        return castVector(GETVECTOR(obj));
+        return castVector(GETVECTOR(obj), readably);
     case Type::TYPE_HASHMAP:
-        return castMap(GETMAP(obj));
+        return castMap(GETMAP(obj), readably);
     case Type::TYPE_KEYWORD:
-        return castKeyword(GETKEYWORD(obj));
+        return castKeyword(GETKEYWORD(obj), readably);
     case Type::TYPE_ATOM:
-        return castAtom(GETATOM(obj)->reference());
+        return castAtom(GETATOM(obj)->reference(), readably);
     }
     return "#<error: print an unknown type>";
 }
@@ -130,22 +130,22 @@ String Printer::printWithEscape(const String &s)
     return ans;
 }
 
-String Printer::castFloat(Float n)
+String Printer::castFloat(Float n, bool)
 {
     return std::to_string(n);
 }
 
-String Printer::castInteger(Integer n)
+String Printer::castInteger(Integer n, bool)
 {
     return std::to_string(n);
 }
 
-String Printer::castSymbol(const Symbol &n)
+String Printer::castSymbol(const Symbol &n, bool)
 {
     return n;
 }
 
-String Printer::castList(ListPointer n)
+String Printer::castList(ListPointer n, bool readably)
 {
     String ans = "(";
     if(!ISEMPTY(n)) {
@@ -156,7 +156,7 @@ String Printer::castList(ListPointer n)
             } else {
                 ans += " ";
             }
-            ans += print(o);
+            ans += print(o, readably);
         });
         if(!ISEMPTY(remain))
             ans += " . " + print(remain);
@@ -165,21 +165,37 @@ String Printer::castList(ListPointer n)
     return ans;
 }
 
-String Printer::castString(const String &n)
+String Printer::castString(const String &n, bool readably)
 {
-    return '"' + n + '"';
+    if(readably) {
+        return '"' + n + '"';
+    }
+    return printWithEscape(n);
 }
 
-String Printer::castBuildinFunction(Pointer<BuildinType> n)
+String Printer::castBuildinFunction(Pointer<BuildinType> n, bool readably)
 {
+    if(readably) {
+        return n->name();
+    }
     return "#<procedure:" + n->name() + ">";
 }
 
-String Printer::castLambda(Pointer<LambdaType> n)
+String Printer::castLambda(Pointer<LambdaType> n, bool readably)
 {
+    if(readably) {
+        String ans = "(" SYM_LAMBDA " ";
+        ans += castList(n->arg(), readably);
+        String in = castList(n->body(), readably);
+        in.erase(in.begin());
+        in.pop_back();
+        ans += " (begin " + in;
+        ans += "))";
+        return ans;
+    }
     String ans = "#<lambda:(";
-    ans += castList(n->arg());
-    String in = castList(n->body());
+    ans += castList(n->arg(), readably);
+    String in = castList(n->body(), readably);
     in.erase(in.begin());
     in.pop_back();
     ans += " (begin " + in;
@@ -187,11 +203,21 @@ String Printer::castLambda(Pointer<LambdaType> n)
     return ans;
 }
 
-String Printer::castMacro(Pointer<MacroType>n)
+String Printer::castMacro(Pointer<MacroType>n, bool readably)
 {
+    if(readably) {
+        String ans = "";
+        ans += castList(n->arg(), readably);
+        String in = castList(n->body(), readably);
+        in.erase(in.begin());
+        in.pop_back();
+        ans += " (begin " + in;
+        ans += ")";
+        return ans;
+    }
     String ans = "#<macro:(";
-    ans += castList(n->arg());
-    String in = castList(n->body());
+    ans += castList(n->arg(), readably);
+    String in = castList(n->body(), readably);
     in.erase(in.begin());
     in.pop_back();
     ans += " (begin " + in;
@@ -199,7 +225,7 @@ String Printer::castMacro(Pointer<MacroType>n)
     return ans;
 }
 
-String Printer::castVector(const Vector& n)
+String Printer::castVector(const Vector& n, bool readably)
 {
     String ans = "[";
     bool first = true;
@@ -209,13 +235,13 @@ String Printer::castVector(const Vector& n)
         } else {
             ans += " ";
         }
-        ans += print(i);
+        ans += print(i, readably);
     }
     ans += "]";
     return ans;
 }
 
-String Printer::castMap(const Map& n)
+String Printer::castMap(const Map& n, bool readably)
 {
     String ans = "{";
     bool first = true;
@@ -225,18 +251,18 @@ String Printer::castMap(const Map& n)
         } else {
             ans += " ";
         }
-        ans += castKeyword(i.first) + " " + print(i.second);
+        ans += castKeyword(i.first, readably) + " " + print(i.second, readably);
     }
     ans += "}";
     return ans;
 }
 
-String Printer::castKeyword(const Keyword& key)
+String Printer::castKeyword(const Keyword& key, bool readably)
 {
-    return ":" + castSymbol(key);
+    return ":" + castSymbol(key, readably);
 }
 
-String Printer::castAtom(ValuePointer ref)
+String Printer::castAtom(ValuePointer ref, bool )
 {
     std::stringstream ss;
     ss << "#<atom: ";

@@ -57,18 +57,19 @@
     * vector
     * vector?
 
-    字符串相关：
+    输入输出：
 
-    * read
-    * read-string
-    * read-file
-    * join-string
-    * print
-    * print-string
     * newline
-    * translate-from-string
-    * translate-to-string
-    * write-file
+    * print
+    * println
+    * pr
+    * prn
+    * print-str
+    * println-str
+    * pr-str
+    * prn-str
+    * slurp
+    * spit
 
     容器相关：
 
@@ -90,6 +91,14 @@
 
     * with-meta
     * meta
+
+    引用
+
+    * atom
+    * atom?
+    * deref
+    * reset!
+    * swap!
 
 3. 全局变量：`Interface`
 
