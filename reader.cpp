@@ -147,7 +147,9 @@ ValuePointer Analyzer::elem()
         return VALUE(QUOTE(elem()));
     } else if(lookahead() == SYM_SIM_WM[0]) {
         match(lookahead());
-        return VALUE(WITH_META(elem()));
+        ValuePointer v = map();
+        ValuePointer e = elem();
+        return VALUE(WITH_META(v, e));
     } else if(lookahead() == SYM_SIM_SUQ[0]) {
         match(lookahead());
         if(lookahead() == SYM_SIM_SUQ[1]) {
