@@ -1,0 +1,9 @@
+(def! x (atom [1 2 3 4 5]))
+(println x)
+(println (deref x))
+
+(reset! x [5 4 3 2 1])
+(println x)
+(println @x)
+
+"test_11 end"

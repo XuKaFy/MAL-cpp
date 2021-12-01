@@ -487,6 +487,27 @@ void Core::registerBasicFunction(EnvironmentPointer env)
             throw Exception("Core::meta: No meta");
         return a1->meta();
     });
+
+    registerFunction(env, "atom", FUNCTION(o) {
+        SINGLE(a1, o);
+        return VALUE(Memory::dispatchAtom(a1));
+    });
+
+    registerFunction(env, "atom?", FUNCTION(o) {
+        SINGLE(a1, o);
+        return IF(a1->type() == Type::TYPE_ATOM);
+    });
+
+    registerFunction(env, "deref", FUNCTION(o) {
+        SINGLE(a1, o);
+        return GETATOM(a1)->reference();
+    });
+
+    registerFunction(env, "reset!", FUNCTION(o) {
+        DOUBLE(a1, a2, o);
+        GETATOM(a1)->setReference(a2);
+        return VOID;
+    });
 }
 
 void Core::registerFunction(EnvironmentPointer env, String name, Function fun)

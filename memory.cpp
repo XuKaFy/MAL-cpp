@@ -102,6 +102,14 @@ Pointer<KeywordType> Memory::dispatchKeyword(Keyword key)
     return new KeywordType(key);
 }
 
+Pointer<AtomType> Memory::dispatchAtom(ValuePointer val)
+{
+#ifdef DISPATCH_DEBUG
+    printf("DISPATCH AtomType = %p\n", val.get());
+#endif
+    return new AtomType(val);
+}
+
 EnvironmentPointer Memory::dispatchEnvironment(EnvironmentPointer env)
 {
 #ifdef DISPATCH_DEBUG

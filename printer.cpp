@@ -27,6 +27,8 @@ String Printer::print(ValuePointer obj)
         return castMap(GETMAP(obj));
     case Type::TYPE_KEYWORD:
         return castKeyword(GETKEYWORD(obj));
+    case Type::TYPE_ATOM:
+        return castAtom(GETATOM(obj)->reference());
     }
     return "#<error: print an unknown type>";
 }
@@ -232,4 +234,13 @@ String Printer::castMap(const Map& n)
 String Printer::castKeyword(const Keyword& key)
 {
     return ":" + castSymbol(key);
+}
+
+String Printer::castAtom(ValuePointer ref)
+{
+    std::stringstream ss;
+    ss << "#<atom: ";
+    ss << ref.get();
+    ss << ">";
+    return ss.str();
 }

@@ -231,3 +231,22 @@ IntegerType::~IntegerType()
 {
     ;
 }
+
+AtomType::AtomType(ValuePointer ref)
+    : m_reference(ref) {
+}
+
+Type AtomType::type() const
+{
+    return Type::TYPE_ATOM;
+}
+
+ValuePointer AtomType::copy() const
+{
+    return new AtomType(m_reference);
+}
+
+AtomType::~AtomType()
+{
+    ;
+}

@@ -58,6 +58,8 @@ bool Helper::eq(ValuePointer a1, ValuePointer a2)
         return eqHashmap(GETMAP(a1), GETMAP(a2));
     case Type::TYPE_VECTOR:
         return eqVector(GETVECTOR(a1), GETVECTOR(a2));
+    case Type::TYPE_ATOM:
+        return GETATOM(a1)->reference() == GETATOM(a2)->reference();
     }
     return false;
 }

@@ -205,4 +205,17 @@ public:
 ATTRIBUTE(Map, Map, map);
 };
 
+class AtomType : public AbstractType
+{
+public:
+    AtomType(ValuePointer ref = nullptr);
+
+    virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
+
+    virtual ~AtomType();
+
+ATTRIBUTE(ValuePointer, Reference, reference);
+};
+
 #endif // TYPE_H

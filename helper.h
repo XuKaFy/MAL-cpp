@@ -19,6 +19,7 @@
 #define GETVECTOR(o)        CONVERT(o,    VectorType)     ->vector()
 #define GETKEYWORD(o)       CONVERT(o,    KeywordType)    ->symbol()
 #define GETMAP(o)           CONVERT(o,    MapType)        ->map()
+#define GETATOM(o)          CONVERT(o,    AtomType) 
 
 #define CAR(o)              Helper::car(o)
 #define CDR(o)              Helper::cdr(o)
@@ -45,6 +46,7 @@
 #define QUASIQUOTE(x)       MAKE_LIST(Memory::dispatchSymbol(SYM_QQ),           MAKE_LIST(x, FALSE))
 #define WITH_META(map, x)   MAKE_LIST(Memory::dispatchSymbol(SYM_WITH_META),    MAKE_LIST(x, \
                                                                                 MAKE_LIST(map, FALSE)))
+#define DEREF(x)            MAKE_LIST(Memory::dispatchSymbol(SYM_DEREF),        MAKE_LIST(x, FALSE))
 
 #define SINGLE(ans, o) \
     if(ISEMPTY(o) || !Helper::isSingle(o)) \

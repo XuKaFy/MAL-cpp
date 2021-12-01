@@ -23,6 +23,7 @@ public:
     static String castVector(const Vector &n);
     static String castMap(const Map &n);
     static String castKeyword(const Keyword &n);
+    static String castAtom(ValuePointer ref);
 
 private:
     static String escape();
