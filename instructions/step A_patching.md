@@ -79,10 +79,17 @@
     * count
     * sequential?
     * concat
+    * conj
+    * seq
 
     计时器：
 
     * time
+
+    元数据：
+
+    * with-meta
+    * meta
 
 3. 全局变量：`Interface`
 

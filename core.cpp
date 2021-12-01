@@ -478,6 +478,20 @@ void Core::registerBasicFunction(EnvironmentPointer env)
             current->setSecond(FALSE);
         return VALUE(root);
     });
+
+    registerFunction(env, "with-meta", FUNCTION(o) {
+        DOUBLE(a1, a2, o);
+        ValuePointer ans = a1->copy();
+        ans->setMeta(a2);
+        return ans;
+    });
+
+    registerFunction(env, "meta", FUNCTION(o) {
+        SINGLE(a1, o);
+        if(a1->meta().empty())
+            throw Exception("Core::meta: No meta");
+        return a1->meta();
+    });
 }
 
 void Core::registerFunction(EnvironmentPointer env, String name, Function fun)

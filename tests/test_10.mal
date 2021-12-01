@@ -1,0 +1,8 @@
+(def! Example (fn* ()
+   (def! my-map (with-meta [1 2 3] {:prop "values"}))
+   (println (meta my-map)))
+)
+(Example)
+(println (meta (with-meta false {:prop "values"})))
+
+"test_10 end"

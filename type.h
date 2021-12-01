@@ -61,6 +61,7 @@ public:
 
 private:
     Type m_type;
+ATTRIBUTE(ValuePointer, Meta, meta);
 };
 
 class FloatType : public AbstractType
