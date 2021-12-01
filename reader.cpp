@@ -140,17 +140,15 @@ ValuePointer Analyzer::elem()
         return list();
     } else if(isdigit(lookahead())) {
         return number();
-    } else if(isSymbolHead(lookahead())) {
-        return symbol();
     } else if(lookahead() == '"') {
         return string();
-    } else if(lookahead() == '\'') {
+    } else if(lookahead() == SYM_SIM_QT[0]) {
         match(lookahead());
         return VALUE(QUOTE(elem()));
-    } if(lookahead() == SYM_SIM_QQ[0]) {
+    } else if(lookahead() == SYM_SIM_WM[0]) {
         match(lookahead());
-        return VALUE(QUASIQUOTE(elem()));
-    } if(lookahead() == SYM_SIM_SUQ[0]) {
+        return VALUE(WITH_META(elem()));
+    } else if(lookahead() == SYM_SIM_SUQ[0]) {
         match(lookahead());
         if(lookahead() == SYM_SIM_SUQ[1]) {
             match(lookahead());
@@ -160,6 +158,8 @@ ValuePointer Analyzer::elem()
     } else if(lookahead() == SYM_COMMENT[0]) {
         comment();
         return nullptr;
+    } else if(isSymbolHead(lookahead())) {
+        return symbol();
     } else if(lookahead() == '[') {
         return VALUE(vector());
     } else if(lookahead() == '{') {

@@ -43,6 +43,7 @@
 #define UNQUOTE(x)          MAKE_LIST(Memory::dispatchSymbol(SYM_UQ),           MAKE_LIST(x, FALSE))
 #define SPLICE_UNQUOTE(x)   MAKE_LIST(Memory::dispatchSymbol(SYM_SUQ),          MAKE_LIST(x, FALSE))
 #define QUASIQUOTE(x)       MAKE_LIST(Memory::dispatchSymbol(SYM_QQ),           MAKE_LIST(x, FALSE))
+#define WITH_META(x)        MAKE_LIST(Memory::dispatchSymbol(SYM_WITH_META),    x)
 
 #define SINGLE(ans, o) \
     if(ISEMPTY(o) || !Helper::isSingle(o)) \

@@ -2,8 +2,8 @@
 
 void Core::registerBasicFunction(EnvironmentPointer env)
 {
-#define REGISTER_INTEGER_FUN(sgn) \
-    registerFunction(env, #sgn, FUNCTION(o) { \
+#define REGISTER_INTEGER_FUN(sgn, name) \
+    registerFunction(env, name, FUNCTION(o) { \
         Integer num = GETINTEGER(GET(o)); \
         FOREACH(m, o, { num sgn##= GETINTEGER(m); }); \
         return VALUE(Memory::dispatchInteger(num)); \
@@ -56,10 +56,10 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     REGISTER_NUMBER_FUN(*)
     REGISTER_NUMBER_FUN(/)
 
-    REGISTER_INTEGER_FUN(^)
-    REGISTER_INTEGER_FUN(|)
-    REGISTER_INTEGER_FUN(&)
-    REGISTER_INTEGER_FUN(%)
+    REGISTER_INTEGER_FUN(^, "bit-xor")
+    REGISTER_INTEGER_FUN(|, "bit-or")
+    REGISTER_INTEGER_FUN(&, "bit-and")
+    REGISTER_INTEGER_FUN(%, "bit-mod")
 
     registerFunction(env, "car", FUNCTION(o) {
         SINGLE(it, o);

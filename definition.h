@@ -39,6 +39,7 @@ typedef     String          Exception;
 #define     SYM_QQ          "quasiquote"
 #define     SYM_SUQ         "splice-unquote"
 #define     SYM_UQ          "unquote"
+#define     SYM_WITH_META   "with-meta"
 #define     SYM_THROW       "throw"
 #define     SYM_TRY         "try*"
 #define     SYM_CATCH       "catch*"
@@ -48,6 +49,8 @@ typedef     String          Exception;
 #define     SYM_SIM_QQ      "`"
 #define     SYM_SIM_UQ      "~"
 #define     SYM_SIM_SUQ     "~@"
+#define     SYM_SIM_WM      "^"
 #define     SYM_COMMENT     ";"
+#define     SYM_SIM_QT      "'"
 
 #endif // DEFINITION_H

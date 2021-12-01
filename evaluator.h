@@ -8,7 +8,6 @@
 
 #include "debug.h"
 
-#include "printer.h"
 #ifdef EVAL_DEBUG
 #include "printer.h"
 #endif
