@@ -341,11 +341,6 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         return VOID;
     });
 
-    registerFunction(env, "time", FUNCTION(o) {
-        NONEARG(o)
-        return VALUE(Memory::dispatchFloat(Float(time(0))));
-    });
-
     registerFunction(env, "nth", FUNCTION(o) {
         DOUBLE(a1, a2, o)
         if(GETINTEGER(a2) < 0)

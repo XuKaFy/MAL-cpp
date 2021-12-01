@@ -1,6 +1,8 @@
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
 
+#include <chrono>
+
 #include "type.h"
 #include "helper.h"
 #include "memory.h"

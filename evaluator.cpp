@@ -95,6 +95,14 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
             SINGLE(it, l);
             it = eval(it, env, true, true);
             return macroExpand(it, env);
+        } else if(name == SYM_TIME_MS) {
+            NEXT(l);
+            SINGLE(it, l);
+            auto start = std::chrono::system_clock::now();
+            it = eval(it, env, true, true);
+            auto end = std::chrono::system_clock::now();
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            return VALUE(Memory::dispatchInteger(ms.count()));
         }
     }
     ValuePointer fun = eval(CAR(l), env, false);

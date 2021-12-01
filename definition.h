@@ -20,7 +20,7 @@ enum class Type {
 
 typedef     std::string     String;
 typedef     double          Float;
-typedef     int             Integer;
+typedef     long long       Integer;
 typedef     String          Symbol;
 typedef     String          Keyword;
 typedef     String          Exception;
@@ -44,6 +44,7 @@ typedef     String          Exception;
 #define     SYM_TRY         "try*"
 #define     SYM_CATCH       "catch*"
 #define     SYM_MACROEXP    "macroexpand"
+#define     SYM_TIME_MS    "time-ms"
 #define     SYM_EQ          "="
 #define     SYM_VARIADIC    "&"
 #define     SYM_SIM_QQ      "`"

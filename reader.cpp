@@ -145,6 +145,9 @@ ValuePointer Analyzer::elem()
     } else if(lookahead() == SYM_SIM_QT[0]) {
         match(lookahead());
         return VALUE(QUOTE(elem()));
+    } else if(lookahead() == SYM_SIM_QQ[0]) {
+        match(lookahead());
+        return VALUE(QUASIQUOTE(elem()));
     } else if(lookahead() == SYM_SIM_WM[0]) {
         match(lookahead());
         ValuePointer v = map();
