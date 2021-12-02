@@ -65,7 +65,7 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         SINGLE(it, o);
         ValuePointer res = CAR(GETLIST(it));
         if(!res)
-            throw Exception("FUNCTION car: Can't \"car\" an empty list");
+            throw Exception("Core::car: Can't \"car\" an empty list");
         return res;
     });
 
@@ -73,8 +73,40 @@ void Core::registerBasicFunction(EnvironmentPointer env)
         SINGLE(it, o);
         ValuePointer res = CDR(GETLIST(it));
         if(!res)
-            throw Exception("FUNCTION car: Can't \"car\" an empty list");
+            throw Exception("Core::car: Can't \"car\" an empty list");
         return res;
+    });
+
+    registerFunction(env, "first", FUNCTION(o) {
+        SINGLE(it, o);
+        if(it->type() == Type::TYPE_LIST) {
+            ValuePointer res = CAR(GETLIST(it));
+            if(!res)
+                throw Exception("Core::first: Can't \"first\" an empty list");
+            return res;
+        } else if(it->type() == Type::TYPE_VECTOR) {
+            const Vector &v = GETVECTOR(it);
+            if(v.empty())
+                throw Exception("Core::first: Can't \"first\" an empty vector");    
+            return *v.begin();
+        }
+        throw Exception("Core::first: Can't \"first\" this type"); 
+    });
+
+    registerFunction(env, "rest", FUNCTION(o) {
+        SINGLE(it, o);
+        if(it->type() == Type::TYPE_LIST) {
+            ValuePointer res = CDR(GETLIST(it));
+            if(!res)
+                throw Exception("Core::rest: Can't \"rest\" an empty list");
+            return res;
+        } else if(it->type() == Type::TYPE_VECTOR) {
+            const Vector &v = GETVECTOR(it);
+            if(v.empty())
+                throw Exception("Core::rest: Can't \"rest\" an empty vector");    
+            return VALUE(Memory::dispatchVector(Vector(v.begin() + 1, v.end())));
+        }
+        throw Exception("Core::rest: Can't \"rest\" this type"); 
     });
 
     registerFunction(env, "cons", FUNCTION(o) {
