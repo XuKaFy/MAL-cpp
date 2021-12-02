@@ -1,1 +1,7 @@
+(def! test (atom 0))
+(println (swap! test (fn* (x) (+ x 1))))
+(println (swap! test (fn* (x) (+ x 1))))
+(println (swap! test (fn* (x) (+ x 1))))
+(println (swap! test (fn* (x) (+ x 1))))
+
 "test_13 end"

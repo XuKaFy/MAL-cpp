@@ -406,7 +406,10 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     registerFunction(env, "str", FUNCTION(o) {
         String s;
         FOREACH(m, o, {
-            s += GETSTRING(m);
+            if(m->type() == Type::TYPE_STRING)
+                s += GETSTRING(m);
+            else
+                s += Printer::print(m, false);
         });
         return VALUE(Memory::dispatchString(s));
     });

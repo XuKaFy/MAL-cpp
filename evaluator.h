@@ -14,6 +14,10 @@
 #include "printer.h"
 #endif
 
+#ifdef EVALLAMBDA_DEBUG
+#include "printer.h"
+#endif
+
 class Evaluator
 {
 public:
@@ -48,6 +52,7 @@ private:
     ValuePointer funBegin      (ListPointer o,      EnvironmentPointer env,     bool tco);
 
     ValuePointer macroExpand   (ValuePointer   o,   EnvironmentPointer env);
+    ValuePointer funSwap       (ListPointer    o,   EnvironmentPointer env);
 };
 
 #endif // EVALUATOR_H

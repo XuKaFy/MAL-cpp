@@ -46,6 +46,7 @@ typedef     String          Exception;
 #define     SYM_CATCH       "catch*"
 #define     SYM_MACROEXP    "macroexpand"
 #define     SYM_DEREF       "deref"
+#define     SYM_SWAP        "swap!"
 #define     SYM_TIME_MS     "time-ms"
 #define     SYM_EQ          "="
 #define     SYM_VARIADIC    "&"

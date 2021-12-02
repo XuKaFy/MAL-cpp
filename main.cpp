@@ -73,6 +73,9 @@ public:
             environment->setValue("false", eval("(quote ())"));
             environment->setValue("not", eval("(fn* (x) (if x false true))"));
             environment->setValue("load-file", eval("(fn* (f) (eval (read-string (str \"(do \" (slurp f) \")\"))))"));
+            environment->setValue("*gensym-counter*", eval("(atom 0)"));
+            environment->setValue("gensym", eval("(fn* () (symbol (str \"G__\" (swap! *gensym-counter* (fn* (x) (+ 1 x))))))"));
+            eval("(defmacro! or (& xs) (if (empty? xs) '() (if (= 1 (count xs)) (first xs) (let* ((condvar (gensym))) `(let* ((~condvar ~(first xs))) (if ~condvar ~condvar (or ~@(rest xs))))))))");
         } catch (Exception e) {
             std::cout << e << std::endl;
         }

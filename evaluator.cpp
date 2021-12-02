@@ -95,6 +95,9 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
             SINGLE(it, l);
             it = eval(it, env, true, true);
             return macroExpand(it, env);
+        } else if(name == SYM_SWAP) {
+            NEXT(l);
+            return funSwap(listOfValues(l, env), env);
         } else if(name == SYM_TIME_MS) {
             NEXT(l);
             SINGLE(it, l);
@@ -250,9 +253,9 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
 {
 #ifdef EVALLAMBDA_DEBUG
     printf("EVAL LAMBDA\n");
-    printf("    BODY<%s>\n", Printer::castList(lam->body()).c_str());
-    printf("    ARGS<%s>\n", Printer::castList(lam->arg()).c_str());
-    printf("    GIVEN<%s>\n", Printer::castList(args).c_str());
+    printf("    BODY<%s>\n", Printer::castList(lam->body(), true).c_str());
+    printf("    ARGS<%s>\n", Printer::castList(lam->arg(), true).c_str());
+    printf("    GIVEN<%s>\n", Printer::castList(args, true).c_str());
 #endif
     if(!ISEMPTY(args) && !ISLIST(args))
         throw Exception("Evaluator::evalLambda: Args given wrong");
@@ -345,7 +348,7 @@ ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
     FOREACH(m, args, {
         DOUBLE_FROM_VALUE(b1, b2, m)
-        childEnv->setValue(GETSYMBOL(b1), b2);
+        childEnv->setValue(GETSYMBOL(b1), eval(b2, env, true, true));
     });
     return funBegin(o, childEnv, tco); // (let ((x 1) (y 2)) (+ x y))
 }
@@ -384,4 +387,13 @@ ValuePointer Evaluator::macroExpand(ValuePointer o, EnvironmentPointer env)
     });
     current->setSecond(macroExpand(remain, env));
     return VALUE(root);
+}
+
+ValuePointer Evaluator::funSwap(ListPointer l, EnvironmentPointer env)
+{
+    Pointer<AtomType>   atom = GETATOM(GET(l));
+    Pointer<LambdaType> lam  = GETLAMBDA(GET(l));
+    ListPointer         args = MAKE_LIST(atom->reference(), l);
+    atom->setReference(evalLambda(lam, args, env, false));
+    return VALUE(atom->reference());
 }
