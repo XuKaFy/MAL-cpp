@@ -65,12 +65,13 @@ public:
         environment->clear();
     }
 
-    void generateMainEnvironment() {
+    void generateMainEnvironment(int argc, char* argv[]) {
         try {
             Core::registerBasicFunction(environment);
             environment->setValue("*host-language*", eval("\"C++\""));
-            environment->setValue("true", eval("(quote t)"));
-            environment->setValue("false", eval("(quote ())"));
+            environment->setValue("true",   TRUE);
+            environment->setValue("false",  FALSE);
+            environment->setValue("nil",    VOID);
             environment->setValue("not", eval("(fn* (x) (if x false true))"));
             environment->setValue("load-file", eval("(fn* (f) (eval (read-string (str \"(do \" (slurp f) \")\"))))"));
             environment->setValue("*gensym-counter*", eval("(atom 0)"));
@@ -79,6 +80,14 @@ public:
         } catch (Exception e) {
             std::cout << e << std::endl;
         }
+        eval("(println (str \"MAL Interpreter [\" *host-language* \"]\"))");
+        if(argc > 1) {
+            eval(String("(load-file \"") + argv[1] + "\")");
+            Vector v;
+            for(int i=2; i<argc; ++i)
+                v.push_back(VALUE(Memory::dispatchString(argv[i])));
+            environment->setValue("*ARGV*",VALUE(Memory::dispatchVector(v)));
+        }
     }
 
 private:
@@ -86,9 +95,9 @@ private:
     EnvironmentPointer  environment;
 } interface;
 
-int main()
+int main(int argc, char* argv[])
 {
-    interface.generateMainEnvironment();
+    interface.generateMainEnvironment(argc, argv);
     interface.loop();
     return 0;
 }
