@@ -8,7 +8,7 @@ ValuePointer Evaluator::eval(ValuePointer o, EnvironmentPointer env)
 ValuePointer Evaluator::eval(ValuePointer o, EnvironmentPointer env, bool tco, bool root)
 {
 #ifdef EVAL_DEBUG
-    printf("EVAL<%s>\n", Printer::print(o).c_str());
+    printf("EVAL<%s>\n", Printer::print(o, true).c_str());
 #endif
 LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o)) {

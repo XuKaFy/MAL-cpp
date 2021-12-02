@@ -25,12 +25,13 @@ public:
     }
 
     ValuePointer eval(String exp) {
-        ValuePointer root = Reader::read(exp);
+        ValuePointer root = VALUE(Reader::read(exp));
+        //print(root);
         return evaluator.eval(root, environment);
     }
 
     void print(ValuePointer obj) {
-        std::cout << Printer::print(obj) << std::endl;
+        std::cout << Printer::print(obj, true) << std::endl;
     }
 
     bool rep() {
@@ -44,7 +45,7 @@ public:
         try {
             print(eval(str));
         } catch(ValuePointer k) {
-            std::cout << "rep: Caught error: " + Printer::print(k) << std::endl;
+            std::cout << "rep: Caught error: " + Printer::print(k, true) << std::endl;
             return false;
         }
         return true;
@@ -67,6 +68,7 @@ public:
     void generateMainEnvironment() {
         try {
             Core::registerBasicFunction(environment);
+            environment->setValue("*host-language*", eval("\"C++\""));
             environment->setValue("true", eval("(quote t)"));
             environment->setValue("false", eval("(quote ())"));
             environment->setValue("not", eval("(fn* (x) (if x false true))"));

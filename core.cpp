@@ -372,18 +372,12 @@ void Core::registerBasicFunction(EnvironmentPointer env)
     });
 
     registerFunction(env, "str", FUNCTION(o) {
-        std::stringstream ss;
+        String s;
         FOREACH(m, o, {
-            ss << Printer::print(m, false);
+            s += GETSTRING(m);
         });
-        return VALUE(Memory::dispatchString(ss.str()));
+        return VALUE(Memory::dispatchString(s));
     });
-
-    registerFunction(env, "join-string", FUNCTION(o) {
-        String ans;
-        FOREACH(m, o, { ans += GETSTRING(m); });
-        return VALUE(Memory::dispatchString(ans));
-    });//(load-file "tests/test_D.mal")
 
     registerFunction(env, "read-string", FUNCTION(o) {
         SINGLE(a1, o);

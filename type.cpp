@@ -186,6 +186,13 @@ Type MacroType::type() const
     return Type::TYPE_MACRO;
 }
 
+ValuePointer MacroType::copy() const
+{
+    return new MacroType(m_arg->copy().convert<ListType>(),
+                         m_body->copy().convert<ListType>(),
+                         m_environment);
+}
+
 MacroType::~MacroType()
 {
     ;

@@ -159,7 +159,7 @@ String Printer::castList(ListPointer n, bool readably)
             ans += print(o, readably);
         });
         if(!ISEMPTY(remain))
-            ans += " . " + print(remain);
+            ans += " . " + print(remain, readably);
     }
     ans += ")";
     return ans;
@@ -181,48 +181,14 @@ String Printer::castBuildinFunction(Pointer<BuildinType> n, bool readably)
     return "#<procedure:" + n->name() + ">";
 }
 
-String Printer::castLambda(Pointer<LambdaType> n, bool readably)
+String Printer::castLambda(Pointer<LambdaType> n, bool)
 {
-    if(readably) {
-        String ans = "(" SYM_LAMBDA " ";
-        ans += castList(n->arg(), readably);
-        String in = castList(n->body(), readably);
-        in.erase(in.begin());
-        in.pop_back();
-        ans += " (begin " + in;
-        ans += "))";
-        return ans;
-    }
-    String ans = "#<lambda:(";
-    ans += castList(n->arg(), readably);
-    String in = castList(n->body(), readably);
-    in.erase(in.begin());
-    in.pop_back();
-    ans += " (begin " + in;
-    ans += "))>";
-    return ans;
+    return "#<lambda>";
 }
 
-String Printer::castMacro(Pointer<MacroType>n, bool readably)
+String Printer::castMacro(Pointer<MacroType>n, bool)
 {
-    if(readably) {
-        String ans = "";
-        ans += castList(n->arg(), readably);
-        String in = castList(n->body(), readably);
-        in.erase(in.begin());
-        in.pop_back();
-        ans += " (begin " + in;
-        ans += ")";
-        return ans;
-    }
-    String ans = "#<macro:(";
-    ans += castList(n->arg(), readably);
-    String in = castList(n->body(), readably);
-    in.erase(in.begin());
-    in.pop_back();
-    ans += " (begin " + in;
-    ans += "))>";
-    return ans;
+    return "#<macro>";
 }
 
 String Printer::castVector(const Vector& n, bool readably)
@@ -257,12 +223,12 @@ String Printer::castMap(const Map& n, bool readably)
     return ans;
 }
 
-String Printer::castKeyword(const Keyword& key, bool readably)
+String Printer::castKeyword(const Keyword& key, bool)
 {
-    return ":" + castSymbol(key, readably);
+    return ":" + castSymbol(key, true);
 }
 
-String Printer::castAtom(ValuePointer ref, bool )
+String Printer::castAtom(ValuePointer ref, bool)
 {
     std::stringstream ss;
     ss << "#<atom: ";

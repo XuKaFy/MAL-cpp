@@ -251,6 +251,8 @@ ValuePointer Reader::read(String s)
     }
     if(ISEMPTY(root))
         return VOID;
+    if(Helper::isLast(root))
+        return CAR(root);
     if(CAR(current))
         current->setSecond(FALSE);
     return VALUE(BEGIN(root));

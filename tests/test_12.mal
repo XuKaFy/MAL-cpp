@@ -1,0 +1,15 @@
+(def! fun (fn* (x) (println "PRINTLN: " x) (prn "PRN: " x)))
+(defmacro! mac () (list 1 2 3))
+
+(fun 1)
+(fun 1.1)
+(fun 'a)
+(fun :a)
+(fun (vector 1 mac fun))
+(fun (list 1 mac fun))
+(fun fun)
+(fun (atom "x"))
+(fun "hello\nworld")
+(fun mac)
+
+"test_12 end"

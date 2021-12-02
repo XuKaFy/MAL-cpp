@@ -19,6 +19,7 @@ class       ListType;
 typedef     Pointer<AbstractType>                           ValuePointer;
 typedef     Pointer<ListType>                               ListPointer;
 typedef     std::vector<ValuePointer>                       Vector;
+typedef     Vector::iterator                                VectorIterator;
 typedef     std::unordered_map<Keyword, ValuePointer>       Map;
 typedef     Environment<ValuePointer>                       EnvironmentType;
 typedef     Pointer<EnvironmentType>                        EnvironmentPointer;
@@ -40,7 +41,7 @@ public: \
     type& name() { \
         return m_##name; \
     } \
-private: \
+protected: \
     type m_##name;
 
 #define ATTRIBUTE_READONLY(type, name) \
@@ -173,7 +174,7 @@ public:
     LambdaType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env);
     
     virtual Type            type() const;
-    virtual ValuePointer    copy() const final;
+    virtual ValuePointer    copy() const;
 
     virtual ~LambdaType();
 
@@ -188,6 +189,7 @@ public:
     MacroType(Pointer<ListType> arg, Pointer<ListType> body, EnvironmentPointer env);
 
     virtual Type            type() const final;
+    virtual ValuePointer    copy() const final;
 
     virtual ~MacroType();
 };
