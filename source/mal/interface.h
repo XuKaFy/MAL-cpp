@@ -1,5 +1,5 @@
-#include <iostream>
-#include <string>
+#ifndef INTERFACE_H
+#define INTERFACE_H
 
 #include "environment.h"
 #include "definition.h"
@@ -93,11 +93,6 @@ public:
 private:
     Evaluator           evaluator;
     EnvironmentPointer  environment;
-} interface;
+};
 
-int main(int argc, char* argv[])
-{
-    interface.generateMainEnvironment(argc, argv);
-    interface.loop();
-    return 0;
-}
+#endif // INTERFACE_H
