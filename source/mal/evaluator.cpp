@@ -1,11 +1,11 @@
 #include "evaluator.h"
 
-ValuePointer Evaluator::eval(ValuePointer o, EnvironmentPointer env)
+ValuePointer Evaluator::evaluate(ValuePointer o, EnvironmentPointer env)
 {
-    return eval(o, env, true, true);
+    return eval(o, env, true);
 }
 
-ValuePointer Evaluator::eval(ValuePointer o, EnvironmentPointer env, bool tco, bool root)
+ValuePointer Evaluator::eval(ValuePointer o, EnvironmentPointer env, bool root)
 {
 #ifdef EVAL_DEBUG
     printf("EVAL<%s>\n", Printer::print(o, true).c_str());
@@ -14,7 +14,7 @@ LABEL_AGAIN:
     if(Helper::isSelfEvaluating(o)) {
         return o;
     }
-    if(!root && tco) {
+    if(!root) {
         throw (StackFrame{o, env});
     }
     try {
@@ -24,7 +24,7 @@ LABEL_AGAIN:
             res = env->getValue(GETSYMBOL(o));
             break;
         case Type::TYPE_LIST:
-            res = apply(GETLIST(o), env, tco);
+            res = apply(GETLIST(o), env);
             break;
         default:
             throw Exception("Evaluator::eval: Can't execute");
@@ -38,7 +38,7 @@ LABEL_AGAIN:
     return VOID;
 }
 
-ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env)
 {
     if(ISEMPTY(l))
         throw Exception("Evaluator::apply: Can't execute");
@@ -49,13 +49,13 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
             return funQuote(l);
         } else if(name == SYM_COND) {
             NEXT(l);
-            return funCond(l, env, tco);
+            return funCond(l, env);
         } else if(name == SYM_IF) {
             NEXT(l);
-            return funIf(l, env, tco);
+            return funIf(l, env);
         } else if(name == SYM_LAMBDA) {
             NEXT(l);
-            return funLambda(l, env, tco);
+            return funLambda(l, env);
         } else if(name == SYM_DEFINE) {
             NEXT(l);
             return funDef(l, env);
@@ -67,18 +67,18 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
             return funDefMacro(l, env);
         } else if(name == SYM_LET) {
             NEXT(l);
-            return funLet(l, env, tco);
+            return funLet(l, env);
         } else if(name == SYM_BEGIN) {
             NEXT(l);
-            return funBegin(l, env, tco);
+            return funBegin(l, env, false);
         } else if(name == SYM_APPLY) {
             NEXT(l);
-            return apply(l, env, tco);
+            return apply(l, env);
         } else if(name == SYM_EVAL) {
             NEXT(l);
             SINGLE(it, l);
-            it = eval(it, env, true, true); // (eval (list + 1 2 3)) -> (eval '(+ 1 2 3))
-            return eval(it, env, tco);
+            it = eval(it, env, true); // (eval (list + 1 2 3)) -> (eval '(+ 1 2 3))
+            return eval(it, env);
         } else if(name == SYM_QQ) {
             NEXT(l);
             SINGLE(it, l);
@@ -86,14 +86,14 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
         } else if(name == SYM_THROW) {
             NEXT(l);
             SINGLE(it, l);
-            throw(eval(it, env, true, true));
+            throw(eval(it, env, true));
         } else if(name == SYM_TRY) {
             NEXT(l);
             return funTry(l, env);
         } else if(name == SYM_MACROEXP) {
             NEXT(l);
             SINGLE(it, l);
-            it = eval(it, env, true, true);
+            it = eval(it, env, true);
             return macroExpand(it, env);
         } else if(name == SYM_SWAP) {
             NEXT(l);
@@ -102,22 +102,22 @@ ValuePointer Evaluator::apply(ListPointer l, EnvironmentPointer env, bool tco)
             NEXT(l);
             SINGLE(it, l);
             auto start = std::chrono::system_clock::now();
-            it = eval(it, env, true, true);
+            it = eval(it, env, true);
             auto end = std::chrono::system_clock::now();
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
             return VALUE(Memory::dispatchInteger(ms.count()));
         }
     }
-    ValuePointer fun = eval(CAR(l), env, false);
+    ValuePointer fun = eval(CAR(l), env, true);
     NEXT(l);
     switch(fun->type()) {
     case Type::TYPE_BUILDIN:
         return GETBUILDIN(fun)->process(listOfValues(l, env));
         break;
     case Type::TYPE_LAMBDA:
-        return evalLambda(GETLAMBDA(fun), listOfValues(l, env), env, tco);
+        return evalLambda(GETLAMBDA(fun), listOfValues(l, env), env, false);
     case Type::TYPE_MACRO:
-        return eval(evalLambda(GETMACRO(fun).convert<LambdaType>(), l, env, false), env, tco);
+        return eval(evalLambda(GETMACRO(fun).convert<LambdaType>(), l, env, true), env);
     case Type::TYPE_KEYWORD:
         return evalKeyword(GETKEYWORD(fun), listOfValues(l, env), env);
     case Type::TYPE_HASHMAP:
@@ -135,7 +135,7 @@ ListPointer Evaluator::listOfValues(ListPointer l, EnvironmentPointer env)
     ListPointer root = Memory::dispatchList();
     ListPointer current = root;
     ValuePointer remain = FOREACH(o, l, {
-        current = Helper::append(current, eval(o, env, true, true));
+        current = Helper::append(current, eval(o, env, true));
     });
     current->setSecond(remain);
     return root;
@@ -151,7 +151,7 @@ ValuePointer Evaluator::funQuote(ListPointer o)
 ValuePointer Evaluator::funDef(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
-    ValuePointer a2 = funBegin(o, env, false);
+    ValuePointer a2 = funBegin(o, env, true);
     env->setValue(GETSYMBOL(a1), a2);
     return a2;
 }
@@ -159,7 +159,7 @@ ValuePointer Evaluator::funDef(ListPointer o, EnvironmentPointer env)
 ValuePointer Evaluator::funSet(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
-    ValuePointer a2 = funBegin(o, env, false);
+    ValuePointer a2 = funBegin(o, env, true);
     env->setExistValue(GETSYMBOL(a1), a2);
     return a2;
 }
@@ -182,20 +182,20 @@ ValuePointer Evaluator::funTry(ListPointer o, EnvironmentPointer env)
     if(GETSYMBOL(catchSymbol) != SYM_CATCH)
         throw Exception("Evaluator::funTry: Wrong format");
     try {
-        return eval(tryBody, env, true, true);
+        return eval(tryBody, env, true);
     } catch(ValuePointer k) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
         childEnv->setValue(GETSYMBOL(catchName), k);
-        return eval(catchBody, childEnv, true, true);
+        return eval(catchBody, childEnv, true);
     } catch(Exception e) {
         EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
         childEnv->setValue(GETSYMBOL(catchName), VALUE(Memory::dispatchString(e)));
-        return eval(catchBody, childEnv, true, true);
+        return eval(catchBody, childEnv, true);
     }
     return VOID;
 }
 
-ValuePointer Evaluator::funLambda(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funLambda(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     if(!Helper::isFlat(GETLIST(a1)))
@@ -216,11 +216,11 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
         if(name == SYM_UQ) {
             NEXT(l);
             SINGLE(it, l);
-            return eval(it, env, false, true);
+            return eval(it, env, true);
         } else if(name == SYM_SUQ) {
             NEXT(l);
             SINGLE(it, l);
-            ListPointer ans = GETLIST(eval(it, env, false, true));
+            ListPointer ans = GETLIST(eval(it, env, true));
             if(ISEMPTY(ans))
                 return FALSE;
             if(!ISLIST(ans))
@@ -249,7 +249,7 @@ ValuePointer Evaluator::funQuasiquote(ValuePointer o, EnvironmentPointer env)
     return VALUE(root);
 }
 
-ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, EnvironmentPointer env, bool root)
 {
 #ifdef EVALLAMBDA_DEBUG
     printf("EVAL LAMBDA\n");
@@ -269,7 +269,7 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
             SINGLE(it, lamPointer);
             name = GETSYMBOL(it);
             childEnv->setValue(name, VALUE(argsPointer));
-            return funBegin(lam->body(), childEnv, tco);
+            return funBegin(lam->body(), childEnv, root);
         }
         if(ISEMPTY(argsPointer))
             throw Exception("Evaluator::evalLambda: (1) Length of Args wrong");
@@ -280,7 +280,7 @@ ValuePointer Evaluator::evalLambda(Pointer<LambdaType> lam, ListPointer args, En
     }
     if(!ISEMPTY(argsPointer))
         throw Exception("Evaluator::evalLambda: (2) Length of Args wrong");
-    return funBegin(lam->body(), childEnv, tco); 
+    return funBegin(lam->body(), childEnv, root); 
 }
 
 ValuePointer Evaluator::evalKeyword(const Keyword &key, ListPointer l, EnvironmentPointer env)
@@ -296,14 +296,14 @@ ValuePointer Evaluator::evalHashmap(const Map &map, ListPointer l, EnvironmentPo
     return map.at(GETKEYWORD(it));
 }
 
-ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env)
 {
     if(ISEMPTY(o))
         return FALSE;
     if(!ISLIST(o))
         throw Exception("Evaluator::funCond: Not a list");
     while(!ISEMPTY(o)) {
-        ValuePointer res = funIf2(GETLIST(CAR(o)), env, tco);
+        ValuePointer res = funIf2(GETLIST(CAR(o)), env);
         if(res)
             return res;
         NEXT(o);
@@ -311,7 +311,7 @@ ValuePointer Evaluator::funCond(ListPointer o, EnvironmentPointer env, bool tco)
     return VOID;
 }
 
-ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = GET(o);
@@ -321,26 +321,26 @@ ValuePointer Evaluator::funIf(ListPointer o, EnvironmentPointer env, bool tco)
         if(!ISEMPTY(o))
             throw Exception("Evaluator::funIf: Length of args error");
     }
-    if(ISTRUE(eval(a1, env, false))) {
-        return eval(a2, env, tco);
+    if(ISTRUE(eval(a1, env, true))) {
+        return eval(a2, env, false);
     } else if(a3) {
-        return eval(a3, env, tco);
+        return eval(a3, env, false);
     }
     return VOID;
 }
 
-ValuePointer Evaluator::funIf2(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funIf2(ListPointer o, EnvironmentPointer env)
 {
     ValuePointer a1 = GET(o);
     ValuePointer a2 = GET(o);
     if(!ISEMPTY(o))
         throw Exception("Evaluator::funIf2: Length of args error");
-    if(ISTRUE(eval(a1, env, false)))
-        return eval(a2, env, tco);
+    if(ISTRUE(eval(a1, env, true)))
+        return eval(a2, env, false);
     return nullptr;
 }
 
-ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env)
 {
     ListPointer args = GETLIST(GET(o));
     if(!ISLIST(args))
@@ -348,20 +348,20 @@ ValuePointer Evaluator::funLet(ListPointer o, EnvironmentPointer env, bool tco)
     EnvironmentPointer childEnv = Memory::dispatchEnvironment(env);
     FOREACH(m, args, {
         DOUBLE_FROM_VALUE(b1, b2, m)
-        childEnv->setValue(GETSYMBOL(b1), eval(b2, env, true, true));
+        childEnv->setValue(GETSYMBOL(b1), eval(b2, env, true));
     });
-    return funBegin(o, childEnv, tco); // (let ((x 1) (y 2)) (+ x y))
+    return funBegin(o, childEnv, true); // (let ((x 1) (y 2)) (+ x y))
 }
 
-ValuePointer Evaluator::funBegin(ListPointer o, EnvironmentPointer env, bool tco)
+ValuePointer Evaluator::funBegin(ListPointer o, EnvironmentPointer env, bool root)
 {
     if(ISEMPTY(o) || !ISLIST(o))
         throw Exception("Evaluator::funBegin: Args given wrong");
     while(!Helper::isLast(o)) {
-        eval(CAR(o), env, true, true);
+        eval(CAR(o), env, true);
         NEXT(o);
     }
-    return eval(CAR(o), env, tco);
+    return eval(CAR(o), env, root);
 }
 
 ValuePointer Evaluator::macroExpand(ValuePointer o, EnvironmentPointer env)
@@ -376,7 +376,7 @@ ValuePointer Evaluator::macroExpand(ValuePointer o, EnvironmentPointer env)
         env->getValue(GETSYMBOL(v))->type() == Type::TYPE_MACRO) {
             Pointer<MacroType> fun = GETMACRO(env->getValue(GETSYMBOL(v)));
             NEXT(l);
-            return evalLambda(fun.convert<LambdaType>(), l, env, false);
+            return evalLambda(fun.convert<LambdaType>(), l, env, true);
         }
     } catch(Exception e) {
     }
@@ -394,6 +394,6 @@ ValuePointer Evaluator::funSwap(ListPointer l, EnvironmentPointer env)
     Pointer<AtomType>   atom = GETATOM(GET(l));
     Pointer<LambdaType> lam  = GETLAMBDA(GET(l));
     ListPointer         args = MAKE_LIST(atom->reference(), l);
-    atom->setReference(evalLambda(lam, args, env, false));
+    atom->setReference(evalLambda(lam, args, env, true));
     return VALUE(atom->reference());
 }

@@ -27,7 +27,7 @@ public:
     ValuePointer eval(String exp) {
         ValuePointer root = VALUE(Reader::read(exp));
         //print(root);
-        return evaluator.eval(root, environment);
+        return evaluator.evaluate(root, environment);
     }
 
     void print(ValuePointer obj) {
